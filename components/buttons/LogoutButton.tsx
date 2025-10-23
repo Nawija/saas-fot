@@ -9,15 +9,15 @@ export default function LogoutButton() {
     const handleLogout = async () => {
         await fetch("/api/auth/logout", { method: "POST" });
         router.push("/login");
-        router.refresh()
+        router.refresh();
     };
 
     return (
         <button
             onClick={handleLogout}
-            className=" flex items-center justify-center text-red-600 hover:text-red-700 text-sm gap-1 font-semibold"
+            className=" flex items-center justify-center text-red-600 text-sm gap-1 font-semibold"
         >
-          <LogOut size={16} />
+            <LogOut size={16} className="text-red-600" />
             <p>Wyloguj</p>
         </button>
     );

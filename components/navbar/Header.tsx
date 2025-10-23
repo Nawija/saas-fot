@@ -1,13 +1,10 @@
 import Link from "next/link";
 import { getUser } from "@/lib/auth/getUser";
-import LogoutButton from "../buttons/LogoutButton";
+import UserDropdown from "./UserDropdown";
 
 export default async function Header() {
     const user = await getUser();
-
-    const username = user?.name?.split(" ")[0] || user?.email?.split("@")[0];
-    const avatar = user?.avatar || "/avatar.jpg";
-
+    const username = user?.name || user?.email?.split("@")[0];
     return (
         <header className="bg-white p-4 shadow-sm">
             <nav className="flex items-center justify-between mx-auto max-w-7xl">
@@ -16,16 +13,13 @@ export default async function Header() {
                 </Link>
 
                 {user ? (
-                    <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-700">
-                            <b>{username}</b>
-                        </span>
-                        <img
-                            src={avatar}
-                            alt={username || "Avatar"}
-                            className="w-8 h-8 rounded-full border border-gray-200 object-cover"
+                    <div className="flex items-center justify-center text-sm text-gray-500 gap-3">
+                        <b>{username}</b>
+                        <UserDropdown
+                            name={user.name}
+                            email={user.email}
+                            avatar={user.avatar}
                         />
-                        <LogoutButton />
                     </div>
                 ) : (
                     <Link href="/login" className="underline">
