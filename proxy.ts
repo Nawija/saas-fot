@@ -3,8 +3,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
-export const runtime = "nodejs"; // proxy.ts runs on Node.js runtime
-
 const PUBLIC_PATHS = [
     "/login",
     "/register",
