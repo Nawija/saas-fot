@@ -42,7 +42,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="min-h-screen flex items-center justify-center ">
             <div className="w-full max-w-md bg-white shadow-md rounded-2xl p-8">
                 <h1 className="text-2xl font-semibold text-center mb-6">
                     Logowanie
@@ -53,6 +53,20 @@ export default function LoginPage() {
                         {error}
                     </p>
                 )}
+
+                <div className="my-6 flex flex-col items-center">
+                    <button
+                        onClick={handleGoogleLogin}
+                        className="w-full border py-2 rounded-lg flex justify-center items-center gap-2 hover:bg-gray-100 transition"
+                    >
+                        <img
+                            src="https://www.svgrepo.com/show/475656/google-color.svg"
+                            alt="Google"
+                            className="w-5 h-5"
+                        />
+                        <span>Zaloguj się przez Google</span>
+                    </button>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -89,20 +103,6 @@ export default function LoginPage() {
                         {loading ? "Logowanie..." : "Zaloguj się"}
                     </button>
                 </form>
-
-                <div className="mt-6 flex flex-col items-center">
-                    <button
-                        onClick={handleGoogleLogin}
-                        className="w-full border py-2 rounded-lg flex justify-center items-center gap-2 hover:bg-gray-100 transition"
-                    >
-                        <img
-                            src="https://www.svgrepo.com/show/475656/google-color.svg"
-                            alt="Google"
-                            className="w-5 h-5"
-                        />
-                        <span>Zaloguj się przez Google</span>
-                    </button>
-                </div>
 
                 <p className="mt-6 text-center text-sm">
                     Nie masz konta?{" "}
