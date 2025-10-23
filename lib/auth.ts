@@ -69,6 +69,12 @@ export async function createOrUpdateGoogleUser(
     name?: string,
     picture?: string
 ) {
+    console.log("createOrUpdateGoogleUser called with:", {
+        email,
+        googleId,
+        name,
+        picture,
+    });
     // 🔹 1. sprawdź czy istnieje po google_id
     const byGoogle = await findUserByGoogleId(googleId);
     if (byGoogle) {
@@ -81,6 +87,7 @@ export async function createOrUpdateGoogleUser(
              RETURNING *`,
             [name, picture, byGoogle.id]
         );
+          console.log("createOrUpdateGoogleUser result updated.rows[0]:", updated.rows[0]);
         return updated.rows[0];
     }
 
@@ -97,8 +104,10 @@ export async function createOrUpdateGoogleUser(
              RETURNING *`,
             [googleId, name, picture, byEmail.id]
         );
+        
         return updated.rows[0];
     }
+    
 
     // 🔹 3. jeśli nie istnieje — utwórz nowego
     const res = await query(
@@ -107,5 +116,7 @@ export async function createOrUpdateGoogleUser(
          RETURNING *`,
         [email, googleId, name, picture]
     );
+      console.log("createOrUpdateGoogleUser result res.rows[0]:",  res.rows[0]);
     return res.rows[0];
+    
 }

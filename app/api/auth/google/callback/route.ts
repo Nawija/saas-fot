@@ -48,6 +48,10 @@ export async function GET(req: NextRequest) {
 
         const googleUser = await userRes.json();
 
+        // (w Twoim callback — tuż po const googleUser = await userRes.json();)
+        console.log("Google user raw:", JSON.stringify(googleUser, null, 2));
+        console.log("Access token data:", JSON.stringify(tokenData, null, 2));
+
         if (!googleUser.email) {
             return NextResponse.json(
                 { error: "No email from Google" },
