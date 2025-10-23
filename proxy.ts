@@ -13,7 +13,6 @@ const PUBLIC_PATHS = [
 
 export default function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    console.log("🧩 proxy.ts fired for:", pathname);
 
     // Osobna obsługa strony głównej
     if (pathname === "/") {

@@ -11,9 +11,10 @@ export async function getUser() {
     try {
         const secret = process.env.JWT_SECRET!;
         const payload = jwt.verify(token, secret) as any;
-        const res = await query("SELECT id, email FROM users WHERE id = $1", [
-            payload.sub,
-        ]);
+        const res = await query(
+            "SELECT id, email, avatar, name FROM users WHERE id = $1",
+            [payload.sub]
+        );
         return res.rows[0] ?? null;
     } catch (e) {
         return null;
