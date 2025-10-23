@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
 import CountdownTimer from "@/components/CountdownTimer";
 
 export default function RegisterPage() {
@@ -12,8 +14,9 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [showCodeStep, setShowCodeStep] = useState(false);
+    const [success, setSuccess] = useState(false);
 
-    // 🔹 Pierwszy etap — wysłanie kodu
+    // 🔹 Etap 1 — wysłanie kodu
     async function handleSendCode(e: React.FormEvent) {
         e.preventDefault();
         setError("");
@@ -27,10 +30,8 @@ export default function RegisterPage() {
             });
 
             const data = await res.json();
-
             if (!res.ok) throw new Error(data.error || "Błąd wysyłki maila");
 
-            // ✅ Kod wysłany — przejdź do drugiego etapu
             setShowCodeStep(true);
         } catch (err: any) {
             setError(err.message);
@@ -39,7 +40,7 @@ export default function RegisterPage() {
         }
     }
 
-    // 🔹 Drugi etap — potwierdzenie kodu i rejestracja
+    // 🔹 Etap 2 — potwierdzenie kodu i rejestracja
     async function handleRegister(e: React.FormEvent) {
         e.preventDefault();
         setError("");
@@ -53,10 +54,13 @@ export default function RegisterPage() {
             });
 
             const data = await res.json();
-
             if (!res.ok) throw new Error(data.error || "Błąd rejestracji");
 
-            router.push("/login");
+            // ✅ Sukces — pokaż animację
+            setSuccess(true);
+
+            // Po 2 sekundach przekierowanie do logowania
+            setTimeout(() => router.push("/login"), 2000);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -65,8 +69,42 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center ">
-            <div className="w-full max-w-md bg-white shadow-md rounded-2xl p-8">
+        <div className="min-h-screen flex items-center justify-center">
+            <div className="w-full max-w-md bg-white shadow-md rounded-2xl p-8 relative overflow-hidden">
+                {/* ✨ Animacja sukcesu */}
+                <AnimatePresence>
+                    {success && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.5, ease: "easeOut" }}
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-white z-10"
+                        >
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 200,
+                                    damping: 10,
+                                }}
+                                className="text-green-500"
+                            >
+                                <CheckCircle2 size={80} strokeWidth={1.5} />
+                            </motion.div>
+                            <motion.p
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="mt-4 text-lg font-medium text-gray-700"
+                            >
+                                Zarejestrowano pomyślnie!
+                            </motion.p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 <h1 className="text-2xl font-semibold text-center mb-6">
                     Rejestracja
                 </h1>
@@ -77,8 +115,8 @@ export default function RegisterPage() {
                     </p>
                 )}
 
-                {/* 🔹 Etap 1 — email i hasło */}
                 {!showCodeStep ? (
+                    // 🔹 Etap 1 — email i hasło
                     <form onSubmit={handleSendCode} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium mb-1">
@@ -113,13 +151,14 @@ export default function RegisterPage() {
                         >
                             {loading ? "Wysyłanie..." : "Zarejestruj się"}
                         </button>
+
                         <p className="mt-6 text-center text-sm">
-                            Masz juz konto?{" "}
+                            Masz już konto?{" "}
                             <a
                                 href="/login"
                                 className="text-blue-600 hover:underline"
                             >
-                                Zaloguj sie
+                                Zaloguj się
                             </a>
                         </p>
                     </form>
@@ -134,9 +173,7 @@ export default function RegisterPage() {
                             Kod wygaśnie za:{" "}
                             <CountdownTimer
                                 minutes={5}
-                                onExpire={() => {
-                                    setError("Kod wygasł");
-                                }}
+                                onExpire={() => setError("Kod wygasł")}
                             />
                         </div>
 
@@ -146,7 +183,7 @@ export default function RegisterPage() {
                             </label>
                             <input
                                 type="text"
-                                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center tracking-widest font-mono"
+                                className="w-full border rounded-lg px-3 py-2 text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 value={code}
                                 onChange={(e) => setCode(e.target.value)}
                                 required
