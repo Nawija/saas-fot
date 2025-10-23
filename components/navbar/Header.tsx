@@ -5,7 +5,7 @@ import LogoutButton from "../buttons/LogoutButton";
 export default async function Header() {
     const user = await getUser();
 
-    const username = user?.name.split(" ")[0] || user?.email?.split("@")[0];
+    const username = user?.name?.split(" ")[0] || user?.email?.split("@")[0];
     const avatar = user?.avatar || "/avatar.jpg";
 
     return (
@@ -17,14 +17,14 @@ export default async function Header() {
 
                 {user ? (
                     <div className="flex items-center gap-3">
+                        <span className="text-sm text-gray-700">
+                            <b>{username}</b>
+                        </span>
                         <img
                             src={avatar}
                             alt={username || "Avatar"}
                             className="w-8 h-8 rounded-full border border-gray-200 object-cover"
                         />
-                        <span className="text-sm text-gray-700">
-                            <b>{username}</b>
-                        </span>
                         <LogoutButton />
                     </div>
                 ) : (
