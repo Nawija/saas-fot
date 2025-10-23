@@ -5,7 +5,7 @@ import LogoutButton from "../buttons/LogoutButton";
 export default async function Header() {
     const user = await getUser();
 
-    const username = user?.name || user?.email?.split("@")[0];
+    const username = user?.name.split(" ")[0] || user?.email?.split("@")[0];
     const avatar = user?.avatar || "/avatar.jpg";
 
     return (
