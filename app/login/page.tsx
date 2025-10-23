@@ -28,6 +28,7 @@ export default function LoginPage() {
                 setError(data.error || "Błąd logowania");
             } else {
                 router.push("/dashboard");
+                router.refresh();
             }
         } catch (err) {
             setError("Błąd sieci lub serwera");

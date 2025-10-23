@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import {
     genSalt,
     hashPassword,
-    createJwt,
     createUserWithEmail,
     findUserByEmail,
 } from "@/lib/auth";
@@ -28,19 +27,19 @@ export async function POST(req: NextRequest) {
 
     const user = await createUserWithEmail(email, hash, salt);
 
-    const token = createJwt({ sub: user.id, email: user.email });
+    // const token = createJwt({ sub: user.id, email: user.email });
 
     const res = NextResponse.json({
         ok: true,
         user: { id: user.id, email: user.email },
     });
-    // Set cookie
-    const maxAge = 60 * 60 * 24 * 7;
-    res.headers.set(
-        "Set-Cookie",
-        `token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Lax; Secure=${
-            process.env.NODE_ENV === "production"
-        }`
-    );
+    // // Set cookie
+    // const maxAge = 60 * 60 * 24 * 7;
+    // res.headers.set(
+    //     "Set-Cookie",
+    //     `token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Lax; Secure=${
+    //         process.env.NODE_ENV === "production"
+    //     }`
+    // );
     return res;
 }

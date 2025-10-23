@@ -27,7 +27,7 @@ export default function RegisterPage() {
             if (!res.ok) {
                 setError(data.error || "Błąd rejestracji");
             } else {
-                router.push("/dashboard");
+                router.push("/login");
             }
         } catch (err) {
             setError("Błąd sieci lub serwera");
@@ -105,10 +105,7 @@ export default function RegisterPage() {
 
                 <p className="mt-6 text-center text-sm">
                     Masz już konto?{" "}
-                    <a
-                        href="/login"
-                        className="text-blue-600 hover:underline"
-                    >
+                    <a href="/login" className="text-blue-600 hover:underline">
                         Zaloguj się
                     </a>
                 </p>
