@@ -1,9 +1,9 @@
 // /app/dashboard/page.tsx
-import React from "react";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { query } from "@/lib/db";
 import Link from "next/link";
+import LogoutButton from "@/components/buttons/LogoutButton";
 
 async function getUserFromToken(token: string | undefined) {
     if (!token) return null;
@@ -18,6 +18,7 @@ async function getUserFromToken(token: string | undefined) {
         return null;
     }
 }
+
 
 export default async function DashboardPage() {
     const cookieStore = await cookies();
@@ -47,11 +48,7 @@ export default async function DashboardPage() {
         <main className="p-8">
             <h1 className="text-2xl font-bold">Panel użytkownika</h1>
             <p className="mt-4">Witaj, {user.email}</p>
-            <form action="/api/auth/logout" method="POST" className="mt-6">
-                <button className="px-4 py-2 rounded bg-gray-800 text-white">
-                    Wyloguj
-                </button>
-            </form>
+            <LogoutButton />
         </main>
     );
 }
