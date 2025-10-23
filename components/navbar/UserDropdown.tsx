@@ -9,7 +9,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut } from "lucide-react";
+import { EllipsisVertical, LogOut } from "lucide-react";
 import LogoutButton from "../buttons/LogoutButton";
 
 interface UserDropdownProps {
@@ -30,8 +30,8 @@ export default function UserDropdown({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200">
-                    <Avatar className="w-8 h-8">
+                <button className="rounded-full relative focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200">
+                    <Avatar className="w-8 h-8 ">
                         <AvatarImage src={avatarUrl} alt={displayName} />
                         <AvatarFallback>{fallback}</AvatarFallback>
                     </Avatar>
@@ -52,10 +52,21 @@ export default function UserDropdown({
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem asChild>
-                    <div className="flex items-center justify-between cursor-pointer">
-                        <LogoutButton />
-                    </div>
+                <DropdownMenuItem>
+                    <p>Zmień Plan</p>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <p>Zmiana Hasła</p>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <p>Zmiana Avatara</p>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <p>Ustawienia</p>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                    <LogoutButton />
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
