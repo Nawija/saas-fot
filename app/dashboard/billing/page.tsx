@@ -55,10 +55,11 @@ export default function BillingPage() {
     const currentPlan = PLANS[user.subscription_plan || "free"];
 
     // Oblicz procent wykorzystania storage bezpośrednio (z dokładnością do 2 miejsc po przecinku)
+    const storageUsed = user.storage_used || 0;
+    const storageLimit = user.storage_limit || 2147483648; // 2GB domyślnie
+
     const storagePercent =
-        user.storage_limit > 0
-            ? (user.storage_used / user.storage_limit) * 100
-            : 0;
+        storageLimit > 0 ? (storageUsed / storageLimit) * 100 : 0;
 
     // Dla wyświetlania progress bara użyj co najmniej 0.5% żeby było widać
     const visualPercent = Math.max(
@@ -158,8 +159,8 @@ export default function BillingPage() {
                                     </p>
                                 </div>
                                 <p className="text-sm font-mono text-gray-700 bg-gray-50 px-3 py-1 rounded-lg">
-                                    {formatBytes(user.storage_used)} /{" "}
-                                    {formatBytes(user.storage_limit)}
+                                    {formatBytes(storageUsed)} /{" "}
+                                    {formatBytes(storageLimit)}
                                 </p>
                             </div>
 

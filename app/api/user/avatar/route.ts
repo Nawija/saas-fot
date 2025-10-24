@@ -42,9 +42,13 @@ export async function POST(req: NextRequest) {
             await processAvatarImage(buffer);
 
         // Usuń stary avatar jeśli istnieje
+        let oldAvatarSize = 0;
         if (user.avatar) {
             const oldKey = extractKeyFromUrl(user.avatar);
             if (oldKey) {
+                // Pobierz rozmiar starego avatara z bazy (opcjonalnie)
+                // Dla uproszczenia przyjmijmy że avatar zawsze ma ~50KB
+                oldAvatarSize = 50000;
                 await deleteFromR2(oldKey);
             }
         }
@@ -60,6 +64,13 @@ export async function POST(req: NextRequest) {
             avatarUrl,
             user.id,
         ]);
+
+        // Zaktualizuj storage_used (nowy rozmiar - stary rozmiar)
+        const sizeDiff = processedBuffer.length - oldAvatarSize;
+        await query(
+            "UPDATE users SET storage_used = storage_used + $1 WHERE id = $2",
+            [sizeDiff, user.id]
+        );
 
         return NextResponse.json({
             ok: true,

@@ -122,7 +122,8 @@ export function canUploadFile(
  * Formatuje bajty na czytelny format
  */
 export function formatBytes(bytes: number, decimals: number = 2): string {
-    if (bytes === 0) return "0 B";
+    // Zabezpieczenie przed NaN, undefined, null
+    if (!bytes || isNaN(bytes) || bytes === 0) return "0 B";
     if (bytes === Infinity) return "Nielimitowane";
 
     const k = 1024;

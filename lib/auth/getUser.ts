@@ -15,13 +15,23 @@ export async function getUser() {
             `SELECT 
                 id, email, avatar, name, provider,
                 subscription_plan, subscription_status, 
-                storage_used, storage_limit, 
+                CAST(storage_used AS BIGINT) as storage_used,
+                CAST(storage_limit AS BIGINT) as storage_limit,
                 lemon_squeezy_customer_id
             FROM users 
             WHERE id = $1`,
             [payload.sub]
         );
-        return res.rows[0] ?? null;
+
+        const user = res.rows[0];
+        if (!user) return null;
+
+        // Konwertuj BIGINT na number (PostgreSQL zwraca jako string)
+        return {
+            ...user,
+            storage_used: parseInt(user.storage_used) || 0,
+            storage_limit: parseInt(user.storage_limit) || 2147483648,
+        };
     } catch (e) {
         return null;
     }

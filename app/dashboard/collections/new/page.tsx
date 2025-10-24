@@ -94,6 +94,15 @@ export default function NewCollectionPage() {
                             hero_image: uploadData.url,
                         }),
                     });
+
+                    // KROK 4: Zaktualizuj storage_used
+                    await fetch("/api/user/update-storage", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            size: uploadData.size,
+                        }),
+                    });
                 }
             }
 
