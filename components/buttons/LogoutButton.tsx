@@ -15,7 +15,7 @@ export default function LogoutButton() {
     return (
         <button
             onClick={handleLogout}
-            className=" flex items-center justify-center text-red-600 text-sm gap-1 font-semibold"
+            className=" flex items-center justify-start text-red-600 text-sm w-full h-full gap-1 font-semibold"
         >
             <LogOut size={16} className="text-red-600" />
             <p>Wyloguj</p>
