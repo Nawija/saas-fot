@@ -7,18 +7,22 @@ export default function LogoutButton() {
     const router = useRouter();
 
     const handleLogout = async () => {
-        await fetch("/api/auth/logout", { method: "POST" });
-        router.push("/login");
-        router.refresh();
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+            router.push("/login");
+            router.refresh();
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
     };
 
     return (
         <button
             onClick={handleLogout}
-            className=" flex items-center justify-start text-red-600 text-sm w-full h-full gap-1 font-semibold"
+            className="flex items-center justify-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium text-sm"
         >
-            <LogOut size={16} className="text-red-600" />
-            <p>Wyloguj</p>
+            <LogOut size={18} />
+            <span>Wyloguj</span>
         </button>
     );
 }

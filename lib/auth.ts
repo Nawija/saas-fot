@@ -1,58 +1,119 @@
-// /lib/auth.ts
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { query } from "./db";
 
+// Stałe konfiguracyjne
 const SCRYPT_KEYLEN = 64;
+const DEFAULT_SALT_LENGTH = 16;
 
-/* ---------- Password utils ---------- */
+/* ---------- Password Utilities ---------- */
 
-export function genSalt(len = 16) {
+/**
+ * Generuje losowy salt do hashowania hasła
+ * @param len - długość salt (domyślnie 16 bajtów)
+ * @returns string - salt w formacie hex
+ */
+export function genSalt(len: number = DEFAULT_SALT_LENGTH): string {
     return crypto.randomBytes(len).toString("hex");
 }
 
-export function hashPassword(password: string, salt: string) {
+/**
+ * Hashuje hasło używając scrypt
+ * @param password - hasło do zahashowania
+ * @param salt - salt używany do hashowania
+ * @returns string - zhashowane hasło w formacie hex
+ */
+export function hashPassword(password: string, salt: string): string {
     const derived = crypto.scryptSync(password, salt, SCRYPT_KEYLEN);
     return derived.toString("hex");
 }
 
-/* ---------- JWT utils ---------- */
+/* ---------- JWT Utilities ---------- */
 
-export function createJwt(payload: object) {
-    const secret = process.env.JWT_SECRET as string;
+/**
+ * Tworzy JWT token
+ * @param payload - dane do zakodowania w tokenie
+ * @returns string - JWT token
+ */
+export function createJwt(payload: object): string {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error("JWT_SECRET is not defined");
+    }
+
     const expiresIn = (process.env.JWT_EXPIRES_IN ||
         "7d") as jwt.SignOptions["expiresIn"];
-    return jwt.sign(payload, secret, { expiresIn } as jwt.SignOptions);
+    return jwt.sign(payload, secret, { expiresIn });
 }
 
-export function verifyJwt(token: string) {
+/**
+ * Weryfikuje i dekoduje JWT token
+ * @param token - token do zweryfikowania
+ * @returns object | null - zdekodowany payload lub null jeśli nieprawidłowy
+ */
+export function verifyJwt(token: string): any | null {
     try {
-        const secret = process.env.JWT_SECRET!;
-        return jwt.verify(token, secret) as any;
-    } catch {
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            throw new Error("JWT_SECRET is not defined");
+        }
+        return jwt.verify(token, secret);
+    } catch (error) {
+        console.error("JWT verification failed:", error);
         return null;
     }
 }
 
-/* ---------- DB helpers ---------- */
+/* ---------- Database Helpers ---------- */
 
-export async function findUserByEmail(email: string) {
-    const res = await query("SELECT * FROM users WHERE email = $1", [email]);
-    return res.rows[0] ?? null;
+/**
+ * Znajduje użytkownika po adresie email
+ * @param email - adres email użytkownika
+ * @returns Promise<User | null>
+ */
+export async function findUserByEmail(email: string): Promise<any | null> {
+    try {
+        const res = await query("SELECT * FROM users WHERE email = $1", [
+            email,
+        ]);
+        return res.rows[0] ?? null;
+    } catch (error) {
+        console.error("Error finding user by email:", error);
+        return null;
+    }
 }
 
-export async function findUserByGoogleId(googleId: string) {
-    const res = await query("SELECT * FROM users WHERE google_id = $1", [
-        googleId,
-    ]);
-    return res.rows[0] ?? null;
+/**
+ * Znajduje użytkownika po Google ID
+ * @param googleId - ID użytkownika z Google
+ * @returns Promise<User | null>
+ */
+export async function findUserByGoogleId(
+    googleId: string
+): Promise<any | null> {
+    try {
+        const res = await query("SELECT * FROM users WHERE google_id = $1", [
+            googleId,
+        ]);
+        return res.rows[0] ?? null;
+    } catch (error) {
+        console.error("Error finding user by Google ID:", error);
+        return null;
+    }
 }
 
+/**
+ * Tworzy nowego użytkownika z emailem i hasłem
+ * @param email - adres email
+ * @param passwordHash - zhashowane hasło
+ * @param salt - salt użyty do hashowania
+ * @returns Promise<User>
+ */
 export async function createUserWithEmail(
     email: string,
     passwordHash: string,
     salt: string
-) {
+): Promise<any> {
     const res = await query(
         `INSERT INTO users (email, password_hash, salt, provider) 
          VALUES ($1, $2, $3, 'email') RETURNING *`,
@@ -63,60 +124,61 @@ export async function createUserWithEmail(
 
 /* ---------- Google OAuth ---------- */
 
+/**
+ * Tworzy lub aktualizuje użytkownika Google
+ * @param email - adres email z Google
+ * @param googleId - ID użytkownika z Google
+ * @param name - imię użytkownika (opcjonalne)
+ * @param picture - URL avatara (opcjonalne)
+ * @returns Promise<User>
+ */
 export async function createOrUpdateGoogleUser(
     email: string,
     googleId: string,
     name?: string,
     picture?: string
-) {
-    console.log("createOrUpdateGoogleUser called with:", {
-        email,
-        googleId,
-        name,
-        picture,
-    });
-    // 🔹 1. sprawdź czy istnieje po google_id
-    const byGoogle = await findUserByGoogleId(googleId);
-    if (byGoogle) {
-        // aktualizuj name/avatar jeśli się zmieniły
-        const updated = await query(
-            `UPDATE users 
-             SET name = COALESCE($1, name),
-                 avatar = COALESCE($2, avatar)
-             WHERE id = $3
-             RETURNING *`,
-            [name, picture, byGoogle.id]
-        );
-          console.log("createOrUpdateGoogleUser result updated.rows[0]:", updated.rows[0]);
-        return updated.rows[0];
-    }
+): Promise<any> {
+    try {
+        // 1. Sprawdź czy użytkownik istnieje po Google ID
+        const byGoogle = await findUserByGoogleId(googleId);
+        if (byGoogle) {
+            const updated = await query(
+                `UPDATE users 
+                 SET name = COALESCE($1, name),
+                     avatar = COALESCE($2, avatar)
+                 WHERE id = $3
+                 RETURNING *`,
+                [name, picture, byGoogle.id]
+            );
+            return updated.rows[0];
+        }
 
-    // 🔹 2. sprawdź czy istnieje po emailu
-    const byEmail = await findUserByEmail(email);
-    if (byEmail) {
-        const updated = await query(
-            `UPDATE users 
-             SET provider='google',
-                 google_id=$1,
-                 name = COALESCE($2, name),
-                 avatar = COALESCE($3, avatar)
-             WHERE id=$4
-             RETURNING *`,
-            [googleId, name, picture, byEmail.id]
-        );
-        
-        return updated.rows[0];
-    }
-    
+        // 2. Sprawdź czy użytkownik istnieje po emailu
+        const byEmail = await findUserByEmail(email);
+        if (byEmail) {
+            const updated = await query(
+                `UPDATE users 
+                 SET provider = 'google',
+                     google_id = $1,
+                     name = COALESCE($2, name),
+                     avatar = COALESCE($3, avatar)
+                 WHERE id = $4
+                 RETURNING *`,
+                [googleId, name, picture, byEmail.id]
+            );
+            return updated.rows[0];
+        }
 
-    // 🔹 3. jeśli nie istnieje — utwórz nowego
-    const res = await query(
-        `INSERT INTO users (email, provider, google_id, name, avatar) 
-         VALUES ($1, 'google', $2, $3, $4)
-         RETURNING *`,
-        [email, googleId, name, picture]
-    );
-      console.log("createOrUpdateGoogleUser result res.rows[0]:",  res.rows[0]);
-    return res.rows[0];
-    
+        // 3. Utwórz nowego użytkownika
+        const res = await query(
+            `INSERT INTO users (email, provider, google_id, name, avatar) 
+             VALUES ($1, 'google', $2, $3, $4)
+             RETURNING *`,
+            [email, googleId, name, picture]
+        );
+        return res.rows[0];
+    } catch (error) {
+        console.error("Error in createOrUpdateGoogleUser:", error);
+        throw error;
+    }
 }
