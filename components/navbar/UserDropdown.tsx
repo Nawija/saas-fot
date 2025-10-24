@@ -16,12 +16,14 @@ interface UserDropdownProps {
     name?: string | null;
     email?: string | null;
     avatar?: string | null;
+    provider?: string | null;
 }
 
 export default function UserDropdown({
     name,
     email,
     avatar,
+    provider,
 }: UserDropdownProps) {
     const displayName = name || email?.split("@")[0] || "Użytkownik";
     const avatarUrl = avatar && avatar.trim() !== "" ? avatar : "/avatar.jpg";
@@ -55,9 +57,14 @@ export default function UserDropdown({
                 <DropdownMenuItem>
                     <p>Zmień Plan</p>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <ChangePassword />
-                </DropdownMenuItem>
+
+                {/* Opcja zmiany hasła tylko dla użytkowników z emailem */}
+                {provider === "email" && (
+                    <DropdownMenuItem>
+                        <ChangePassword />
+                    </DropdownMenuItem>
+                )}
+
                 <DropdownMenuItem>
                     <p>Zmiana Avatara</p>
                 </DropdownMenuItem>

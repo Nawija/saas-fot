@@ -5,6 +5,7 @@ interface User {
     email: string;
     name?: string;
     avatar?: string;
+    provider?: string;
 }
 
 interface DashboardHeaderProps {
