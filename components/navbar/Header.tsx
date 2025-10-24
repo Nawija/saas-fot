@@ -4,7 +4,7 @@ import UserDropdown from "./UserDropdown";
 
 export default async function Header() {
     const user = await getUser();
-    const username = user?.name || user?.email?.split("@")[0];
+    const username = user?.name?.split(" ")[0] || user?.email?.split("@")[0];
     return (
         <header className="bg-white p-4 shadow-sm">
             <nav className="flex items-center justify-between mx-auto max-w-7xl">

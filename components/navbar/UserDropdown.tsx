@@ -31,15 +31,15 @@ export default function UserDropdown({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button className="rounded-full relative focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200">
-                    <Avatar className="w-8 h-8 ">
+                <button className="rounded-full relative focus:outline-none border border-gray-300 focus:ring-2 focus:ring-offset-2 focus:ring-gray-200">
+                    <Avatar className="w-8 h-8">
                         <AvatarImage src={avatarUrl} alt={displayName} />
                         <AvatarFallback>{fallback}</AvatarFallback>
                     </Avatar>
                 </button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-56 p-2">
+            <DropdownMenuContent align="end" className="w-64 p-2">
                 <DropdownMenuLabel className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
                         <AvatarImage src={avatarUrl} alt={displayName} />
