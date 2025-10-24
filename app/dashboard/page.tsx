@@ -1,6 +1,5 @@
 import { getUser } from "@/lib/auth/getUser";
 import UnauthenticatedView from "@/components/dashboard/UnauthenticatedView";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import Link from "next/link";
 
 export default async function DashboardPage() {
@@ -12,7 +11,6 @@ export default async function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <DashboardHeader user={user} />
 
             <main className="max-w-7xl mx-auto py-8">
                 <div className="bg-white rounded-lg shadow p-6">

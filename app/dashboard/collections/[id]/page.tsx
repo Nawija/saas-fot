@@ -34,19 +34,23 @@ interface Photo {
 
 // Helper do formatowania rozmiaru plików
 function formatFileSize(bytes: number): string {
+    // Konwertuj na liczbę jeśli jest stringiem
+    const numBytes = typeof bytes === "string" ? parseInt(bytes) : bytes;
+
     // Debug - usuń po naprawieniu
-    if (bytes > 1e10) {
-        console.error("Suspicious file size:", bytes);
-        return "Błąd rozmiaru";
+    if (numBytes > 1e10) {
+        console.error("Suspicious file size:", numBytes, "original:", bytes);
+        // Jeśli to błąd, zwróć 0
+        return "0 B (błąd)";
     }
 
-    if (bytes === 0) return "0 B";
-    if (isNaN(bytes) || !isFinite(bytes)) return "0 B";
+    if (numBytes === 0 || !numBytes) return "0 B";
+    if (isNaN(numBytes) || !isFinite(numBytes)) return "0 B";
 
     const units = ["B", "KB", "MB", "GB"];
     const k = 1024;
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    const size = bytes / Math.pow(k, i);
+    const i = Math.floor(Math.log(numBytes) / Math.log(k));
+    const size = numBytes / Math.pow(k, i);
 
     return `${size.toFixed(1)} ${units[i]}`;
 }
@@ -402,7 +406,7 @@ export default function CollectionDetailPage({
                                         alt={photo.file_name}
                                         className="w-full h-full object-cover"
                                     />
-                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                    <div className="absolute inset-0 bg-black/40 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
                                         <button
                                             onClick={() =>
                                                 deletePhoto(photo.id)

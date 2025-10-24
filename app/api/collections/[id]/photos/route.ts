@@ -32,7 +32,9 @@ export async function GET(
 
         // Pobierz zdjęcia
         const result = await query(
-            `SELECT id, file_name, file_path, file_size, created_at 
+            `SELECT id, file_name, file_path, 
+             CAST(file_size AS INTEGER) as file_size, 
+             created_at 
        FROM photos 
        WHERE collection_id = $1 
        ORDER BY created_at DESC`,
@@ -65,6 +67,16 @@ export async function POST(
 
         const { file_name, file_path, file_size } = await request.json();
 
+        // Upewnij się że file_size jest liczbą
+        const fileSizeNum = parseInt(file_size);
+
+        if (isNaN(fileSizeNum) || fileSizeNum < 0) {
+            return NextResponse.json(
+                { error: "Invalid file size" },
+                { status: 400 }
+            );
+        }
+
         // Sprawdź czy kolekcja należy do użytkownika
         const collectionCheck = await query(
             "SELECT id FROM collections WHERE id = $1 AND user_id = $2",
@@ -83,13 +95,13 @@ export async function POST(
             `INSERT INTO photos (collection_id, user_id, file_name, file_path, file_size) 
        VALUES ($1, $2, $3, $4, $5) 
        RETURNING *`,
-            [id, user.id, file_name, file_path, file_size]
+            [id, user.id, file_name, file_path, fileSizeNum]
         );
 
         // Zaktualizuj storage_used
         await query(
             "UPDATE users SET storage_used = storage_used + $1 WHERE id = $2",
-            [file_size, user.id]
+            [fileSizeNum, user.id]
         );
 
         return NextResponse.json(result.rows[0]);
