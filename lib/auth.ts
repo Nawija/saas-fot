@@ -152,7 +152,7 @@ export async function createOrUpdateGoogleUser(
         if (byGoogle) {
             // Nie nadpisuj avatara jeśli użytkownik ma własny z R2
             const shouldUpdateAvatar = !isCustomAvatar(byGoogle.avatar);
-            
+
             const updated = await query(
                 `UPDATE users 
                  SET name = COALESCE($1, name),
@@ -172,7 +172,7 @@ export async function createOrUpdateGoogleUser(
         if (byEmail) {
             // Nie nadpisuj avatara jeśli użytkownik ma własny z R2
             const shouldUpdateAvatar = !isCustomAvatar(byEmail.avatar);
-            
+
             const updated = await query(
                 `UPDATE users 
                  SET provider = 'google',
