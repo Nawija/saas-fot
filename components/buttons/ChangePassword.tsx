@@ -13,7 +13,7 @@ export default function ChangePassword() {
     return (
         <button
             onClick={handleChangePass}
-            className=" flex items-center justify-center text-red-600 text-sm gap-1 font-semibold"
+            className=" flex items-center justify-start text-blue-700 text-sm w-full h-full gap-1"
         >
             <p>Zmien Haslo</p>
         </button>

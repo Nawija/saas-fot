@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import CountdownTimer from "@/components/CountdownTimer";
+import { useRouter } from "next/navigation";
 
 export default function ChangePasswordPage() {
+    const router = useRouter();
     const [email, setEmail] = useState<string | null>(null);
     const [confirmed, setConfirmed] = useState(false);
     const [showCodeStep, setShowCodeStep] = useState(false);
@@ -57,6 +59,13 @@ export default function ChangePasswordPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
             setSuccess("Hasło zostało zmienione pomyślnie!");
+
+            await fetch("/api/auth/logout", { method: "POST" });
+
+            setTimeout(() => {
+                router.push("/login");
+                router.refresh();
+            }, 1000);
         } catch (err: any) {
             setError(err.message);
         } finally {
