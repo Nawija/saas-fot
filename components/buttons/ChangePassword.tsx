@@ -34,7 +34,7 @@ export default function ChangePassword() {
         <button
             onClick={handleChangePass}
             disabled={isLoading}
-            className="flex items-center justify-start text-blue-700 text-sm w-full h-full gap-2 disabled:opacity-50"
+            className="flex items-center justify-start text-sm w-full h-full gap-1.5"
         >
             <Key size={16} />
             <p>{isLoading ? "Wysyłanie..." : "Zmień hasło"}</p>
