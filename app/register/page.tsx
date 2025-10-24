@@ -21,18 +21,18 @@ export default function RegisterPage() {
     async function handleSendCode(e: React.FormEvent) {
         e.preventDefault();
         setError("");
-        
+
         // Walidacja haseł
         if (password !== confirmPassword) {
             setError("Hasła nie są takie same");
             return;
         }
-        
+
         if (password.length < 6) {
             setError("Hasło musi mieć przynajmniej 6 znaków");
             return;
         }
-        
+
         setLoading(true);
 
         try {
@@ -165,7 +165,9 @@ export default function RegisterPage() {
                                 type="password"
                                 className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                onChange={(e) =>
+                                    setConfirmPassword(e.target.value)
+                                }
                                 required
                             />
                         </div>
