@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import { R2Paths } from "./r2";
 
 const AVATAR_SIZE = 200; // rozmiar avatara w pikselach
 const AVATAR_QUALITY = 80; // jakość kompresji (0-100)
@@ -70,10 +71,9 @@ export function isValidImageType(mimetype: string): boolean {
 
 /**
  * Generuje unikalną nazwę pliku dla avatara
- * @param userId - ID użytkownika
+ * @param userId - ID użytkownika (UUID string)
  * @returns string
  */
-export function generateAvatarKey(userId: number): string {
-    const timestamp = Date.now();
-    return `avatars/user-${userId}-${timestamp}.webp`;
+export function generateAvatarKey(userId: string): string {
+    return R2Paths.avatar(userId);
 }

@@ -1,6 +1,7 @@
 import { getUser } from "@/lib/auth/getUser";
 import UnauthenticatedView from "@/components/dashboard/UnauthenticatedView";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import Link from "next/link";
 
 export default async function DashboardPage() {
     const user = await getUser();
@@ -19,6 +20,14 @@ export default async function DashboardPage() {
                     <p className="text-gray-600">
                         Witaj w swoim panelu zarządzania!
                     </p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-6 mt-8">
+                    <Link
+                        href="/dashboard/collections"
+                        className="text-white bg-blue-600 px-4 py-2 rounded-lg"
+                    >
+                        Stwórz nową kolekcję
+                    </Link>
                 </div>
             </main>
         </div>

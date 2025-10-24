@@ -18,6 +18,21 @@ const BUCKET_NAME = process.env.R2_BUCKET || "foto";
 const PUBLIC_DOMAIN = process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN;
 
 /**
+ * Generuje ścieżki do plików w R2
+ */
+export const R2Paths = {
+    avatar: (userId: string) => `users/${userId}/avatar/profile.jpg`,
+    collectionHero: (userId: string, collectionId: number) =>
+        `users/${userId}/collections/${collectionId}/hero.jpg`,
+    collectionPhoto: (
+        userId: string,
+        collectionId: number,
+        photoId: number,
+        ext: string
+    ) => `users/${userId}/collections/${collectionId}/photos/${photoId}.${ext}`,
+};
+
+/**
  * Przesyła plik do R2
  * @param buffer - bufor pliku
  * @param key - ścieżka w bucket (np. "avatars/user-123.jpg")

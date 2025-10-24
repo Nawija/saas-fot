@@ -8,7 +8,7 @@ export default async function Header() {
     return (
         <header className="bg-white p-4 shadow-sm">
             <nav className="flex items-center justify-between mx-auto max-w-7xl">
-                <Link href="/" className="text-xl font-semibold">
+                <Link href="/dashboard" className="text-xl font-semibold">
                     SaaS
                 </Link>
 
