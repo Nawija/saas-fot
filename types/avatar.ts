@@ -28,4 +28,9 @@ export interface User {
     name?: string;
     avatar?: string;
     provider: "email" | "google";
+    subscription_plan: "free" | "basic" | "pro" | "unlimited";
+    subscription_status: "active" | "cancelled" | "expired" | null;
+    storage_used: number;
+    storage_limit: number;
+    lemon_squeezy_customer_id?: string;
 }

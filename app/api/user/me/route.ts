@@ -5,6 +5,9 @@ import { getUser } from "@/lib/auth/getUser";
 export async function GET() {
     const user = await getUser();
     if (!user)
-        return NextResponse.json({ error: "Nie zalogowano" }, { status: 401 });
-    return NextResponse.json(user);
+        return NextResponse.json(
+            { ok: false, error: "Nie zalogowano" },
+            { status: 401 }
+        );
+    return NextResponse.json({ ok: true, user });
 }

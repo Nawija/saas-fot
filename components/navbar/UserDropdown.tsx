@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import LogoutButton from "../buttons/LogoutButton";
 import ChangePassword from "../buttons/ChangePassword";
 import Link from "next/link";
-import { Settings } from "lucide-react";
+import { Settings, CreditCard } from "lucide-react";
 
 interface UserDropdownProps {
     name?: string | null;
@@ -56,16 +56,15 @@ export default function UserDropdown({
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem>
-                    <p>Zmień Plan</p>
+                <DropdownMenuItem asChild>
+                    <Link
+                        href="/dashboard/billing"
+                        className="flex items-center gap-2 cursor-pointer"
+                    >
+                        <CreditCard size={16} />
+                        <span>Subskrypcja i płatności</span>
+                    </Link>
                 </DropdownMenuItem>
-
-                {/* Opcja zmiany hasła tylko dla użytkowników z emailem */}
-                {provider === "email" && (
-                    <DropdownMenuItem>
-                        <ChangePassword />
-                    </DropdownMenuItem>
-                )}
 
                 <DropdownMenuItem asChild>
                     <Link
@@ -76,6 +75,14 @@ export default function UserDropdown({
                         <span>Ustawienia profilu</span>
                     </Link>
                 </DropdownMenuItem>
+
+                {/* Opcja zmiany hasła tylko dla użytkowników z emailem */}
+                {provider === "email" && (
+                    <DropdownMenuItem>
+                        <ChangePassword />
+                    </DropdownMenuItem>
+                )}
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                     <LogoutButton />
