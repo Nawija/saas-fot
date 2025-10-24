@@ -11,6 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EllipsisVertical, LogOut } from "lucide-react";
 import LogoutButton from "../buttons/LogoutButton";
+import ChangePassword from "../buttons/ChangePassword";
 
 interface UserDropdownProps {
     name?: string | null;
@@ -56,7 +57,7 @@ export default function UserDropdown({
                     <p>Zmień Plan</p>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <p>Zmiana Hasła</p>
+                    <ChangePassword />
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <p>Zmiana Avatara</p>
