@@ -118,10 +118,10 @@ export default function GalleryLandingPage() {
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700"></div>
+                    <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
                 )}
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-black/40"></div>
+                <div className="absolute inset-0 bg-black/80" />
             </div>
 
             {/* Content */}
@@ -179,20 +179,11 @@ export default function GalleryLandingPage() {
                     ) : (
                         <button
                             onClick={handleViewGallery}
-                            className="group inline-flex items-center gap-3 px-10 py-5 bg-white text-gray-900 font-bold rounded-2xl shadow-2xl hover:shadow-3xl hover:scale-105 transition-all duration-300 text-xl animate-in fade-in slide-in-from-bottom-4"
+                            className="inline-flex items-center hover:bg-white/20 hover:border-white/10 gap-1 bg-white/10 px-4 py-2 border border-white/30 text-white/80 hover:text-white"
                         >
-                            <Eye className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                            <Eye size={20} />
                             Zobacz jako gość
                         </button>
-                    )}
-
-                    {/* Scroll Indicator */}
-                    {!showPasswordPrompt && (
-                        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-                            <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
-                                <div className="w-1.5 h-3 bg-white rounded-full"></div>
-                            </div>
-                        </div>
                     )}
                 </div>
             </div>

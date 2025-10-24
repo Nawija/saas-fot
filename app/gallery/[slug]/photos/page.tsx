@@ -125,7 +125,7 @@ export default function GalleryPhotosPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-900">
+            <div className="min-h-screen flex items-center justify-center bg-zinc-900">
                 <div className="relative">
                     <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-700"></div>
                     <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent absolute top-0 left-0"></div>
@@ -136,7 +136,7 @@ export default function GalleryPhotosPage() {
 
     if (!collection) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+            <div className="min-h-screen flex items-center justify-center bg-zinc-900 text-white">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold mb-4">Brak dostępu</h1>
                     <button
@@ -184,10 +184,18 @@ export default function GalleryPhotosPage() {
                                     {collection.description}
                                 </p>
                             )}
-                            
                         </div>
                     </div>
                 </div>
+                
+                {/* Scroll Indicator */}
+
+                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+                        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
+                            <div className="w-1.5 h-3 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+
 
                 {/* Photos Grid - Masonry Layout */}
                 <div className="px-2 py-12">

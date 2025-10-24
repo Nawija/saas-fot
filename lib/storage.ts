@@ -32,7 +32,9 @@ export async function getStorageUsed(userId: number): Promise<number> {
     `;
 
     const result = await dbQuery(sql, [userId]);
-    return result.rows[0]?.storage_used || 0;
+    const val = result.rows[0]?.storage_used;
+    // Postgres returns BIGINT as string — zawsze rzutujemy na number
+    return val !== undefined && val !== null ? parseInt(val, 10) || 0 : 0;
 }
 
 /**
@@ -48,7 +50,10 @@ export async function getStorageLimit(userId: number): Promise<number> {
     `;
 
     const result = await dbQuery(sql, [userId]);
-    return result.rows[0]?.storage_limit || 2147483648; // Domyślnie 2GB
+    const val = result.rows[0]?.storage_limit;
+    return val !== undefined && val !== null
+        ? parseInt(val, 10) || 2147483648
+        : 2147483648; // Domyślnie 2GB
 }
 
 /**
@@ -72,7 +77,17 @@ export async function canUploadFile(
 
     if (!user) return false;
 
-    return user.storage_used + fileSize <= user.storage_limit;
+    // Postgres returns BIGINT as string — rzutujemy na number, aby uniknąć konkatenacji string+number
+    const used =
+        user.storage_used !== undefined && user.storage_used !== null
+            ? parseInt(user.storage_used, 10) || 0
+            : 0;
+    const limit =
+        user.storage_limit !== undefined && user.storage_limit !== null
+            ? parseInt(user.storage_limit, 10) || 2147483648
+            : 2147483648;
+
+    return used + fileSize <= limit;
 }
 
 /**
@@ -145,12 +160,21 @@ export async function getStorageStats(userId: number): Promise<{
         };
     }
 
-    const available = Math.max(0, user.storage_limit - user.storage_used);
-    const percentUsed = (user.storage_used / user.storage_limit) * 100;
+    const used =
+        user.storage_used !== undefined && user.storage_used !== null
+            ? parseInt(user.storage_used, 10) || 0
+            : 0;
+    const limit =
+        user.storage_limit !== undefined && user.storage_limit !== null
+            ? parseInt(user.storage_limit, 10) || 2147483648
+            : 2147483648;
+
+    const available = Math.max(0, limit - used);
+    const percentUsed = limit > 0 ? (used / limit) * 100 : 0;
 
     return {
-        used: user.storage_used,
-        limit: user.storage_limit,
+        used,
+        limit,
         available,
         percentUsed,
     };
