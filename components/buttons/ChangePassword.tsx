@@ -6,8 +6,8 @@ export default function ChangePassword() {
     const router = useRouter();
 
     const handleChangePass = async () => {
-        await fetch("/api/auth/send-reset", { method: "POST" });
-        router.refresh();
+        await fetch("/api/auth/reset-password", { method: "POST" });
+        router.push("/reset-password");
     };
 
     return (
