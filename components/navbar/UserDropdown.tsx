@@ -9,7 +9,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { EllipsisVertical, LogOut } from "lucide-react";
 import LogoutButton from "../buttons/LogoutButton";
 import ChangePassword from "../buttons/ChangePassword";
 
