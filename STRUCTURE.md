@@ -21,6 +21,9 @@
 ### 📂 `/components/buttons/` - Przyciski
 
 -   **`LogoutButton.tsx`** - Przycisk wylogowania
+-   **`ChangePassword.tsx`** - Przycisk zmiany hasła (tylko dla email users)
+-   **`ChangeAvatar.tsx`** - Pełny interfejs zmiany avatara
+-   **`ChangeAvatarMenuItem.tsx`** - Prosty komponent do menu dropdown
 
 ### 📂 `/hooks/` - Custom React Hooks
 
@@ -46,6 +49,8 @@
 -   **`auth.ts`** - Funkcje hashowania, JWT, zarządzanie użytkownikami
 -   **`db.ts`** - Połączenie z bazą danych
 -   **`utils.ts`** - Ogólne narzędzia
+-   **`r2.ts`** - Klient Cloudflare R2 i operacje na plikach
+-   **`imageProcessor.ts`** - Przetwarzanie i optymalizacja obrazów (Sharp)
 
 ## 🎯 Zalety nowej struktury
 
@@ -119,8 +124,28 @@ Wszystkie API routes używają:
 -   ✅ Odpowiednich kodów HTTP
 -   ✅ Helperów z `apiHelpers.ts`
 
-## 📚 Dodatkowe zasoby
+## �️ Nowe funkcjonalności
+
+### Zarządzanie awatarami
+
+-   **Upload**: Automatyczne przetwarzanie do 200x200px WebP
+-   **Storage**: Cloudflare R2 z publicznym dostępem
+-   **Delete**: Automatyczne usuwanie starych plików
+-   **UI**: Dropdown menu + dedykowana strona ustawień
+
+Zobacz szczegóły w [`docs/AVATAR_MANAGEMENT.md`](./docs/AVATAR_MANAGEMENT.md)
+
+### Zarządzanie hasłami
+
+-   **Provider-aware**: Zmiana hasła tylko dla użytkowników email
+-   **Verification**: Kod weryfikacyjny wysyłany na email
+-   **Security**: Wielopoziomowa walidacja (UI + API + DB)
+
+Zobacz szczegóły w [`docs/PASSWORD_MANAGEMENT.md`](./docs/PASSWORD_MANAGEMENT.md)
+
+## �📚 Dodatkowe zasoby
 
 -   Każda funkcja w `lib/auth.ts` ma JSDoc komentarze
 -   Komponenty mają interfejsy TypeScript dla props
 -   API routes mają obsługę błędów
+-   Pełna dokumentacja w folderze `/docs`

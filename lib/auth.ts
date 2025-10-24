@@ -129,7 +129,7 @@ export async function createUserWithEmail(
  * @param email - adres email z Google
  * @param googleId - ID użytkownika z Google
  * @param name - imię użytkownika (opcjonalne)
- * @param picture - URL avatara (opcjonalne)
+ * @param picture - URL avatara z Google (opcjonalne)
  * @returns Promise<User>
  */
 export async function createOrUpdateGoogleUser(
@@ -139,16 +139,30 @@ export async function createOrUpdateGoogleUser(
     picture?: string
 ): Promise<any> {
     try {
+        const PUBLIC_DOMAIN = process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN;
+
+        // Funkcja sprawdzająca czy avatar jest z R2 (własny użytkownika)
+        const isCustomAvatar = (avatarUrl: string | null) => {
+            if (!avatarUrl) return false;
+            return PUBLIC_DOMAIN && avatarUrl.startsWith(PUBLIC_DOMAIN);
+        };
+
         // 1. Sprawdź czy użytkownik istnieje po Google ID
         const byGoogle = await findUserByGoogleId(googleId);
         if (byGoogle) {
+            // Nie nadpisuj avatara jeśli użytkownik ma własny z R2
+            const shouldUpdateAvatar = !isCustomAvatar(byGoogle.avatar);
+            
             const updated = await query(
                 `UPDATE users 
                  SET name = COALESCE($1, name),
-                     avatar = COALESCE($2, avatar)
-                 WHERE id = $3
+                     avatar = CASE 
+                         WHEN $2 = true THEN COALESCE($3, avatar)
+                         ELSE avatar 
+                     END
+                 WHERE id = $4
                  RETURNING *`,
-                [name, picture, byGoogle.id]
+                [name, shouldUpdateAvatar, picture, byGoogle.id]
             );
             return updated.rows[0];
         }
@@ -156,20 +170,26 @@ export async function createOrUpdateGoogleUser(
         // 2. Sprawdź czy użytkownik istnieje po emailu
         const byEmail = await findUserByEmail(email);
         if (byEmail) {
+            // Nie nadpisuj avatara jeśli użytkownik ma własny z R2
+            const shouldUpdateAvatar = !isCustomAvatar(byEmail.avatar);
+            
             const updated = await query(
                 `UPDATE users 
                  SET provider = 'google',
                      google_id = $1,
                      name = COALESCE($2, name),
-                     avatar = COALESCE($3, avatar)
-                 WHERE id = $4
+                     avatar = CASE 
+                         WHEN $3 = true THEN COALESCE($4, avatar)
+                         ELSE avatar 
+                     END
+                 WHERE id = $5
                  RETURNING *`,
-                [googleId, name, picture, byEmail.id]
+                [googleId, name, shouldUpdateAvatar, picture, byEmail.id]
             );
             return updated.rows[0];
         }
 
-        // 3. Utwórz nowego użytkownika
+        // 3. Utwórz nowego użytkownika (pierwsza rejestracja - użyj avatar z Google)
         const res = await query(
             `INSERT INTO users (email, provider, google_id, name, avatar) 
              VALUES ($1, 'google', $2, $3, $4)

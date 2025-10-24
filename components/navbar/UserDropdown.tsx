@@ -11,6 +11,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import LogoutButton from "../buttons/LogoutButton";
 import ChangePassword from "../buttons/ChangePassword";
+import Link from "next/link";
+import { Settings } from "lucide-react";
 
 interface UserDropdownProps {
     name?: string | null;
@@ -40,7 +42,7 @@ export default function UserDropdown({
                 </button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-64 p-2">
+            <DropdownMenuContent align="end" className="w-64 p-2 mt-3">
                 <DropdownMenuLabel className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
                         <AvatarImage src={avatarUrl} alt={displayName} />
@@ -65,11 +67,14 @@ export default function UserDropdown({
                     </DropdownMenuItem>
                 )}
 
-                <DropdownMenuItem>
-                    <p>Zmiana Avatara</p>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <p>Ustawienia</p>
+                <DropdownMenuItem asChild>
+                    <Link
+                        href="/dashboard/profile"
+                        className="flex items-center gap-2 cursor-pointer"
+                    >
+                        <Settings size={16} />
+                        <span>Ustawienia profilu</span>
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
