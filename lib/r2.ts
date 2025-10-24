@@ -94,3 +94,24 @@ export function extractKeyFromUrl(url: string): string | null {
 
     return null;
 }
+
+/**
+ * Usuwa wiele plików z R2 (batch delete)
+ * @param urls - tablica URL-i do usunięcia
+ */
+export async function deleteMultipleFromR2(urls: string[]): Promise<void> {
+    try {
+        const deletePromises = urls.map((url) => {
+            const key = extractKeyFromUrl(url);
+            if (key) {
+                return deleteFromR2(key);
+            }
+            return Promise.resolve();
+        });
+
+        await Promise.all(deletePromises);
+    } catch (error) {
+        console.error("Error deleting multiple from R2:", error);
+        // Nie rzucamy błędu - usunięcie jest opcjonalne
+    }
+}

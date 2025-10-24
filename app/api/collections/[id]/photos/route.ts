@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { getUser } from "@/lib/auth/getUser";
+import { canUploadFile } from "@/lib/storage";
 
 export async function GET(
     request: NextRequest,
@@ -87,6 +88,19 @@ export async function POST(
             return NextResponse.json(
                 { error: "Collection not found" },
                 { status: 404 }
+            );
+        }
+
+        // Sprawdź czy użytkownik ma wystarczająco miejsca
+        const hasSpace = await canUploadFile(user.id, fileSizeNum);
+        if (!hasSpace) {
+            return NextResponse.json(
+                {
+                    error: "Brak miejsca",
+                    message: "Przekroczono limit storage. Zakup większy plan.",
+                    upgradeRequired: true,
+                },
+                { status: 413 }
             );
         }
 

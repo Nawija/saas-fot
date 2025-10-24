@@ -140,21 +140,44 @@ export default function CollectionDetailPage({
                 });
 
                 if (!uploadRes.ok) {
+                    const errorData = await uploadRes.json();
+                    if (uploadRes.status === 413 && errorData.upgradeRequired) {
+                        alert(
+                            `❌ Brak miejsca!\n\n${errorData.message}\n\nPrzekierowuję do zakupu rozszerzenia...`
+                        );
+                        router.push("/dashboard/billing");
+                        return;
+                    }
                     throw new Error(`Failed to upload ${file.name}`);
                 }
 
                 const { url, size } = await uploadRes.json();
 
                 // Zapisz w bazie
-                await fetch(`/api/collections/${collectionId}/photos`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        file_name: file.name,
-                        file_path: url,
-                        file_size: size,
-                    }),
-                });
+                const saveRes = await fetch(
+                    `/api/collections/${collectionId}/photos`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            file_name: file.name,
+                            file_path: url,
+                            file_size: size,
+                        }),
+                    }
+                );
+
+                if (!saveRes.ok) {
+                    const errorData = await saveRes.json();
+                    if (saveRes.status === 413 && errorData.upgradeRequired) {
+                        alert(
+                            `❌ Brak miejsca!\n\n${errorData.message}\n\nPrzekierowuję do zakupu rozszerzenia...`
+                        );
+                        router.push("/dashboard/billing");
+                        return;
+                    }
+                    throw new Error(`Failed to save ${file.name}`);
+                }
 
                 uploaded++;
                 setUploadProgress(Math.round((uploaded / totalFiles) * 100));

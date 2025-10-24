@@ -44,6 +44,46 @@ export default function CollectionsPage() {
         }
     };
 
+    const handleDelete = async (
+        collectionId: number,
+        collectionName: string
+    ) => {
+        if (
+            !confirm(
+                `Czy na pewno chcesz usunąć galerię "${collectionName}"?\n\nUsuniete zostaną:\n- Galeria\n- Wszystkie zdjęcia\n- Pliki z Cloudflare R2\n\nTej operacji nie można cofnąć!`
+            )
+        ) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/collections/${collectionId}`, {
+                method: "DELETE",
+            });
+
+            const data = await res.json();
+
+            if (data.ok) {
+                alert(
+                    `✅ Usunięto galerię!\n\nUsunięto ${
+                        data.deletedFiles
+                    } plików\nZwolniono ${
+                        Math.round((data.freedSpace / 1024 / 1024) * 10) / 10
+                    } MB`
+                );
+                // Odśwież listę
+                setCollections(
+                    collections.filter((c) => c.id !== collectionId)
+                );
+            } else {
+                alert("❌ Błąd: " + (data.error || "Nie udało się usunąć"));
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+            alert("❌ Wystąpił błąd podczas usuwania");
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -171,11 +211,24 @@ export default function CollectionsPage() {
                                             <span>Zobacz</span>
                                         </Link>
                                         <Link
-                                            href={`/dashboard/collections/${collection.id}/edit`}
+                                            href={`/dashboard/collections/${collection.id}`}
                                             className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors"
+                                            title="Zarządzaj"
                                         >
                                             <Settings className="w-4 h-4" />
                                         </Link>
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(
+                                                    collection.id,
+                                                    collection.name
+                                                )
+                                            }
+                                            className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-colors"
+                                            title="Usuń galerię"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     </div>
                                 </div>
                             </div>

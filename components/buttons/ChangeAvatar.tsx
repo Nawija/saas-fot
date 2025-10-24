@@ -50,6 +50,13 @@ export default function ChangeAvatar({ currentAvatar }: ChangeAvatarProps) {
             if (res.ok) {
                 router.refresh();
             } else {
+                if (res.status === 413 && data.upgradeRequired) {
+                    alert(
+                        `❌ Brak miejsca!\n\n${data.message}\n\nPrzekierowuję do zakupu rozszerzenia...`
+                    );
+                    router.push("/dashboard/billing");
+                    return;
+                }
                 setError(data.error || "Błąd przesyłania");
             }
         } catch (error) {

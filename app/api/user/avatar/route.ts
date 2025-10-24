@@ -8,6 +8,7 @@ import {
     generateAvatarKey,
 } from "@/lib/imageProcessor";
 import { query } from "@/lib/db";
+import { canUploadFile } from "@/lib/storage";
 
 export async function POST(req: NextRequest) {
     try {
@@ -41,14 +42,34 @@ export async function POST(req: NextRequest) {
         const { buffer: processedBuffer, contentType } =
             await processAvatarImage(buffer);
 
-        // Usuń stary avatar jeśli istnieje
+        // Oblicz różnicę rozmiaru (nowy avatar - stary avatar)
         let oldAvatarSize = 0;
+        if (user.avatar) {
+            // Dla uproszczenia przyjmujemy że avatar zawsze ma ~50KB
+            oldAvatarSize = 50000;
+        }
+        const sizeDiff = processedBuffer.length - oldAvatarSize;
+
+        // Sprawdź czy użytkownik ma wystarczająco miejsca (tylko jeśli zwiększamy rozmiar)
+        if (sizeDiff > 0) {
+            const hasSpace = await canUploadFile(user.id, sizeDiff);
+            if (!hasSpace) {
+                return NextResponse.json(
+                    {
+                        error: "Brak miejsca",
+                        message:
+                            "Przekroczono limit storage. Zakup większy plan.",
+                        upgradeRequired: true,
+                    },
+                    { status: 413 }
+                );
+            }
+        }
+
+        // Usuń stary avatar jeśli istnieje
         if (user.avatar) {
             const oldKey = extractKeyFromUrl(user.avatar);
             if (oldKey) {
-                // Pobierz rozmiar starego avatara z bazy (opcjonalnie)
-                // Dla uproszczenia przyjmijmy że avatar zawsze ma ~50KB
-                oldAvatarSize = 50000;
                 await deleteFromR2(oldKey);
             }
         }
@@ -65,8 +86,7 @@ export async function POST(req: NextRequest) {
             user.id,
         ]);
 
-        // Zaktualizuj storage_used (nowy rozmiar - stary rozmiar)
-        const sizeDiff = processedBuffer.length - oldAvatarSize;
+        // Zaktualizuj storage_used (używamy wcześniej obliczonego sizeDiff)
         await query(
             "UPDATE users SET storage_used = storage_used + $1 WHERE id = $2",
             [sizeDiff, user.id]

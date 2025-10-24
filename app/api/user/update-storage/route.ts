@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { query } from "@/lib/db";
+import { canUploadFile } from "@/lib/storage";
 
 export async function POST(req: NextRequest) {
     try {
@@ -19,6 +20,19 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 { error: "Invalid size" },
                 { status: 400 }
+            );
+        }
+
+        // Sprawdź czy użytkownik ma wystarczająco miejsca
+        const hasSpace = await canUploadFile(user.id, size);
+        if (!hasSpace) {
+            return NextResponse.json(
+                {
+                    error: "Brak miejsca",
+                    message: "Przekroczono limit storage. Zakup większy plan.",
+                    upgradeRequired: true,
+                },
+                { status: 413 }
             );
         }
 

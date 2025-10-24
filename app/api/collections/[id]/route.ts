@@ -1,7 +1,7 @@
-// app/api/collections/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { getUser } from "@/lib/auth/getUser";
+import { deleteMultipleFromR2 } from "@/lib/r2";
 
 export async function GET(
     request: NextRequest,
@@ -56,13 +56,63 @@ export async function DELETE(
             );
         }
 
-        // Usuń kolekcję (CASCADE usunie też photos i photo_likes)
+        // Pobierz hero image i wszystkie zdjęcia do usunięcia z R2
+        const collectionResult = await query(
+            "SELECT hero_image FROM collections WHERE id = $1 AND user_id = $2",
+            [id, user.id]
+        );
+
+        if (collectionResult.rows.length === 0) {
+            return NextResponse.json(
+                { error: "Collection not found" },
+                { status: 404 }
+            );
+        }
+
+        const photosResult = await query(
+            "SELECT file_path, file_size FROM photos WHERE collection_id = $1",
+            [id]
+        );
+
+        // Zbierz wszystkie URL-e do usunięcia
+        const urlsToDelete: string[] = [];
+        const collection = collectionResult.rows[0];
+
+        if (collection.hero_image) {
+            urlsToDelete.push(collection.hero_image);
+        }
+
+        let totalSize = 0;
+        photosResult.rows.forEach((photo: any) => {
+            urlsToDelete.push(photo.file_path);
+            totalSize += parseInt(photo.file_size) || 0;
+        });
+
+        // Usuń pliki z R2
+        if (urlsToDelete.length > 0) {
+            await deleteMultipleFromR2(urlsToDelete);
+        }
+
+        // Usuń kolekcję z bazy (CASCADE usunie też photos i photo_likes)
         await query("DELETE FROM collections WHERE id = $1 AND user_id = $2", [
             id,
             user.id,
         ]);
 
-        return NextResponse.json({ success: true });
+        // Zmniejsz storage_used
+        if (totalSize > 0) {
+            await query(
+                "UPDATE users SET storage_used = storage_used - $1 WHERE id = $2",
+                [totalSize, user.id]
+            );
+        }
+
+        return NextResponse.json({
+            ok: true,
+            message: "Collection deleted",
+            deletedFiles: urlsToDelete.length,
+            freedSpace: totalSize,
+        });
     } catch (error) {
         console.error("Delete collection error:", error);
         return NextResponse.json(

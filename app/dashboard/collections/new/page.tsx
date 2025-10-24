@@ -85,6 +85,23 @@ export default function NewCollectionPage() {
 
                 const uploadData = await uploadRes.json();
 
+                if (!uploadRes.ok) {
+                    if (
+                        uploadRes.status === 413 &&
+                        uploadData.upgradeRequired
+                    ) {
+                        alert(
+                            "❌ Brak miejsca!\n\n" +
+                                uploadData.message +
+                                "\n\nPrzekierowuję do zakupu rozszerzenia..."
+                        );
+                        router.push("/dashboard/billing");
+                        return;
+                    }
+                    alert(uploadData.error || "Błąd uploadu hero image");
+                    return;
+                }
+
                 if (uploadData.ok) {
                     // KROK 3: Zaktualizuj kolekcję z hero image URL
                     await fetch(`/api/collections/${collectionId}`, {
@@ -96,13 +113,29 @@ export default function NewCollectionPage() {
                     });
 
                     // KROK 4: Zaktualizuj storage_used
-                    await fetch("/api/user/update-storage", {
+                    const storageRes = await fetch("/api/user/update-storage", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             size: uploadData.size,
                         }),
                     });
+
+                    const storageData = await storageRes.json();
+
+                    if (
+                        !storageRes.ok &&
+                        storageRes.status === 413 &&
+                        storageData.upgradeRequired
+                    ) {
+                        alert(
+                            "❌ Brak miejsca!\n\n" +
+                                storageData.message +
+                                "\n\nPrzekierowuję do zakupu rozszerzenia..."
+                        );
+                        router.push("/dashboard/billing");
+                        return;
+                    }
                 }
             }
 
