@@ -154,7 +154,7 @@ export default function GalleryPhotosPage() {
         <>
             <div className="min-h-screen bg-gray-50">
                 {/* Header with Hero */}
-                <div className="relative h-96 bg-gray-900 overflow-hidden">
+                <div className="relative h-screen bg-gray-900 overflow-hidden">
                     {collection.hero_image && (
                         <img
                             src={collection.hero_image}
@@ -162,7 +162,7 @@ export default function GalleryPhotosPage() {
                             className="w-full h-full object-cover opacity-60"
                         />
                     )}
-                    <div className="absolute inset-0 bg-linear-to-b from-transparent to-gray-900/80"></div>
+                    <div className="absolute inset-0 bg-linear-to-b from-transparent to-zinc-900/80"></div>
 
                     {/* Back Button */}
                     <button
@@ -174,7 +174,7 @@ export default function GalleryPhotosPage() {
                     </button>
 
                     {/* Title */}
-                    <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                    <div className="absolute top-1/2 -translate-y-1/2 text-center left-1/2 -translate-x-1/2 p-8 text-white">
                         <div className="container mx-auto max-w-7xl">
                             <h1 className="text-4xl md:text-6xl font-bold mb-3">
                                 {collection.name}
@@ -184,26 +184,23 @@ export default function GalleryPhotosPage() {
                                     {collection.description}
                                 </p>
                             )}
-                            <p className="text-gray-300 mt-4">
-                                {photos.length}{" "}
-                                {photos.length === 1 ? "zdjęcie" : "zdjęć"}
-                            </p>
+                            
                         </div>
                     </div>
                 </div>
 
                 {/* Photos Grid - Masonry Layout */}
-                <div className="container mx-auto max-w-7xl px-4 py-12">
+                <div className="px-2 py-12">
                     {photos.length === 0 ? (
                         <div className="text-center py-20 text-gray-500">
                             <p>Brak zdjęć w tej galerii</p>
                         </div>
                     ) : (
-                        <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
+                        <div className="columns-1 md:columns-2 lg:columns-3 gap-2 space-y-2">
                             {photos.map((photo, index) => (
                                 <div
                                     key={photo.id}
-                                    className="break-inside-avoid group relative cursor-pointer overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-xl transition-all duration-300"
+                                    className="break-inside-avoid group relative cursor-pointer overflow-hidden bg-white transition-all duration-300"
                                     onClick={() => openLightbox(index)}
                                 >
                                     <img
@@ -212,7 +209,7 @@ export default function GalleryPhotosPage() {
                                             photo.file_path
                                         }
                                         alt={`Zdjęcie ${index + 1}`}
-                                        className="w-full h-auto group-hover:scale-105 transition-transform duration-300"
+                                        className="w-full h-auto"
                                         loading="lazy"
                                     />
 
