@@ -64,29 +64,74 @@ export function getPlanStorageLimit(plan: string): number {
 }
 
 /**
- * Generuje URL checkout Lemon Squeezy
+ * Tworzy checkout przez API Lemon Squeezy (zawsze działa, nie wymaga subdomeny)
  */
-export function generateCheckoutUrl(
+export async function generateCheckoutUrl(
     variantId: string,
     email: string,
     userId: number
-): string {
+): Promise<string> {
+    const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
     const storeId = process.env.NEXT_PUBLIC_LEMON_SQUEEZY_STORE_ID;
 
-    // Format URL: https://twój-store.lemonsqueezy.com/checkout/buy/variant-id
-    // Możesz też użyć bezpośredniego URL jeśli masz własną domenę
-    const baseUrl = `https://${storeId}.lemonsqueezy.com/checkout/buy/${variantId}`;
+    if (!apiKey || !storeId) {
+        throw new Error("Brak LEMON_SQUEEZY_API_KEY lub STORE_ID");
+    }
 
-    const params = new URLSearchParams({
-        checkout: JSON.stringify({
-            email,
-            custom: JSON.stringify({
-                user_id: userId.toString(),
-            }),
-        }),
-    });
+    try {
+        const response = await fetch(
+            "https://api.lemonsqueezy.com/v1/checkouts",
+            {
+                method: "POST",
+                headers: {
+                    Accept: "application/vnd.api+json",
+                    "Content-Type": "application/vnd.api+json",
+                    Authorization: `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                    data: {
+                        type: "checkouts",
+                        attributes: {
+                            checkout_data: {
+                                email,
+                                custom: {
+                                    user_id: userId.toString(),
+                                },
+                            },
+                        },
+                        relationships: {
+                            store: {
+                                data: {
+                                    type: "stores",
+                                    id: storeId,
+                                },
+                            },
+                            variant: {
+                                data: {
+                                    type: "variants",
+                                    id: variantId,
+                                },
+                            },
+                        },
+                    },
+                }),
+            }
+        );
 
-    return `${baseUrl}?${params.toString()}`;
+        if (!response.ok) {
+            const error = await response.text();
+            console.error("Lemon Squeezy API error:", error);
+            throw new Error(
+                `Nie udało się utworzyć checkoutu: ${response.status}`
+            );
+        }
+
+        const data = await response.json();
+        return data.data.attributes.url;
+    } catch (error) {
+        console.error("Error creating checkout:", error);
+        throw error;
+    }
 }
 
 /**

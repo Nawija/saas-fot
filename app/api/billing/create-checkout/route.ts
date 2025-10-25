@@ -17,8 +17,12 @@ export async function POST(req: NextRequest) {
             return createErrorResponse("Brak variant ID", 400);
         }
 
-        // Generuj URL checkout
-        const checkoutUrl = generateCheckoutUrl(variantId, user.email, user.id);
+        // Generuj URL checkout przez API (async)
+        const checkoutUrl = await generateCheckoutUrl(
+            variantId,
+            user.email,
+            user.id
+        );
 
         return NextResponse.json({
             ok: true,
@@ -26,6 +30,9 @@ export async function POST(req: NextRequest) {
         });
     } catch (error: any) {
         console.error("Create checkout error:", error);
-        return createErrorResponse("Błąd tworzenia checkout", 500);
+        return createErrorResponse(
+            error.message || "Błąd tworzenia checkout",
+            500
+        );
     }
 }
