@@ -1,6 +1,7 @@
 import CountdownTimer from "@/components/CountdownTimer";
 import FormInput from "./FormInput";
 import SubmitButton from "./SubmitButton";
+import MainButton from "../buttons/MainButton";
 
 interface VerificationFormProps {
     email: string;
@@ -42,13 +43,14 @@ export default function VerificationForm({
                 className="text-center tracking-widest font-mono"
             />
 
-            <SubmitButton
+            <MainButton
                 loading={loading}
                 loadingText="Rejestrowanie..."
-                text="Potwierdź kod"
+                type="submit"
+                label="Potwierdź kod"
+                className="w-full"
                 variant="success"
             />
-
             <button
                 type="button"
                 onClick={onBack}

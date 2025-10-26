@@ -1,5 +1,6 @@
+import Link from "next/link";
+import MainButton from "../buttons/MainButton";
 import FormInput from "./FormInput";
-import SubmitButton from "./SubmitButton";
 
 interface LoginFormProps {
     email: string;
@@ -36,18 +37,22 @@ export default function LoginForm({
                 required
             />
 
-            <SubmitButton
+            <MainButton
                 loading={loading}
                 loadingText="Logowanie..."
-                text="Zaloguj się"
-                variant="primary"
+                type="submit"
+                label="Zaloguj się"
+                className="w-full"
             />
 
             <p className="mt-6 text-center text-sm">
                 Nie masz konta?{" "}
-                <a href="/register" className="text-blue-600 hover:underline">
+                <Link
+                    href="/register"
+                    className="text-blue-600 hover:underline"
+                >
                     Zarejestruj się
-                </a>
+                </Link>
             </p>
         </form>
     );
