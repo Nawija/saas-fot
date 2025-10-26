@@ -144,7 +144,7 @@ export default function CollectionsPage() {
                         {collections.map((collection) => (
                             <div
                                 key={collection.id}
-                                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group"
+                                className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 group"
                             >
                                 {/* Hero Image */}
                                 <Link
@@ -155,7 +155,7 @@ export default function CollectionsPage() {
                                             <img
                                                 src={collection.hero_image}
                                                 alt={collection.name}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                className="w-full h-full object-cover transition-transform duration-300"
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">
