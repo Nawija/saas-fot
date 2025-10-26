@@ -27,6 +27,7 @@ interface Collection {
     name: string;
     description?: string;
     hero_image?: string;
+    hero_template?: string;
 }
 
 export default function GalleryPhotosPage() {
@@ -144,51 +145,197 @@ export default function GalleryPhotosPage() {
         );
     }
 
-    return (
-        <>
-            <div className="min-h-screen bg-gray-50">
-                {/* Header with Hero */}
-                <div className="relative h-screen bg-gray-900 overflow-hidden">
-                    {collection.hero_image && (
+    const template = collection.hero_template || "minimal";
+
+    const BaseBackButton = () => (
+        <button
+            onClick={() => router.push(`/gallery/${params.slug}`)}
+            className="absolute top-6 left-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-lg transition-colors"
+        >
+            <ArrowLeft className="w-5 h-5" />
+            Powrót
+        </button>
+    );
+
+    const ScrollIndicator = () => (
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+            <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
+                <div className="w-1.5 h-3 bg-white rounded-full"></div>
+            </div>
+        </div>
+    );
+
+    const MinimalHero = () => (
+        <div className="relative h-screen bg-gray-900 overflow-hidden">
+            {collection.hero_image ? (
+                <img
+                    src={collection.hero_image}
+                    alt={collection.name}
+                    className="w-full h-full object-cover opacity-60"
+                />
+            ) : (
+                <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
+            )}
+            <div className="absolute inset-0 bg-linear-to-b from-transparent to-zinc-900/80" />
+            <BaseBackButton />
+            <div className="absolute top-1/2 -translate-y-1/2 text-center left-1/2 -translate-x-1/2 p-8 text-white">
+                <div className="container mx-auto max-w-7xl">
+                    <h1 className="text-4xl md:text-6xl font-bold mb-3">
+                        {collection.name}
+                    </h1>
+                    {collection.description && (
+                        <p className="text-xl text-gray-200">
+                            {collection.description}
+                        </p>
+                    )}
+                </div>
+            </div>
+            <ScrollIndicator />
+        </div>
+    );
+
+    const FullscreenHero = () => (
+        <div className="relative h-screen w-full overflow-hidden">
+            {collection.hero_image ? (
+                <img
+                    src={collection.hero_image}
+                    alt={collection.name}
+                    className="w-full h-full object-cover"
+                />
+            ) : (
+                <div className="w-full h-full bg-linear-to-br from-slate-800 to-slate-600" />
+            )}
+            <div className="absolute inset-0 bg-linear-to-b from-black/10 via-black/20 to-black/60" />
+            <BaseBackButton />
+            <div className="absolute inset-0 flex items-center justify-center text-white px-6">
+                <div className="text-center">
+                    <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-6">
+                        {collection.name}
+                    </h1>
+                    {collection.description && (
+                        <p className="text-2xl md:text-3xl text-gray-200 mb-10 max-w-4xl mx-auto">
+                            {collection.description}
+                        </p>
+                    )}
+                </div>
+            </div>
+            <ScrollIndicator />
+        </div>
+    );
+
+    const SplitHero = () => (
+        <div className="relative h-screen w-full grid grid-cols-1 md:grid-cols-2">
+            <div className="relative order-2 md:order-1 flex items-center justify-center p-10 bg-white">
+                <div className="max-w-lg">
+                    <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
+                        {collection.name}
+                    </h1>
+                    {collection.description && (
+                        <p className="text-lg md:text-xl text-gray-600">
+                            {collection.description}
+                        </p>
+                    )}
+                </div>
+            </div>
+            <div className="relative order-1 md:order-2">
+                {collection.hero_image ? (
+                    <img
+                        src={collection.hero_image}
+                        alt={collection.name}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-500" />
+                )}
+                <BaseBackButton />
+            </div>
+        </div>
+    );
+
+    const OverlayHero = () => (
+        <div className="relative h-screen w-full overflow-hidden">
+            <div className="absolute inset-0">
+                {collection.hero_image ? (
+                    <img
+                        src={collection.hero_image}
+                        alt={collection.name}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
+                )}
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
+            </div>
+            <BaseBackButton />
+            <div className="relative z-10 h-full flex flex-col items-center justify-end text-white px-6 pb-16">
+                <div className="max-w-4xl mx-auto text-center">
+                    <h1 className="text-5xl md:text-7xl font-bold mb-4 drop-shadow">
+                        {collection.name}
+                    </h1>
+                    {collection.description && (
+                        <p className="text-xl md:text-2xl text-gray-200 mb-8 drop-shadow">
+                            {collection.description}
+                        </p>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+
+    const GradientHero = () => (
+        <div className="relative h-screen w-full bg-linear-to-br from-gray-900 via-slate-800 to-gray-700 overflow-hidden">
+            <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-white/20 shadow-2xl">
+                    {collection.hero_image ? (
                         <img
                             src={collection.hero_image}
                             alt={collection.name}
-                            className="w-full h-full object-cover opacity-60"
+                            className="w-full h-full object-cover"
                         />
+                    ) : (
+                        <div className="w-full h-full bg-linear-to-br from-slate-600 to-slate-400" />
                     )}
-                    <div className="absolute inset-0 bg-linear-to-b from-transparent to-zinc-900/80"></div>
-
-                    {/* Back Button */}
-                    <button
-                        onClick={() => router.push(`/gallery/${params.slug}`)}
-                        className="absolute top-6 left-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-lg transition-colors"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                        Powrót
-                    </button>
-
-                    {/* Title */}
-                    <div className="absolute top-1/2 -translate-y-1/2 text-center left-1/2 -translate-x-1/2 p-8 text-white">
-                        <div className="container mx-auto max-w-7xl">
-                            <h1 className="text-4xl md:text-6xl font-bold mb-3">
-                                {collection.name}
-                            </h1>
-                            {collection.description && (
-                                <p className="text-xl text-gray-200">
-                                    {collection.description}
-                                </p>
-                            )}
-                        </div>
-                    </div>
                 </div>
-
-                {/* Scroll Indicator */}
-
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-                    <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
-                        <div className="w-1.5 h-3 bg-white rounded-full"></div>
-                    </div>
+            </div>
+            <div className="absolute inset-0 bg-[radial-gradient(transparent,rgba(0,0,0,0.5))]" />
+            <div className="relative z-10 h-full flex flex-col items-center justify-end text-white px-6 pb-16">
+                <div className="max-w-3xl mx-auto text-center">
+                    <h1 className="text-5xl md:text-6xl font-extrabold mb-4 drop-shadow">
+                        {collection.name}
+                    </h1>
+                    {collection.description && (
+                        <p className="text-lg md:text-2xl text-gray-200 mb-8 drop-shadow">
+                            {collection.description}
+                        </p>
+                    )}
                 </div>
+            </div>
+        </div>
+    );
+
+    const Hero = () => {
+        switch (template) {
+            case "fullscreen":
+                return <FullscreenHero />;
+            case "split":
+                return <SplitHero />;
+            case "overlay":
+                return <OverlayHero />;
+            case "gradient":
+                return <GradientHero />;
+            case "cards":
+                return <SplitHero />;
+            case "minimal":
+            default:
+                return <MinimalHero />;
+        }
+    };
+
+    return (
+        <>
+            <div className="min-h-screen bg-gray-50">
+                {/* Header with Hero (template-driven) */}
+                <Hero />
 
                 {/* Photos Grid - Masonry Layout */}
                 <div className="px-2 py-12">

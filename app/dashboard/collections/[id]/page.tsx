@@ -25,6 +25,7 @@ interface Collection {
     slug: string;
     description: string;
     hero_image: string;
+    hero_template?: string;
     is_public: boolean;
     password_plain?: string;
     created_at: string;
@@ -75,6 +76,11 @@ export default function CollectionDetailPage({
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [copied, setCopied] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [previewTab, setPreviewTab] = useState<"landing" | "photos">(
+        "landing"
+    );
+    const [selectedTemplate, setSelectedTemplate] = useState<string>("minimal");
 
     const galleryUrl = `${
         typeof window !== "undefined" ? window.location.origin : ""
@@ -99,6 +105,10 @@ export default function CollectionDetailPage({
             if (res.ok) {
                 const data = await res.json();
                 setCollection(data);
+                // ustaw podgląd na zapisany szablon po załadowaniu
+                if (data?.hero_template) {
+                    setSelectedTemplate(data.hero_template);
+                }
             } else {
                 router.push("/dashboard/collections");
             }
@@ -106,6 +116,30 @@ export default function CollectionDetailPage({
             console.error("Error fetching collection:", error);
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function updateHeroTemplate(tpl: string) {
+        if (!collectionId || !collection) return;
+        try {
+            setSaving(true);
+            const res = await fetch(`/api/collections/${collectionId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ hero_template: tpl }),
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err?.error || "Błąd zapisu szablonu");
+            }
+            const result = await res.json();
+            setCollection(result.collection);
+            setSelectedTemplate(result.collection.hero_template || tpl);
+            toast.success("Zapisano wygląd hero");
+        } catch (e: any) {
+            toast.error(e?.message || "Nie udało się zapisać");
+        } finally {
+            setSaving(false);
         }
     }
 
@@ -459,6 +493,954 @@ export default function CollectionDetailPage({
                                 </div>
                                 <div className="text-sm text-gray-600">
                                     Utworzona
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Hero template selection */}
+                <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 mb-8">
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">
+                        Wygląd sekcji hero
+                    </h2>
+                    <p className="text-sm text-gray-600 mb-4">
+                        Kliknij aby podejrzeć. Zapisz gdy wybierzesz docelowy
+                        wygląd. Podgląd poniżej pokazuje wersję desktop i
+                        telefon.
+                    </p>
+                    <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">
+                                Podgląd:
+                            </span>
+                            <div className="inline-flex rounded-md border border-gray-200 overflow-hidden">
+                                <button
+                                    onClick={() => setPreviewTab("landing")}
+                                    className={`px-3 py-1.5 text-sm ${
+                                        previewTab === "landing"
+                                            ? "bg-blue-50 text-blue-700"
+                                            : "bg-white text-gray-700 hover:bg-gray-50"
+                                    }`}
+                                >
+                                    Landing
+                                </button>
+                                <button
+                                    onClick={() => setPreviewTab("photos")}
+                                    className={`px-3 py-1.5 text-sm border-l border-gray-200 ${
+                                        previewTab === "photos"
+                                            ? "bg-blue-50 text-blue-700"
+                                            : "bg-white text-gray-700 hover:bg-gray-50"
+                                    }`}
+                                >
+                                    Photos
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                disabled={
+                                    saving ||
+                                    selectedTemplate ===
+                                        (collection.hero_template || "minimal")
+                                }
+                                onClick={() =>
+                                    updateHeroTemplate(selectedTemplate)
+                                }
+                                className={`px-4 py-2 text-sm rounded-md text-white ${
+                                    saving ||
+                                    selectedTemplate ===
+                                        (collection.hero_template || "minimal")
+                                        ? "bg-gray-300 cursor-not-allowed"
+                                        : "bg-blue-600 hover:bg-blue-700"
+                                }`}
+                            >
+                                {saving
+                                    ? "Zapisywanie..."
+                                    : "Zapisz wybrany wygląd"}
+                            </button>
+                            <button
+                                disabled={saving}
+                                onClick={() =>
+                                    setSelectedTemplate(
+                                        collection.hero_template || "minimal"
+                                    )
+                                }
+                                className="px-4 py-2 text-sm rounded-md border border-gray-200 hover:bg-gray-50"
+                            >
+                                Reset podglądu
+                            </button>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {[
+                            { key: "minimal", label: "Minimal" },
+                            { key: "fullscreen", label: "Pełny ekran" },
+                            { key: "split", label: "Podział 50/50" },
+                            { key: "overlay", label: "Overlay" },
+                            { key: "gradient", label: "Gradient" },
+                            { key: "cards", label: "Karty" },
+                        ].map((tpl) => {
+                            const isSaved =
+                                (collection.hero_template || "minimal") ===
+                                tpl.key;
+                            const isPreview = selectedTemplate === tpl.key;
+                            return (
+                                <button
+                                    key={tpl.key}
+                                    onClick={() => setSelectedTemplate(tpl.key)}
+                                    className={`group relative text-left overflow-hidden rounded-xl border transition-all ${
+                                        isPreview
+                                            ? "border-blue-500 ring-2 ring-blue-200"
+                                            : isSaved
+                                            ? "border-green-500"
+                                            : "border-gray-200 hover:border-gray-300"
+                                    }`}
+                                >
+                                    <div className="aspect-video w-full bg-gray-100">
+                                        {/* Simple visual preview variants */}
+                                        {tpl.key === "minimal" && (
+                                            <div className="w-full h-full relative">
+                                                <div className="absolute inset-0 bg-gray-800" />
+                                                <div className="absolute inset-0 bg-black/60" />
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <div className="w-1/2 h-3 bg-white/80" />
+                                                </div>
+                                            </div>
+                                        )}
+                                        {tpl.key === "fullscreen" && (
+                                            <div className="w-full h-full relative">
+                                                <div className="absolute inset-0 bg-gray-700" />
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <div className="w-2/3 h-4 bg-white" />
+                                                </div>
+                                            </div>
+                                        )}
+                                        {tpl.key === "split" && (
+                                            <div className="w-full h-full grid grid-cols-2">
+                                                <div className="bg-white" />
+                                                <div className="bg-gray-300" />
+                                            </div>
+                                        )}
+                                        {tpl.key === "overlay" && (
+                                            <div className="w-full h-full relative">
+                                                <div className="absolute inset-0 bg-gray-700" />
+                                                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
+                                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-1/2 h-3 bg-white/80" />
+                                            </div>
+                                        )}
+                                        {tpl.key === "gradient" && (
+                                            <div className="w-full h-full bg-linear-to-br from-gray-800 via-slate-700 to-gray-600" />
+                                        )}
+                                        {tpl.key === "cards" && (
+                                            <div className="w-full h-full grid grid-cols-3 gap-1 p-2 bg-gray-100">
+                                                <div className="bg-white" />
+                                                <div className="bg-white" />
+                                                <div className="bg-white" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-3 flex items-center justify-between">
+                                        <div>
+                                            <div className="text-sm font-medium text-gray-900">
+                                                {tpl.label}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                /gallery/{collection.slug}
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {isSaved && (
+                                                <span className="inline-flex items-center gap-1 text-green-600 text-xs font-medium">
+                                                    <Check className="w-4 h-4" />{" "}
+                                                    Zapisany
+                                                </span>
+                                            )}
+                                            {isPreview && !isSaved && (
+                                                <span className="inline-flex items-center gap-1 text-blue-600 text-xs font-medium">
+                                                    <Check className="w-4 h-4" />{" "}
+                                                    Podgląd
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                    {/* Live preview: Desktop and Phone */}
+                    <div className="mt-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Desktop preview */}
+                            <div className="rounded-xl overflow-hidden border border-gray-200 bg-white">
+                                <div className="px-4 py-2 border-b border-gray-200 text-xs text-gray-600">
+                                    Podgląd Desktop
+                                </div>
+                                <div className="aspect-video w-full bg-gray-900 relative">
+                                    {(() => {
+                                        const tpl = selectedTemplate;
+                                        const title = collection.name;
+                                        const desc = collection.description;
+                                        const img = collection.hero_image;
+
+                                        if (previewTab === "landing") {
+                                            switch (tpl) {
+                                                case "fullscreen":
+                                                    return (
+                                                        <div className="absolute inset-0">
+                                                            {img ? (
+                                                                <img
+                                                                    src={img}
+                                                                    alt={title}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-linear-to-br from-slate-800 to-slate-600" />
+                                                            )}
+                                                            <div className="absolute inset-0 bg-linear-to-b from-black/10 via-black/20 to-black/60" />
+                                                            <div className="absolute inset-0 flex items-center justify-center text-white px-6">
+                                                                <div className="text-center">
+                                                                    <h1 className="text-3xl font-extrabold mb-1">
+                                                                        {title}
+                                                                    </h1>
+                                                                    {desc && (
+                                                                        <p className="text-sm text-gray-200">
+                                                                            {
+                                                                                desc
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "split":
+                                                    return (
+                                                        <div className="grid grid-cols-2 h-full">
+                                                            <div className="bg-white flex items-center justify-center">
+                                                                <div className="p-6 text-center">
+                                                                    <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                                                                        {title}
+                                                                    </h1>
+                                                                    {desc && (
+                                                                        <p className="text-gray-600 text-xs">
+                                                                            {
+                                                                                desc
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="relative">
+                                                                {img ? (
+                                                                    <img
+                                                                        src={
+                                                                            img
+                                                                        }
+                                                                        alt={
+                                                                            title
+                                                                        }
+                                                                        className="w-full h-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-500" />
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "overlay":
+                                                    return (
+                                                        <div className="absolute inset-0">
+                                                            {img ? (
+                                                                <img
+                                                                    src={img}
+                                                                    alt={title}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
+                                                            )}
+                                                            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
+                                                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-white px-6">
+                                                                <h1 className="text-2xl font-bold mb-1">
+                                                                    {title}
+                                                                </h1>
+                                                                {desc && (
+                                                                    <p className="text-gray-200 text-xs">
+                                                                        {desc}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "gradient":
+                                                    return (
+                                                        <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-slate-800 to-gray-700">
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                <div className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-white/20 shadow-xl">
+                                                                    {img ? (
+                                                                        <img
+                                                                            src={
+                                                                                img
+                                                                            }
+                                                                            alt={
+                                                                                title
+                                                                            }
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full bg-linear-to-br from-slate-600 to-slate-400" />
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="absolute inset-0 bg-[radial-gradient(transparent,rgba(0,0,0,0.5))]" />
+                                                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-white px-6">
+                                                                <h1 className="text-2xl font-extrabold mb-1">
+                                                                    {title}
+                                                                </h1>
+                                                                {desc && (
+                                                                    <p className="text-gray-200 text-xs">
+                                                                        {desc}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "cards":
+                                                    return (
+                                                        <div className="grid grid-cols-2 h-full">
+                                                            <div className="bg-white flex items-center justify-center">
+                                                                <div className="p-6 text-center">
+                                                                    <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                                                                        {title}
+                                                                    </h1>
+                                                                    {desc && (
+                                                                        <p className="text-gray-600 text-xs">
+                                                                            {
+                                                                                desc
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="bg-gray-100 grid grid-cols-3 gap-1 p-2">
+                                                                <div className="bg-white" />
+                                                                <div className="bg-white" />
+                                                                <div className="bg-white" />
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "minimal":
+                                                default:
+                                                    return (
+                                                        <div className="absolute inset-0">
+                                                            {img ? (
+                                                                <img
+                                                                    src={img}
+                                                                    alt={title}
+                                                                    className="w-full h-full object-cover opacity-60"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-gray-800" />
+                                                            )}
+                                                            <div className="absolute inset-0 bg-black/60" />
+                                                            <div className="absolute inset-0 flex items-center justify-center text-white">
+                                                                <h1 className="text-3xl font-bold">
+                                                                    {title}
+                                                                </h1>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                            }
+                                        } else {
+                                            // photos preview header
+                                            switch (tpl) {
+                                                case "fullscreen":
+                                                    return (
+                                                        <div className="absolute inset-0">
+                                                            {img ? (
+                                                                <img
+                                                                    src={img}
+                                                                    alt={title}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-linear-to-br from-slate-800 to-slate-600" />
+                                                            )}
+                                                            <div className="absolute inset-0 bg-linear-to-b from-black/10 via-black/20 to-black/60" />
+                                                            <div className="absolute inset-0 flex items-center justify-center text-white px-6">
+                                                                <div className="text-center">
+                                                                    <h1 className="text-3xl font-extrabold mb-1">
+                                                                        {title}
+                                                                    </h1>
+                                                                    {desc && (
+                                                                        <p className="text-sm text-gray-200">
+                                                                            {
+                                                                                desc
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "split":
+                                                    return (
+                                                        <div className="grid grid-cols-2 h-full">
+                                                            <div className="bg-white flex items-center justify-center">
+                                                                <div className="p-6 text-center">
+                                                                    <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                                                                        {title}
+                                                                    </h1>
+                                                                    {desc && (
+                                                                        <p className="text-gray-600 text-xs">
+                                                                            {
+                                                                                desc
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="relative">
+                                                                {img ? (
+                                                                    <img
+                                                                        src={
+                                                                            img
+                                                                        }
+                                                                        alt={
+                                                                            title
+                                                                        }
+                                                                        className="w-full h-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-500" />
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "overlay":
+                                                    return (
+                                                        <div className="absolute inset-0">
+                                                            {img ? (
+                                                                <img
+                                                                    src={img}
+                                                                    alt={title}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
+                                                            )}
+                                                            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
+                                                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-white px-6">
+                                                                <h1 className="text-2xl font-bold mb-1">
+                                                                    {title}
+                                                                </h1>
+                                                                {desc && (
+                                                                    <p className="text-gray-200 text-xs">
+                                                                        {desc}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "gradient":
+                                                    return (
+                                                        <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-slate-800 to-gray-700">
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                <div className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-white/20 shadow-xl">
+                                                                    {img ? (
+                                                                        <img
+                                                                            src={
+                                                                                img
+                                                                            }
+                                                                            alt={
+                                                                                title
+                                                                            }
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full bg-linear-to-br from-slate-600 to-slate-400" />
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="absolute inset-0 bg-[radial-gradient(transparent,rgba(0,0,0,0.5))]" />
+                                                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-white px-6">
+                                                                <h1 className="text-2xl font-extrabold mb-1">
+                                                                    {title}
+                                                                </h1>
+                                                                {desc && (
+                                                                    <p className="text-gray-200 text-xs">
+                                                                        {desc}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "cards":
+                                                    return (
+                                                        <div className="grid grid-cols-2 h-full">
+                                                            <div className="bg-white flex items-center justify-center">
+                                                                <div className="p-6 text-center">
+                                                                    <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                                                                        {title}
+                                                                    </h1>
+                                                                    {desc && (
+                                                                        <p className="text-gray-600 text-xs">
+                                                                            {
+                                                                                desc
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="bg-gray-100 grid grid-cols-3 gap-1 p-2">
+                                                                <div className="bg-white" />
+                                                                <div className="bg-white" />
+                                                                <div className="bg-white" />
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                case "minimal":
+                                                default:
+                                                    return (
+                                                        <div className="absolute inset-0">
+                                                            {img ? (
+                                                                <img
+                                                                    src={img}
+                                                                    alt={title}
+                                                                    className="w-full h-full object-cover opacity-60"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-gray-800" />
+                                                            )}
+                                                            <div className="absolute inset-0 bg-black/60" />
+                                                            <div className="absolute inset-0 flex items-center justify-center text-white">
+                                                                <h1 className="text-3xl font-bold">
+                                                                    {title}
+                                                                </h1>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                            }
+                                        }
+                                    })()}
+                                </div>
+                            </div>
+                            {/* Phone preview */}
+                            <div className="rounded-xl overflow-hidden border border-gray-200 bg-white">
+                                <div className="px-4 py-2 border-b border-gray-200 text-xs text-gray-600">
+                                    Podgląd Telefon
+                                </div>
+                                <div className="w-full flex items-center justify-center p-6 bg-gray-50">
+                                    <div className="relative w-[360px] h-[720px] rounded-4xl border-8 border-black overflow-hidden shadow-xl bg-black">
+                                        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-1.5 rounded-full bg-black/60 z-20" />
+                                        <div className="absolute inset-0">
+                                            {(() => {
+                                                const tpl = selectedTemplate;
+                                                const title = collection.name;
+                                                const desc =
+                                                    collection.description;
+                                                const img =
+                                                    collection.hero_image;
+                                                if (previewTab === "landing") {
+                                                    switch (tpl) {
+                                                        case "fullscreen":
+                                                            return (
+                                                                <div className="absolute inset-0">
+                                                                    {img ? (
+                                                                        <img
+                                                                            src={
+                                                                                img
+                                                                            }
+                                                                            alt={
+                                                                                title
+                                                                            }
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full bg-linear-to-br from-slate-800 to-slate-600" />
+                                                                    )}
+                                                                    <div className="absolute inset-0 bg-black/40" />
+                                                                    <div className="absolute inset-0 flex items-center justify-center text-white px-4">
+                                                                        <div className="text-center">
+                                                                            <h1 className="text-2xl font-extrabold mb-1">
+                                                                                {
+                                                                                    title
+                                                                                }
+                                                                            </h1>
+                                                                            {desc && (
+                                                                                <p className="text-xs text-gray-200 line-clamp-3">
+                                                                                    {
+                                                                                        desc
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "split":
+                                                            return (
+                                                                <div className="grid grid-rows-2 h-full">
+                                                                    <div className="bg-white flex items-center justify-center p-4">
+                                                                        <div className="text-center">
+                                                                            <h1 className="text-xl font-bold text-gray-900 mb-1">
+                                                                                {
+                                                                                    title
+                                                                                }
+                                                                            </h1>
+                                                                            {desc && (
+                                                                                <p className="text-gray-600 text-xs line-clamp-3">
+                                                                                    {
+                                                                                        desc
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="relative">
+                                                                        {img ? (
+                                                                            <img
+                                                                                src={
+                                                                                    img
+                                                                                }
+                                                                                alt={
+                                                                                    title
+                                                                                }
+                                                                                className="w-full h-full object-cover"
+                                                                            />
+                                                                        ) : (
+                                                                            <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-500" />
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "overlay":
+                                                            return (
+                                                                <div className="absolute inset-0">
+                                                                    {img ? (
+                                                                        <img
+                                                                            src={
+                                                                                img
+                                                                            }
+                                                                            alt={
+                                                                                title
+                                                                            }
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
+                                                                    )}
+                                                                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
+                                                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-white px-4">
+                                                                        <h1 className="text-xl font-bold mb-1">
+                                                                            {
+                                                                                title
+                                                                            }
+                                                                        </h1>
+                                                                        {desc && (
+                                                                            <p className="text-gray-200 text-xs line-clamp-2">
+                                                                                {
+                                                                                    desc
+                                                                                }
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "gradient":
+                                                            return (
+                                                                <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-slate-800 to-gray-700">
+                                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 shadow-xl">
+                                                                            {img ? (
+                                                                                <img
+                                                                                    src={
+                                                                                        img
+                                                                                    }
+                                                                                    alt={
+                                                                                        title
+                                                                                    }
+                                                                                    className="w-full h-full object-cover"
+                                                                                />
+                                                                            ) : (
+                                                                                <div className="w-full h-full bg-linear-to-br from-slate-600 to-slate-400" />
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="absolute inset-0 bg-[radial-gradient(transparent,rgba(0,0,0,0.5))]" />
+                                                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-white px-4">
+                                                                        <h1 className="text-xl font-extrabold mb-1">
+                                                                            {
+                                                                                title
+                                                                            }
+                                                                        </h1>
+                                                                        {desc && (
+                                                                            <p className="text-gray-200 text-xs line-clamp-2">
+                                                                                {
+                                                                                    desc
+                                                                                }
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "cards":
+                                                            return (
+                                                                <div className="grid grid-rows-2 h-full">
+                                                                    <div className="bg-white flex items-center justify-center p-4">
+                                                                        <div className="text-center">
+                                                                            <h1 className="text-xl font-bold text-gray-900 mb-1">
+                                                                                {
+                                                                                    title
+                                                                                }
+                                                                            </h1>
+                                                                            {desc && (
+                                                                                <p className="text-gray-600 text-xs line-clamp-3">
+                                                                                    {
+                                                                                        desc
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="bg-gray-100 grid grid-cols-3 gap-1 p-2">
+                                                                        <div className="bg-white h-20" />
+                                                                        <div className="bg-white h-20" />
+                                                                        <div className="bg-white h-20" />
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "minimal":
+                                                        default:
+                                                            return (
+                                                                <div className="absolute inset-0">
+                                                                    {img ? (
+                                                                        <img
+                                                                            src={
+                                                                                img
+                                                                            }
+                                                                            alt={
+                                                                                title
+                                                                            }
+                                                                            className="w-full h-full object-cover opacity-60"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full bg-gray-800" />
+                                                                    )}
+                                                                    <div className="absolute inset-0 bg-black/60" />
+                                                                    <div className="absolute inset-0 flex items-center justify-center text-white">
+                                                                        <h1 className="text-2xl font-bold">
+                                                                            {
+                                                                                title
+                                                                            }
+                                                                        </h1>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                    }
+                                                } else {
+                                                    // Photos header (mobile)
+                                                    switch (tpl) {
+                                                        case "fullscreen":
+                                                            return (
+                                                                <div className="absolute inset-0">
+                                                                    {img ? (
+                                                                        <img
+                                                                            src={
+                                                                                img
+                                                                            }
+                                                                            alt={
+                                                                                title
+                                                                            }
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full bg-linear-to-br from-slate-800 to-slate-600" />
+                                                                    )}
+                                                                    <div className="absolute inset-0 bg-black/40" />
+                                                                    <div className="absolute inset-0 flex items-center justify-center text-white px-4">
+                                                                        <div className="text-center">
+                                                                            <h1 className="text-2xl font-extrabold mb-1">
+                                                                                {
+                                                                                    title
+                                                                                }
+                                                                            </h1>
+                                                                            {desc && (
+                                                                                <p className="text-xs text-gray-200 line-clamp-3">
+                                                                                    {
+                                                                                        desc
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "split":
+                                                            return (
+                                                                <div className="grid grid-rows-2 h-full">
+                                                                    <div className="bg-white flex items-center justify-center p-4">
+                                                                        <div className="text-center">
+                                                                            <h1 className="text-xl font-bold text-gray-900 mb-1">
+                                                                                {
+                                                                                    title
+                                                                                }
+                                                                            </h1>
+                                                                            {desc && (
+                                                                                <p className="text-gray-600 text-xs line-clamp-3">
+                                                                                    {
+                                                                                        desc
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="relative">
+                                                                        {img ? (
+                                                                            <img
+                                                                                src={
+                                                                                    img
+                                                                                }
+                                                                                alt={
+                                                                                    title
+                                                                                }
+                                                                                className="w-full h-full object-cover"
+                                                                            />
+                                                                        ) : (
+                                                                            <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-500" />
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "overlay":
+                                                            return (
+                                                                <div className="absolute inset-0">
+                                                                    {img ? (
+                                                                        <img
+                                                                            src={
+                                                                                img
+                                                                            }
+                                                                            alt={
+                                                                                title
+                                                                            }
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
+                                                                    )}
+                                                                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
+                                                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-white px-4">
+                                                                        <h1 className="text-xl font-bold mb-1">
+                                                                            {
+                                                                                title
+                                                                            }
+                                                                        </h1>
+                                                                        {desc && (
+                                                                            <p className="text-gray-200 text-xs line-clamp-2">
+                                                                                {
+                                                                                    desc
+                                                                                }
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "gradient":
+                                                            return (
+                                                                <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-slate-800 to-gray-700">
+                                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 shadow-xl">
+                                                                            {img ? (
+                                                                                <img
+                                                                                    src={
+                                                                                        img
+                                                                                    }
+                                                                                    alt={
+                                                                                        title
+                                                                                    }
+                                                                                    className="w-full h-full object-cover"
+                                                                                />
+                                                                            ) : (
+                                                                                <div className="w-full h-full bg-linear-to-br from-slate-600 to-slate-400" />
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="absolute inset-0 bg-[radial-gradient(transparent,rgba(0,0,0,0.5))]" />
+                                                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-white px-4">
+                                                                        <h1 className="text-xl font-extrabold mb-1">
+                                                                            {
+                                                                                title
+                                                                            }
+                                                                        </h1>
+                                                                        {desc && (
+                                                                            <p className="text-gray-200 text-xs line-clamp-2">
+                                                                                {
+                                                                                    desc
+                                                                                }
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "cards":
+                                                            return (
+                                                                <div className="grid grid-rows-2 h-full">
+                                                                    <div className="bg-white flex items-center justify-center p-4">
+                                                                        <div className="text-center">
+                                                                            <h1 className="text-xl font-bold text-gray-900 mb-1">
+                                                                                {
+                                                                                    title
+                                                                                }
+                                                                            </h1>
+                                                                            {desc && (
+                                                                                <p className="text-gray-600 text-xs line-clamp-3">
+                                                                                    {
+                                                                                        desc
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="bg-gray-100 grid grid-cols-3 gap-1 p-2">
+                                                                        <div className="bg-white h-16" />
+                                                                        <div className="bg-white h-16" />
+                                                                        <div className="bg-white h-16" />
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        case "minimal":
+                                                        default:
+                                                            return (
+                                                                <div className="absolute inset-0">
+                                                                    {img ? (
+                                                                        <img
+                                                                            src={
+                                                                                img
+                                                                            }
+                                                                            alt={
+                                                                                title
+                                                                            }
+                                                                            className="w-full h-full object-cover opacity-60"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-full h-full bg-gray-800" />
+                                                                    )}
+                                                                    <div className="absolute inset-0 bg-black/60" />
+                                                                    <div className="absolute inset-0 flex items-center justify-center text-white">
+                                                                        <h1 className="text-2xl font-bold">
+                                                                            {
+                                                                                title
+                                                                            }
+                                                                        </h1>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                    }
+                                                }
+                                            })()}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

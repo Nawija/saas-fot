@@ -137,7 +137,23 @@ export async function PATCH(
         }
 
         const body = await request.json();
-        const { hero_image, name, description, password, is_public } = body;
+        const {
+            hero_image,
+            name,
+            description,
+            password,
+            is_public,
+            hero_template,
+        } = body;
+
+        const allowedTemplates = new Set([
+            "minimal",
+            "fullscreen",
+            "split",
+            "overlay",
+            "gradient",
+            "cards",
+        ]);
 
         // Buduj dynamiczne zapytanie UPDATE
         const updates: string[] = [];
@@ -159,6 +175,20 @@ export async function PATCH(
         if (is_public !== undefined) {
             updates.push(`is_public = $${paramCount++}`);
             values.push(is_public);
+        }
+        if (hero_template !== undefined) {
+            // Opcjonalna walidacja dozwolonych wartości
+            if (
+                typeof hero_template !== "string" ||
+                !allowedTemplates.has(hero_template)
+            ) {
+                return NextResponse.json(
+                    { error: "Invalid hero_template value" },
+                    { status: 400 }
+                );
+            }
+            updates.push(`hero_template = $${paramCount++}`);
+            values.push(hero_template);
         }
         if (password !== undefined) {
             const bcrypt = require("bcrypt");
