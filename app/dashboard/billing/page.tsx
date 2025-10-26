@@ -90,10 +90,10 @@ export default function BillingPage() {
                 <div className="mb-10">
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
                         {/* Plan Header with Gradient */}
-                        <div className="bg-linear-to-r from-blue-500 to-blue-600 px-8 py-6">
+                        <div className="bg-linear-to-r from-blue-300 to-indigo-200 px-8 py-6">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="text-white">
-                                    <p className="text-sm font-medium text-blue-100 mb-1">
+                                    <p className="text-sm font-medium text-indigo-700 mb-1">
                                         Aktualny plan
                                     </p>
                                     <h2 className="text-3xl font-bold mb-1">
@@ -114,18 +114,18 @@ export default function BillingPage() {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="text-right">
-                                        <p className="text-xs text-blue-100 mb-1">
+                                        <p className="text-xs text-indigo-700 mb-1">
                                             Status
                                         </p>
                                         <span
                                             className={`inline-flex items-center gap-1 px-4 py-2 rounded-full text-sm font-semibold ${
                                                 user.subscription_status ===
                                                 "active"
-                                                    ? "bg-green-400 text-green-900"
+                                                    ? "bg-green-200 text-green-700"
                                                     : user.subscription_status ===
                                                       "cancelled"
                                                     ? "bg-red-400 text-red-900"
-                                                    : "bg-white/20 text-white"
+                                                    : "bg-black/20 text-white"
                                             }`}
                                         >
                                             <div
@@ -133,7 +133,7 @@ export default function BillingPage() {
                                                     user.subscription_status ===
                                                     "active"
                                                         ? "bg-green-900 animate-pulse"
-                                                        : "bg-gray-400"
+                                                        : "bg-gray-600"
                                                 }`}
                                             ></div>
                                             {user.subscription_status ===

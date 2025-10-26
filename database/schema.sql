@@ -1,6 +1,6 @@
 -- Dodaj kolumny do tabeli users dla subskrypcji
 ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_plan VARCHAR(50) DEFAULT 'free';
-ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(50) DEFAULT 'active';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(50) DEFAULT 'free';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS storage_used BIGINT DEFAULT 0;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS storage_limit BIGINT DEFAULT 2147483648; -- 2GB w bajtach
 ALTER TABLE users ADD COLUMN IF NOT EXISTS lemon_squeezy_customer_id VARCHAR(255);

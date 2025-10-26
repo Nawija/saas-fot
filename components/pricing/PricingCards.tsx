@@ -69,7 +69,7 @@ export default function PricingCards({
                         } ${isCurrentPlan ? "ring-2 ring-green-500" : ""}`}
                     >
                         {plan.popular && (
-                            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <div className="absolute -top-4 left-1/3 transform -translate-x-1/2">
                                 <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
                                     Najpopularniejszy
                                 </span>
@@ -78,7 +78,7 @@ export default function PricingCards({
 
                         {isCurrentPlan && (
                             <div className="absolute -top-4 right-4">
-                                <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                                <span className="bg-green-300 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
                                     Aktywny
                                 </span>
                             </div>
