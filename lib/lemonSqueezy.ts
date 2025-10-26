@@ -69,10 +69,12 @@ export function getPlanStorageLimit(plan: string): number {
 export async function generateCheckoutUrl(
     variantId: string,
     email: string,
-    userId: number
+    userId: number,
+    name?: string
 ): Promise<string> {
     const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
     const storeId = process.env.NEXT_PUBLIC_LEMON_SQUEEZY_STORE_ID;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
     if (!apiKey || !storeId) {
         throw new Error("Brak LEMON_SQUEEZY_API_KEY lub STORE_ID");
@@ -92,8 +94,16 @@ export async function generateCheckoutUrl(
                     data: {
                         type: "checkouts",
                         attributes: {
+                            // Redirect back to dashboard after successful purchase
+                            product_options: appUrl
+                                ? {
+                                      redirect_url: `${appUrl}/dashboard/billing`,
+                                  }
+                                : undefined,
                             checkout_data: {
                                 email,
+                                // Force customer name in checkout to avoid stale/cached value
+                                ...(name ? { name } : {}),
                                 custom: {
                                     user_id: userId.toString(),
                                 },

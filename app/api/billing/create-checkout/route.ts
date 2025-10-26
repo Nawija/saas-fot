@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
         const checkoutUrl = await generateCheckoutUrl(
             variantId,
             user.email,
-            user.id
+            user.id,
+            user.name
         );
 
         return NextResponse.json({

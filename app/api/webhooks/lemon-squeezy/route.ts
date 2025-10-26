@@ -47,6 +47,10 @@ export async function POST(req: NextRequest) {
         // Obsługa różnych eventów
         switch (eventName) {
             case "order_created":
+                // Order created doesn't always include subscription fields; acknowledge only.
+                // Subscription updates will arrive via subscription_* events.
+                break;
+
             case "subscription_created":
                 await handleSubscriptionCreated(userId, data);
                 break;
