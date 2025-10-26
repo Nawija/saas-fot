@@ -167,7 +167,7 @@ export default function CollectionsPage() {
                                     <Link
                                         href={`/dashboard/collections/${collection.id}`}
                                     >
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-800 transition-colors">
                                             {collection.name}
                                         </h3>
                                     </Link>
