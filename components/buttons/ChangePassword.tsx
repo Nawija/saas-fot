@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Key } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ChangePassword() {
     const router = useRouter();
@@ -20,11 +21,11 @@ export default function ChangePassword() {
             if (res.ok) {
                 router.push("/dashboard/u/reset-password");
             } else {
-                alert(data.error || "Błąd wysyłania kodu");
+                toast.error(data.error || "Błąd wysyłania kodu");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Wystąpił błąd. Spróbuj ponownie.");
+            toast.error("Wystąpił błąd. Spróbuj ponownie.");
         } finally {
             setIsLoading(false);
         }

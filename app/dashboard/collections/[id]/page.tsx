@@ -2,7 +2,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { AnimatePresence, motion } from "framer-motion";
 import {
     Upload,
     Link as LinkIcon,
@@ -11,6 +14,8 @@ import {
     ArrowLeft,
     Trash2,
     Eye,
+    Check,
+    Copy,
 } from "lucide-react";
 
 interface Collection {
@@ -20,6 +25,7 @@ interface Collection {
     description: string;
     hero_image: string;
     is_public: boolean;
+    password_plain?: string;
     created_at: string;
     photo_count: number;
 }
@@ -67,6 +73,7 @@ export default function CollectionDetailPage({
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [copied, setCopied] = useState(false);
 
     const galleryUrl = `${
         typeof window !== "undefined" ? window.location.origin : ""
@@ -151,12 +158,11 @@ export default function CollectionDetailPage({
                 ) {
                     if (!quotaErrorRedirected) {
                         quotaErrorRedirected = true;
-                        alert(
-                            `❌ Brak miejsca!\n\n${
+                        toast.error("Brak miejsca", {
+                            description:
                                 errorData.message ||
-                                "Przekroczono limit storage."
-                            }\n\nPrzekierowuję do zakupu rozszerzenia...`
-                        );
+                                "Przekroczono limit storage. Przekierowuję do zakupu rozszerzenia...",
+                        });
                         router.push("/dashboard/billing");
                     }
                     throw new Error("Storage limit reached");
@@ -191,12 +197,11 @@ export default function CollectionDetailPage({
                 ) {
                     if (!quotaErrorRedirected) {
                         quotaErrorRedirected = true;
-                        alert(
-                            `❌ Brak miejsca!\n\n${
+                        toast.error("Brak miejsca", {
+                            description:
                                 errorData.message ||
-                                "Przekroczono limit storage."
-                            }\n\nPrzekierowuję do zakupu rozszerzenia...`
-                        );
+                                "Przekroczono limit storage. Przekierowuję do zakupu rozszerzenia...",
+                        });
                         router.push("/dashboard/billing");
                     }
                     throw new Error("Storage limit reached");
@@ -237,10 +242,10 @@ export default function CollectionDetailPage({
             await fetchPhotos();
             await fetchCollection();
 
-            alert(`✅ Dodano ${uploaded} z ${totalFiles} zdjęć!`);
+            toast.success(`Dodano ${uploaded} z ${totalFiles} zdjęć`);
         } catch (error) {
             console.error("Upload error:", error);
-            alert("❌ Błąd podczas uploadu zdjęć");
+            toast.error("Błąd podczas uploadu zdjęć");
         } finally {
             setUploading(false);
             setUploadProgress(0);
@@ -250,31 +255,32 @@ export default function CollectionDetailPage({
     async function copyToClipboard() {
         try {
             await navigator.clipboard.writeText(galleryUrl);
-            alert("✅ Link skopiowany!");
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
         } catch (error) {
-            alert("❌ Nie udało się skopiować");
+            toast.error("Nie udało się skopiować");
         }
     }
 
-    async function deletePhoto(photoId: number) {
-        if (!collectionId) return;
-        if (!confirm("Na pewno chcesz usunąć to zdjęcie?")) return;
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [pendingPhotoId, setPendingPhotoId] = useState<number | null>(null);
 
+    async function performDeletePhoto(photoId: number) {
+        if (!collectionId) return;
         try {
             const res = await fetch(
                 `/api/collections/${collectionId}/photos/${photoId}`,
-                {
-                    method: "DELETE",
-                }
+                { method: "DELETE" }
             );
-
             if (res.ok) {
-                setPhotos(photos.filter((p) => p.id !== photoId));
-                await fetchCollection(); // Odśwież licznik
-                alert("✅ Zdjęcie usunięte");
+                setPhotos((prev) => prev.filter((p) => p.id !== photoId));
+                await fetchCollection();
+                toast.success("Zdjęcie usunięte");
+            } else {
+                toast.error("Nie udało się usunąć zdjęcia");
             }
         } catch (error) {
-            alert("❌ Błąd podczas usuwania");
+            toast.error("Błąd podczas usuwania");
         }
     }
 
@@ -339,18 +345,82 @@ export default function CollectionDetailPage({
                                     </p>
                                 )}
 
+                                {/* Hasło dostępu dla prywatnych galerii */}
+                                {!collection.is_public &&
+                                    collection.password_plain && (
+                                        <div className="flex items-center justify-start gap-2 mb-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                                            <p className="text-sm text-orange-700 font-medium">
+                                                Hasło dostępu dla klientów:
+                                            </p>
+                                            <code className="text-base font-mono text-orange-900 font-semibold">
+                                                {collection.password_plain}
+                                            </code>
+                                        </div>
+                                    )}
+
                                 {/* Link do udostępnienia */}
                                 <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
                                     <LinkIcon className="w-4 h-4 text-gray-400" />
                                     <code className="flex-1 text-sm text-gray-700 font-mono">
                                         {galleryUrl}
                                     </code>
-                                    <button
+                                    <motion.button
                                         onClick={copyToClipboard}
-                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                                        className={`relative overflow-hidden px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors ${
+                                            copied
+                                                ? "bg-green-600 hover:bg-green-700"
+                                                : "bg-blue-500 hover:bg-blue-600"
+                                        }`}
+                                        animate={{
+                                            width: copied ? "auto" : "auto",
+                                        }}
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 300,
+                                            damping: 25,
+                                        }}
                                     >
-                                        Kopiuj
-                                    </button>
+                                        <AnimatePresence
+                                            mode="wait"
+                                            initial={false}
+                                        >
+                                            <motion.span
+                                                key={
+                                                    copied ? "copied" : "label"
+                                                }
+                                                initial={{ y: 10, opacity: 0 }}
+                                                animate={{ y: 0, opacity: 1 }}
+                                                exit={{ y: -10, opacity: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="flex items-center justify-center gap-2 whitespace-nowrap"
+                                            >
+                                                {copied ? (
+                                                    <>
+                                                        <Check size={16} />
+                                                        Skopiowano
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Copy size={16} />
+                                                        Kopiuj
+                                                    </>
+                                                )}
+                                            </motion.span>
+                                        </AnimatePresence>
+                                        <AnimatePresence>
+                                            {copied && (
+                                                <motion.span
+                                                    className="absolute inset-0 rounded-lg bg-white/10"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                    transition={{
+                                                        duration: 0.3,
+                                                    }}
+                                                />
+                                            )}
+                                        </AnimatePresence>
+                                    </motion.button>
                                     <a
                                         href={galleryUrl}
                                         target="_blank"
@@ -484,9 +554,10 @@ export default function CollectionDetailPage({
                                     />
                                     <div className="absolute inset-0 bg-black/40 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
                                         <button
-                                            onClick={() =>
-                                                deletePhoto(photo.id)
-                                            }
+                                            onClick={() => {
+                                                setPendingPhotoId(photo.id);
+                                                setConfirmOpen(true);
+                                            }}
                                             className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                                         >
                                             <Trash2 className="w-5 h-5" />
@@ -498,6 +569,20 @@ export default function CollectionDetailPage({
                     )}
                 </div>
             </div>
+            <ConfirmDialog
+                open={confirmOpen}
+                onOpenChange={setConfirmOpen}
+                title="Na pewno chcesz usunąć to zdjęcie?"
+                description="Tej operacji nie można cofnąć."
+                confirmLabel="Usuń zdjęcie"
+                cancelLabel="Anuluj"
+                onConfirm={async () => {
+                    if (pendingPhotoId != null) {
+                        await performDeletePhoto(pendingPhotoId);
+                        setPendingPhotoId(null);
+                    }
+                }}
+            />
         </div>
     );
 }

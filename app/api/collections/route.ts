@@ -70,8 +70,8 @@ export async function POST(req: NextRequest) {
 
         const result = await query(
             `INSERT INTO collections 
-            (user_id, name, slug, description, hero_image, password_hash, is_public)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            (user_id, name, slug, description, hero_image, password_hash, password_plain, is_public)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *`,
             [
                 user.id,
@@ -80,6 +80,7 @@ export async function POST(req: NextRequest) {
                 description || null,
                 hero_image || null,
                 passwordHash,
+                password || null,
                 is_public || false,
             ]
         );

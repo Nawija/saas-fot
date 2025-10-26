@@ -3,6 +3,7 @@
 import { PLANS, Plan } from "@/lib/plans";
 import { Check } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface PricingCardsProps {
     currentPlan?: string;
@@ -45,7 +46,7 @@ export default function PricingCards({
             }
         } catch (error) {
             console.error("Checkout error:", error);
-            alert("Wystąpił błąd. Spróbuj ponownie.");
+            toast.error("Wystąpił błąd. Spróbuj ponownie.");
         } finally {
             setIsLoading(null);
         }

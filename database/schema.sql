@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS collections (
     description TEXT,
     hero_image TEXT,
     password_hash TEXT,
+    password_plain TEXT,
     is_public BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),

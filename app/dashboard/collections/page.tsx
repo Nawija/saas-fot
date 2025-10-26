@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import {
     Plus,
     Image,
@@ -9,6 +11,8 @@ import {
     ExternalLink,
     Settings,
     Trash2,
+    Globe,
+    Lock,
 } from "lucide-react";
 
 interface Collection {
@@ -18,6 +22,7 @@ interface Collection {
     description?: string;
     hero_image?: string;
     is_public: boolean;
+    password_plain?: string;
     photo_count?: number;
     created_at: string;
 }
@@ -25,6 +30,10 @@ interface Collection {
 export default function CollectionsPage() {
     const [collections, setCollections] = useState<Collection[]>([]);
     const [loading, setLoading] = useState(true);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [pending, setPending] = useState<{ id: number; name: string } | null>(
+        null
+    );
 
     useEffect(() => {
         fetchCollections();
@@ -44,43 +53,30 @@ export default function CollectionsPage() {
         }
     };
 
-    const handleDelete = async (
-        collectionId: number,
-        collectionName: string
-    ) => {
-        if (
-            !confirm(
-                `Czy na pewno chcesz usunąć galerię "${collectionName}"?\n\nUsuniete zostaną:\n- Galeria\n- Wszystkie zdjęcia\n- Pliki z Cloudflare R2\n\nTej operacji nie można cofnąć!`
-            )
-        ) {
-            return;
-        }
-
+    const performDelete = async (collectionId: number) => {
         try {
             const res = await fetch(`/api/collections/${collectionId}`, {
                 method: "DELETE",
             });
-
             const data = await res.json();
-
             if (data.ok) {
-                alert(
-                    `✅ Usunięto galerię!\n\nUsunięto ${
-                        data.deletedFiles
-                    } plików\nZwolniono ${
+                toast.success(
+                    `Usunięto galerię — zwolniono ${
                         Math.round((data.freedSpace / 1024 / 1024) * 10) / 10
-                    } MB`
+                    } MB`,
+                    { description: `Usunięto ${data.deletedFiles} plików` }
                 );
-                // Odśwież listę
-                setCollections(
-                    collections.filter((c) => c.id !== collectionId)
+                setCollections((prev) =>
+                    prev.filter((c) => c.id !== collectionId)
                 );
             } else {
-                alert("❌ Błąd: " + (data.error || "Nie udało się usunąć"));
+                toast.error("Błąd usuwania", {
+                    description: data.error || "Nie udało się usunąć",
+                });
             }
         } catch (error) {
             console.error("Delete error:", error);
-            alert("❌ Wystąpił błąd podczas usuwania");
+            toast.error("Wystąpił błąd podczas usuwania");
         }
     };
 
@@ -190,14 +186,25 @@ export default function CollectionsPage() {
                                                 zdjęć
                                             </span>
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                            <Users className="w-4 h-4" />
-                                            <span>
-                                                {collection.is_public
-                                                    ? "Publiczna"
-                                                    : "Prywatna"}
+                                         <span
+                                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                            collection.is_public
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-orange-100 text-orange-700"
+                                        }`}
+                                    >
+                                        {collection.is_public ? (
+                                            <span className="flex items-center gap-1">
+                                                <Globe className="w-3 h-3" />{" "}
+                                                Publiczna
                                             </span>
-                                        </div>
+                                        ) : (
+                                            <span className="flex items-center gap-1">
+                                                <Lock className="w-3 h-3" />{" "}
+                                                Chroniona
+                                            </span>
+                                        )}
+                                    </span>
                                     </div>
 
                                     {/* Actions */}
@@ -218,12 +225,13 @@ export default function CollectionsPage() {
                                             <Settings className="w-4 h-4" />
                                         </Link>
                                         <button
-                                            onClick={() =>
-                                                handleDelete(
-                                                    collection.id,
-                                                    collection.name
-                                                )
-                                            }
+                                            onClick={() => {
+                                                setPending({
+                                                    id: collection.id,
+                                                    name: collection.name,
+                                                });
+                                                setConfirmOpen(true);
+                                            }}
                                             className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-colors"
                                             title="Usuń galerię"
                                         >
@@ -236,6 +244,24 @@ export default function CollectionsPage() {
                     </div>
                 )}
             </div>
+            <ConfirmDialog
+                open={confirmOpen}
+                onOpenChange={setConfirmOpen}
+                title={
+                    pending ? `Usunąć galerię "${pending.name}"?` : "Usunąć?"
+                }
+                description={
+                    "Usunięte zostaną: galeria, wszystkie zdjęcia i pliki z Cloudflare R2. Tej operacji nie można cofnąć."
+                }
+                confirmLabel="Usuń galerię"
+                cancelLabel="Anuluj"
+                onConfirm={async () => {
+                    if (pending) {
+                        await performDelete(pending.id);
+                        setPending(null);
+                    }
+                }}
+            />
         </div>
     );
 }

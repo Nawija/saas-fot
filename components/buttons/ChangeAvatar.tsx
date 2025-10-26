@@ -3,6 +3,8 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, Trash2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 interface ChangeAvatarProps {
     currentAvatar?: string | null;
@@ -14,6 +16,7 @@ export default function ChangeAvatar({ currentAvatar }: ChangeAvatarProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState("");
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     const handleFileSelect = async (
         event: React.ChangeEvent<HTMLInputElement>
@@ -51,9 +54,11 @@ export default function ChangeAvatar({ currentAvatar }: ChangeAvatarProps) {
                 router.refresh();
             } else {
                 if (res.status === 413 && data.upgradeRequired) {
-                    alert(
-                        `❌ Brak miejsca!\n\n${data.message}\n\nPrzekierowuję do zakupu rozszerzenia...`
-                    );
+                    toast.error("Brak miejsca", {
+                        description:
+                            data.message ||
+                            "Przekroczono limit storage. Przekierowuję do zakupu rozszerzenia...",
+                    });
                     router.push("/dashboard/billing");
                     return;
                 }
@@ -73,19 +78,10 @@ export default function ChangeAvatar({ currentAvatar }: ChangeAvatarProps) {
 
     const handleDelete = async () => {
         if (!currentAvatar) return;
-
-        const confirmed = confirm("Czy na pewno chcesz usunąć avatar?");
-        if (!confirmed) return;
-
         setIsDeleting(true);
-
         try {
-            const res = await fetch("/api/user/avatar", {
-                method: "DELETE",
-            });
-
+            const res = await fetch("/api/user/avatar", { method: "DELETE" });
             const data = await res.json();
-
             if (res.ok) {
                 router.refresh();
             } else {
@@ -100,60 +96,75 @@ export default function ChangeAvatar({ currentAvatar }: ChangeAvatarProps) {
     };
 
     return (
-        <div className="space-y-3">
-            <div className="flex items-center gap-2">
-                <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading || isDeleting}
-                    className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                >
-                    {isUploading ? (
-                        <>
-                            <Loader2 size={16} className="animate-spin" />
-                            <span>Przesyłanie...</span>
-                        </>
-                    ) : (
-                        <>
-                            <Upload size={16} />
-                            <span>Zmień avatar</span>
-                        </>
-                    )}
-                </button>
-
-                {currentAvatar && (
+        <>
+            <div className="space-y-3">
+                <div className="flex items-center gap-2">
                     <button
-                        onClick={handleDelete}
+                        onClick={() => fileInputRef.current?.click()}
                         disabled={isUploading || isDeleting}
-                        className="flex items-center gap-2 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
                     >
-                        {isDeleting ? (
+                        {isUploading ? (
                             <>
                                 <Loader2 size={16} className="animate-spin" />
-                                <span>Usuwanie...</span>
+                                <span>Przesyłanie...</span>
                             </>
                         ) : (
                             <>
-                                <Trash2 size={16} />
-                                <span>Usuń</span>
+                                <Upload size={16} />
+                                <span>Zmień avatar</span>
                             </>
                         )}
                     </button>
-                )}
+
+                    {currentAvatar && (
+                        <button
+                            onClick={() => setConfirmOpen(true)}
+                            disabled={isUploading || isDeleting}
+                            className="flex items-center gap-2 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <Loader2
+                                        size={16}
+                                        className="animate-spin"
+                                    />
+                                    <span>Usuwanie...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Trash2 size={16} />
+                                    <span>Usuń</span>
+                                </>
+                            )}
+                        </button>
+                    )}
+                </div>
+
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                />
+
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+
+                <p className="text-xs text-gray-500">
+                    Dozwolone formaty: JPG, PNG, WEBP, GIF. Maksymalny rozmiar:
+                    5MB
+                </p>
             </div>
-
-            <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
+            <ConfirmDialog
+                open={confirmOpen}
+                onOpenChange={setConfirmOpen}
+                title="Czy na pewno chcesz usunąć avatar?"
+                description="Tej operacji nie można cofnąć."
+                confirmLabel="Usuń avatar"
+                cancelLabel="Anuluj"
+                onConfirm={handleDelete}
             />
-
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            <p className="text-xs text-gray-500">
-                Dozwolone formaty: JPG, PNG, WEBP, GIF. Maksymalny rozmiar: 5MB
-            </p>
-        </div>
+        </>
     );
 }

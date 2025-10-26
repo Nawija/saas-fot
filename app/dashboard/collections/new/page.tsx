@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Lock, Globe } from "lucide-react";
+import { toast } from "sonner";
 
 export default function NewCollectionPage() {
     const router = useRouter();
@@ -65,7 +66,7 @@ export default function NewCollectionPage() {
             const data = await res.json();
 
             if (!data.ok) {
-                alert(data.error || "Błąd tworzenia galerii");
+                toast.error(data.error || "Błąd tworzenia galerii");
                 return;
             }
 
@@ -90,15 +91,15 @@ export default function NewCollectionPage() {
                         uploadRes.status === 413 &&
                         uploadData.upgradeRequired
                     ) {
-                        alert(
-                            "❌ Brak miejsca!\n\n" +
-                                uploadData.message +
-                                "\n\nPrzekierowuję do zakupu rozszerzenia..."
-                        );
+                        toast.error("Brak miejsca", {
+                            description:
+                                uploadData.message ||
+                                "Przekroczono limit storage. Przekierowuję do zakupu rozszerzenia...",
+                        });
                         router.push("/dashboard/billing");
                         return;
                     }
-                    alert(uploadData.error || "Błąd uploadu hero image");
+                    toast.error(uploadData.error || "Błąd uploadu hero image");
                     return;
                 }
 
@@ -128,11 +129,11 @@ export default function NewCollectionPage() {
                         storageRes.status === 413 &&
                         storageData.upgradeRequired
                     ) {
-                        alert(
-                            "❌ Brak miejsca!\n\n" +
-                                storageData.message +
-                                "\n\nPrzekierowuję do zakupu rozszerzenia..."
-                        );
+                        toast.error("Brak miejsca", {
+                            description:
+                                storageData.message ||
+                                "Przekroczono limit storage. Przekierowuję do zakupu rozszerzenia...",
+                        });
                         router.push("/dashboard/billing");
                         return;
                     }
@@ -143,7 +144,7 @@ export default function NewCollectionPage() {
             router.push(`/dashboard/collections/${collectionId}`);
         } catch (error) {
             console.error("Error:", error);
-            alert("Wystąpił błąd");
+            toast.error("Wystąpił błąd");
         } finally {
             setLoading(false);
         }
