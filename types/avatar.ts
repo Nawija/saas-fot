@@ -33,4 +33,6 @@ export interface User {
     storage_used: number;
     storage_limit: number;
     lemon_squeezy_customer_id?: string;
+    lemon_squeezy_subscription_id?: string;
+    subscription_ends_at?: string | null;
 }

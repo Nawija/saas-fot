@@ -43,6 +43,11 @@ export async function POST(req: NextRequest) {
         }
 
         const data = payload.data.attributes;
+        const subscriptionId = payload.data.id; // ID subskrypcji jest tutaj, nie w attributes
+
+        console.log(
+            `[Webhook ${eventName}] User: ${userId}, SubscriptionID: ${subscriptionId}`
+        );
 
         // Obsługa różnych eventów
         switch (eventName) {
@@ -52,11 +57,11 @@ export async function POST(req: NextRequest) {
                 break;
 
             case "subscription_created":
-                await handleSubscriptionCreated(userId, data);
+                await handleSubscriptionCreated(userId, data, subscriptionId);
                 break;
 
             case "subscription_updated":
-                await handleSubscriptionUpdated(userId, data);
+                await handleSubscriptionUpdated(userId, data, subscriptionId);
                 break;
 
             case "subscription_cancelled":
@@ -91,9 +96,17 @@ export async function POST(req: NextRequest) {
     }
 }
 
-async function handleSubscriptionCreated(userId: string, data: any) {
+async function handleSubscriptionCreated(
+    userId: string,
+    data: any,
+    subscriptionId: string
+) {
     const plan = mapVariantToPlan(data.variant_id.toString());
     const storageLimit = getPlanStorageLimit(plan);
+
+    console.log(
+        `[handleSubscriptionCreated] Saving subscription_id: ${subscriptionId} for user: ${userId}`
+    );
 
     await query(
         `UPDATE users 
@@ -109,29 +122,47 @@ async function handleSubscriptionCreated(userId: string, data: any) {
             data.status,
             storageLimit,
             data.customer_id.toString(),
-            data.subscription_id?.toString() || null,
-            data.ends_at ? new Date(data.ends_at) : null,
+            subscriptionId,
+            data.renews_at
+                ? new Date(data.renews_at)
+                : data.ends_at
+                ? new Date(data.ends_at)
+                : null,
             userId,
         ]
     );
 }
 
-async function handleSubscriptionUpdated(userId: string, data: any) {
+async function handleSubscriptionUpdated(
+    userId: string,
+    data: any,
+    subscriptionId: string
+) {
     const plan = mapVariantToPlan(data.variant_id.toString());
     const storageLimit = getPlanStorageLimit(plan);
+
+    console.log(
+        `[handleSubscriptionUpdated] Saving subscription_id: ${subscriptionId} for user: ${userId}`
+    );
 
     await query(
         `UPDATE users 
          SET subscription_plan = $1,
              subscription_status = $2,
              storage_limit = $3,
-             subscription_ends_at = $4
-         WHERE id = $5`,
+             lemon_squeezy_subscription_id = $4,
+             subscription_ends_at = $5
+         WHERE id = $6`,
         [
             plan,
             data.status,
             storageLimit,
-            data.ends_at ? new Date(data.ends_at) : null,
+            subscriptionId,
+            data.renews_at
+                ? new Date(data.renews_at)
+                : data.ends_at
+                ? new Date(data.ends_at)
+                : null,
             userId,
         ]
     );

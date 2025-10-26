@@ -2,6 +2,8 @@ import { getUser } from "@/lib/auth/getUser";
 import { redirect } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ChangeAvatar from "@/components/buttons/ChangeAvatar";
+import SubscriptionSection from "@/components/dashboard/SubscriptionSection";
+import DeleteAccountButton from "@/components/buttons/DeleteAccountButton";
 
 export default async function ProfilePage() {
     const user = await getUser();
@@ -73,6 +75,24 @@ export default async function ProfilePage() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {user.subscription_plan !== "free" && (
+                <div className="max-w-4xl mx-auto px-4 mt-6">
+                    <SubscriptionSection
+                        subscription_plan={user.subscription_plan}
+                        subscription_status={user.subscription_status}
+                        lemon_squeezy_subscription_id={
+                            user.lemon_squeezy_subscription_id
+                        }
+                        subscription_ends_at={user.subscription_ends_at}
+                    />
+                </div>
+            )}
+
+            {/* Delete Account Section */}
+            <div className="max-w-4xl mx-auto px-4 mt-6 mb-12">
+                <DeleteAccountButton />
             </div>
         </div>
     );

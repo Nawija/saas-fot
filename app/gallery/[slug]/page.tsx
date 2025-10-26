@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Loading from "@/components/ui/Loading";
 import { Eye, Lock } from "lucide-react";
 
 interface Collection {
@@ -82,14 +83,7 @@ export default function GalleryLandingPage() {
     };
 
     if (loading) {
-        return (
-            <div className="h-screen flex items-center justify-center bg-black">
-                <div className="relative">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-600"></div>
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent absolute top-0 left-0"></div>
-                </div>
-            </div>
-        );
+        return <Loading />;
     }
 
     if (error || !collection) {

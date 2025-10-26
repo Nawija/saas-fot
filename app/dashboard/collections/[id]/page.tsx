@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import Loading from "@/components/ui/Loading";
 import { AnimatePresence, motion } from "framer-motion";
 import {
     Upload,
@@ -285,13 +286,7 @@ export default function CollectionDetailPage({
     }
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
-                </div>
-            </div>
-        );
+        return <Loading />;
     }
 
     if (!collection) {

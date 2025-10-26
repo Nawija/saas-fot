@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { User } from "@/types/avatar";
 import { PLANS, formatBytes } from "@/lib/plans";
 import PricingCards from "@/components/pricing/PricingCards";
+import Loading from "@/components/ui/Loading";
 import { Sparkles, TrendingUp, Shield } from "lucide-react";
 
 export default function BillingPage() {
@@ -29,14 +30,7 @@ export default function BillingPage() {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen ">
-                <div className="relative">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200"></div>
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent absolute top-0 left-0"></div>
-                </div>
-            </div>
-        );
+        return <Loading />;
     }
 
     if (!user) {

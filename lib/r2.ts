@@ -2,6 +2,8 @@ import {
     S3Client,
     PutObjectCommand,
     DeleteObjectCommand,
+    ListObjectsV2Command,
+    DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
 
 // Konfiguracja klienta R2
@@ -113,5 +115,47 @@ export async function deleteMultipleFromR2(urls: string[]): Promise<void> {
     } catch (error) {
         console.error("Error deleting multiple from R2:", error);
         // Nie rzucamy błędu - usunięcie jest opcjonalne
+    }
+}
+
+/**
+ * Usuwa całą zawartość folderu użytkownika z R2
+ * @param userId - ID użytkownika
+ */
+export async function deleteUserFolder(userId: string): Promise<void> {
+    try {
+        const prefix = `users/${userId}/`;
+
+        // Pobierz listę wszystkich obiektów w folderze użytkownika
+        const listCommand = new ListObjectsV2Command({
+            Bucket: BUCKET_NAME,
+            Prefix: prefix,
+        });
+
+        const listedObjects = await r2Client.send(listCommand);
+
+        if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
+            console.log(`No objects found for user ${userId}`);
+            return;
+        }
+
+        // Usuń wszystkie obiekty
+        const deleteCommand = new DeleteObjectsCommand({
+            Bucket: BUCKET_NAME,
+            Delete: {
+                Objects: listedObjects.Contents.map((obj) => ({
+                    Key: obj.Key,
+                })),
+                Quiet: true,
+            },
+        });
+
+        await r2Client.send(deleteCommand);
+        console.log(
+            `Deleted ${listedObjects.Contents.length} objects for user ${userId}`
+        );
+    } catch (error) {
+        console.error("Error deleting user folder from R2:", error);
+        throw new Error("Nie udało się usunąć plików użytkownika");
     }
 }

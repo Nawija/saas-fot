@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Loading from "@/components/ui/Loading";
 import {
     Heart,
     Download,
@@ -124,14 +125,7 @@ export default function GalleryPhotosPage() {
     }, [lightboxOpen, currentPhotoIndex]);
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-zinc-900">
-                <div className="relative">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-700"></div>
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent absolute top-0 left-0"></div>
-                </div>
-            </div>
-        );
+        return <Loading />;
     }
 
     if (!collection) {
@@ -187,15 +181,14 @@ export default function GalleryPhotosPage() {
                         </div>
                     </div>
                 </div>
-                
+
                 {/* Scroll Indicator */}
 
-                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-                        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
-                            <div className="w-1.5 h-3 bg-white rounded-full"></div>
-                        </div>
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+                    <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
+                        <div className="w-1.5 h-3 bg-white rounded-full"></div>
                     </div>
-
+                </div>
 
                 {/* Photos Grid - Masonry Layout */}
                 <div className="px-2 py-12">

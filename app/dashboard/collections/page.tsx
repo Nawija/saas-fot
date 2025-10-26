@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import Loading from "@/components/ui/Loading";
 import {
     Plus,
     Image,
-    Users,
     ExternalLink,
     Settings,
     Trash2,
@@ -81,14 +81,7 @@ export default function CollectionsPage() {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="relative">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200"></div>
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent absolute top-0 left-0"></div>
-                </div>
-            </div>
-        );
+        return <Loading />;
     }
 
     return (
@@ -186,25 +179,25 @@ export default function CollectionsPage() {
                                                 zdjęć
                                             </span>
                                         </div>
-                                         <span
-                                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                            collection.is_public
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-orange-100 text-orange-700"
-                                        }`}
-                                    >
-                                        {collection.is_public ? (
-                                            <span className="flex items-center gap-1">
-                                                <Globe className="w-3 h-3" />{" "}
-                                                Publiczna
-                                            </span>
-                                        ) : (
-                                            <span className="flex items-center gap-1">
-                                                <Lock className="w-3 h-3" />{" "}
-                                                Chroniona
-                                            </span>
-                                        )}
-                                    </span>
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                                collection.is_public
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-orange-100 text-orange-700"
+                                            }`}
+                                        >
+                                            {collection.is_public ? (
+                                                <span className="flex items-center gap-1">
+                                                    <Globe className="w-3 h-3" />{" "}
+                                                    Publiczna
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center gap-1">
+                                                    <Lock className="w-3 h-3" />{" "}
+                                                    Chroniona
+                                                </span>
+                                            )}
+                                        </span>
                                     </div>
 
                                     {/* Actions */}
