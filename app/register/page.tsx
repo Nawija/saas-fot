@@ -11,7 +11,7 @@ import SuccessAnimation from "@/components/auth/SuccessAnimation";
 import ErrorMessage from "@/components/auth/ErrorMessage";
 import EmailPasswordForm from "@/components/auth/EmailPasswordForm";
 import VerificationForm from "@/components/auth/VerificationForm";
-import Image from "next/image";
+import AuthSidePanel from "@/components/auth/AuthSidePanel";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -78,25 +78,10 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
-            <div className="w-full bg-white shadow-lg rounded-3xl overflow-hidden flex flex-col md:flex-row">
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="w-full bg-white overflow-hidden flex flex-col md:flex-row">
                 {/* LEWA STRONA */}
-                <div className="hidden md:flex h-screen flex-col justify-center items-center w-1/2 bg-linear-to-tl from-blue-400 to-blue-700 text-white p-10">
-                    <div className="text-center">
-                        <div className="bg-white p-3 rounded-full w-max mx-auto mb-4">
-                            <Image
-                                src="/logo.svg"
-                                alt="Logo"
-                                width={60}
-                                height={60}
-                            />
-                        </div>
-                        <h2 className="text-2xl font-semibold">SEOVILEO</h2>
-                        <p className="mt-4 text-blue-100">
-                            We make it easy for you to manage your account
-                        </p>
-                    </div>
-                </div>
+                <AuthSidePanel subtitle="We make it easy for you to manage your account" />
 
                 {/* PRAWA STRONA */}
                 <div className="w-full md:w-1/3 mx-auto p-10 flex flex-col justify-center relative overflow-hidden">

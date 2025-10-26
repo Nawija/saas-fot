@@ -123,70 +123,121 @@ export default function CollectionDetailPage({
         setUploading(true);
         setUploadProgress(0);
 
-        try {
-            const totalFiles = files.length;
-            let uploaded = 0;
+        const fileArray = Array.from(files);
+        const totalFiles = fileArray.length;
+        let uploaded = 0;
+        let quotaErrorRedirected = false;
 
-            for (const file of Array.from(files)) {
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("type", "photo");
-                formData.append("collectionId", collectionId); // DODANE
+        const uploadSingle = async (file: File) => {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("type", "photo");
+            formData.append("collectionId", collectionId);
 
-                // Upload do R2
-                const uploadRes = await fetch("/api/collections/upload", {
-                    method: "POST",
-                    body: formData,
-                });
+            // Upload do R2
+            const uploadRes = await fetch("/api/collections/upload", {
+                method: "POST",
+                body: formData,
+            });
 
-                if (!uploadRes.ok) {
-                    const errorData = await uploadRes.json();
-                    if (uploadRes.status === 413 && errorData.upgradeRequired) {
+            if (!uploadRes.ok) {
+                let errorData: any = {};
+                try {
+                    errorData = await uploadRes.json();
+                } catch {}
+                if (
+                    uploadRes.status === 413 &&
+                    (errorData?.upgradeRequired || errorData?.message)
+                ) {
+                    if (!quotaErrorRedirected) {
+                        quotaErrorRedirected = true;
                         alert(
-                            `❌ Brak miejsca!\n\n${errorData.message}\n\nPrzekierowuję do zakupu rozszerzenia...`
+                            `❌ Brak miejsca!\n\n${
+                                errorData.message ||
+                                "Przekroczono limit storage."
+                            }\n\nPrzekierowuję do zakupu rozszerzenia...`
                         );
                         router.push("/dashboard/billing");
-                        return;
                     }
-                    throw new Error(`Failed to upload ${file.name}`);
+                    throw new Error("Storage limit reached");
                 }
-
-                const { url, size } = await uploadRes.json();
-
-                // Zapisz w bazie
-                const saveRes = await fetch(
-                    `/api/collections/${collectionId}/photos`,
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            file_name: file.name,
-                            file_path: url,
-                            file_size: size,
-                        }),
-                    }
-                );
-
-                if (!saveRes.ok) {
-                    const errorData = await saveRes.json();
-                    if (saveRes.status === 413 && errorData.upgradeRequired) {
-                        alert(
-                            `❌ Brak miejsca!\n\n${errorData.message}\n\nPrzekierowuję do zakupu rozszerzenia...`
-                        );
-                        router.push("/dashboard/billing");
-                        return;
-                    }
-                    throw new Error(`Failed to save ${file.name}`);
-                }
-
-                uploaded++;
-                setUploadProgress(Math.round((uploaded / totalFiles) * 100));
+                throw new Error(`Failed to upload ${file.name}`);
             }
+
+            const { url, size } = await uploadRes.json();
+
+            // Zapisz w bazie
+            const saveRes = await fetch(
+                `/api/collections/${collectionId}/photos`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        file_name: file.name,
+                        file_path: url,
+                        file_size: size,
+                    }),
+                }
+            );
+
+            if (!saveRes.ok) {
+                let errorData: any = {};
+                try {
+                    errorData = await saveRes.json();
+                } catch {}
+                if (
+                    saveRes.status === 413 &&
+                    (errorData?.upgradeRequired || errorData?.message)
+                ) {
+                    if (!quotaErrorRedirected) {
+                        quotaErrorRedirected = true;
+                        alert(
+                            `❌ Brak miejsca!\n\n${
+                                errorData.message ||
+                                "Przekroczono limit storage."
+                            }\n\nPrzekierowuję do zakupu rozszerzenia...`
+                        );
+                        router.push("/dashboard/billing");
+                    }
+                    throw new Error("Storage limit reached");
+                }
+                throw new Error(`Failed to save ${file.name}`);
+            }
+
+            // Progress po zakończeniu pojedynczego pliku
+            uploaded++;
+            setUploadProgress(Math.round((uploaded / totalFiles) * 100));
+        };
+
+        try {
+            // Prosty pulpit współbieżności (limit równoległych uploadów)
+            const CONCURRENCY = 4; // rozsądna równoległość
+            let index = 0;
+
+            const worker = async () => {
+                while (index < totalFiles) {
+                    const currentIndex = index++;
+                    const file = fileArray[currentIndex];
+                    try {
+                        await uploadSingle(file);
+                    } catch (err) {
+                        // Błąd pojedynczego pliku — log i kontynuacja pozostałych
+                        console.error("Upload failed for", file.name, err);
+                    }
+                }
+            };
+
+            const workers = Array.from(
+                { length: Math.min(CONCURRENCY, totalFiles) },
+                () => worker()
+            );
+            await Promise.all(workers);
 
             // Odśwież listę zdjęć
             await fetchPhotos();
             await fetchCollection();
-            alert(`✅ Dodano ${uploaded} zdjęć!`);
+
+            alert(`✅ Dodano ${uploaded} z ${totalFiles} zdjęć!`);
         } catch (error) {
             console.error("Upload error:", error);
             alert("❌ Błąd podczas uploadu zdjęć");
@@ -428,6 +479,8 @@ export default function CollectionDetailPage({
                                         src={photo.file_path}
                                         alt={photo.file_name}
                                         className="w-full h-full object-cover"
+                                        loading="lazy"
+                                        decoding="async"
                                     />
                                     <div className="absolute inset-0 bg-black/40 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
                                         <button

@@ -37,6 +37,15 @@ export default function LoginForm({
                 required
             />
 
+            <div className="text-right">
+                <Link
+                    href="/forgot-password"
+                    className="text-sm text-blue-600 hover:underline"
+                >
+                    Zapomniałeś hasła?
+                </Link>
+            </div>
+
             <MainButton
                 loading={loading}
                 loadingText="Logowanie..."

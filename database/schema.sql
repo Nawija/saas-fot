@@ -10,7 +10,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_ends_at TIMESTAMP;
 -- Tabela dla kolekcji (galerii) klientów
 CREATE TABLE IF NOT EXISTS collections (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL,
     description TEXT,
@@ -29,7 +29,7 @@ CREATE INDEX IF NOT EXISTS idx_collections_slug ON collections(slug);
 CREATE TABLE IF NOT EXISTS photos (
     id SERIAL PRIMARY KEY,
     collection_id INTEGER NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     file_name VARCHAR(255) NOT NULL,
     file_path TEXT NOT NULL,
     file_size BIGINT NOT NULL,
@@ -67,3 +67,17 @@ CREATE TABLE IF NOT EXISTS lemon_squeezy_webhooks (
 
 CREATE INDEX IF NOT EXISTS idx_webhooks_processed ON lemon_squeezy_webhooks(processed);
 CREATE INDEX IF NOT EXISTS idx_webhooks_created_at ON lemon_squeezy_webhooks(created_at);
+
+-- Tabela dla kodów resetowania hasła
+CREATE TABLE IF NOT EXISTS password_reset_codes (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    code VARCHAR(6) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    used BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_password_reset_user_id ON password_reset_codes(user_id);
+CREATE INDEX IF NOT EXISTS idx_password_reset_expires ON password_reset_codes(expires_at);
