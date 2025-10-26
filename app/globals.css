@@ -10,6 +10,18 @@ button {
     cursor: pointer;
 }
 
+.anim-opacity {
+    animation: anim-opacity 0.4s both 0.1s;
+}
+@keyframes anim-opacity {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 @theme inline {
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
@@ -118,10 +130,10 @@ button {
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+    * {
+        @apply border-border outline-ring/50;
     }
-  body {
-    @apply bg-background text-foreground;
+    body {
+        @apply bg-background text-foreground;
     }
 }

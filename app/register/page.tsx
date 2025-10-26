@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
     useRegisterForm,
     usePasswordValidation,
@@ -105,43 +105,75 @@ export default function RegisterPage() {
                         {state.success && <SuccessAnimation />}
                     </AnimatePresence>
 
-                    <h1 className="text-3xl font-semibold text-center text-blue-700 mb-2">
-                        Create Account
-                    </h1>
-                    <p className="text-center text-gray-500 mb-6">
-                        Sign up to get started
-                    </p>
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <h1 className="text-3xl font-semibold text-center text-blue-700 mb-2">
+                            Create Account
+                        </h1>
+                        <p className="text-center text-gray-500 mb-6">
+                            Sign up to get started
+                        </p>
+                    </motion.div>
 
                     <ErrorMessage message={state.error} />
 
-                    {!state.showCodeStep ? (
-                        <EmailPasswordForm
-                            email={state.email}
-                            password={state.password}
-                            confirmPassword={state.confirmPassword}
-                            loading={state.loading}
-                            onEmailChange={(value) =>
-                                updateField("email", value)
-                            }
-                            onPasswordChange={(value) =>
-                                updateField("password", value)
-                            }
-                            onConfirmPasswordChange={(value) =>
-                                updateField("confirmPassword", value)
-                            }
-                            onSubmit={handleSendCode}
-                        />
-                    ) : (
-                        <VerificationForm
-                            email={state.email}
-                            code={state.code}
-                            loading={state.loading}
-                            onCodeChange={(value) => updateField("code", value)}
-                            onSubmit={handleRegister}
-                            onBack={() => setShowCodeStep(false)}
-                            onExpire={() => setError("Kod wygasł")}
-                        />
-                    )}
+                    <AnimatePresence mode="wait">
+                        {!state.showCodeStep ? (
+                            <motion.div
+                                key="email-form"
+                                initial={{ opacity: 0, x: -50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 50 }}
+                                transition={{
+                                    duration: 0.4,
+                                    ease: "easeInOut",
+                                }}
+                            >
+                                <EmailPasswordForm
+                                    email={state.email}
+                                    password={state.password}
+                                    confirmPassword={state.confirmPassword}
+                                    loading={state.loading}
+                                    onEmailChange={(value) =>
+                                        updateField("email", value)
+                                    }
+                                    onPasswordChange={(value) =>
+                                        updateField("password", value)
+                                    }
+                                    onConfirmPasswordChange={(value) =>
+                                        updateField("confirmPassword", value)
+                                    }
+                                    onSubmit={handleSendCode}
+                                />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="verification-form"
+                                initial={{ opacity: 0, x: 50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -50 }}
+                                transition={{
+                                    duration: 0.4,
+                                    ease: "easeInOut",
+                                }}
+                            >
+                                <VerificationForm
+                                    email={state.email}
+                                    code={state.code}
+                                    loading={state.loading}
+                                    onCodeChange={(value) =>
+                                        updateField("code", value)
+                                    }
+                                    onSubmit={handleRegister}
+                                    onBack={() => setShowCodeStep(false)}
+                                    onExpire={() => setError("Kod wygasł")}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
         </div>

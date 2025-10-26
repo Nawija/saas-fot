@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { useLoginForm } from "@/hooks/useLoginForm";
 import { loginService } from "@/lib/services/loginService";
 import ErrorMessage from "@/components/auth/ErrorMessage";
@@ -37,7 +38,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
+        <div className="min-h-screen anim-opacity flex items-center justify-center bg-gray-100 px-2">
             <div className="w-full bg-white shadow-lg rounded-3xl overflow-hidden flex flex-col md:flex-row">
                 {/* LEWA STRONA */}
                 <div className="hidden md:flex h-screen flex-col justify-center items-center w-1/2 bg-linear-to-tl from-blue-400 to-blue-700 text-white p-10">
@@ -59,27 +60,41 @@ export default function LoginPage() {
 
                 {/* PRAWA STRONA */}
                 <div className="w-full md:w-1/3 mx-auto p-10 flex flex-col justify-center">
-                    <h1 className="text-3xl font-semibold text-center text-blue-700 mb-2">
-                        Welcome
-                    </h1>
-                    <p className="text-center text-gray-500 mb-6">
-                        Log in to your account to continue
-                    </p>
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <h1 className="text-3xl font-semibold text-center text-blue-700 mb-2">
+                            Welcome
+                        </h1>
+                        <p className="text-center text-gray-500 mb-6">
+                            Log in to your account to continue
+                        </p>
+                    </motion.div>
 
                     <ErrorMessage message={state.error} />
 
-                    <LoginForm
-                        email={state.email}
-                        password={state.password}
-                        loading={state.loading}
-                        onEmailChange={(v) => updateField("email", v)}
-                        onPasswordChange={(v) => updateField("password", v)}
-                        onSubmit={handleSubmit}
-                    />
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                    >
+                        <LoginForm
+                            email={state.email}
+                            password={state.password}
+                            loading={state.loading}
+                            onEmailChange={(v) => updateField("email", v)}
+                            onPasswordChange={(v) => updateField("password", v)}
+                            onSubmit={handleSubmit}
+                        />
 
-                    <div className="my-4 text-center text-gray-400">lub</div>
+                        <div className="my-4 text-center text-gray-400">
+                            lub
+                        </div>
 
-                    <GoogleLoginButton onClick={handleGoogleLogin} />
+                        <GoogleLoginButton onClick={handleGoogleLogin} />
+                    </motion.div>
                 </div>
             </div>
         </div>
