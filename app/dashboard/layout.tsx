@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Header from "@/components/navbar/Header";
+import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -8,8 +9,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-    title: "SaaS",
-    description: "",
+    title: "Dashboard - SEOVILEO",
+    description: "Manage your photo galleries",
 };
 
 export default function RootLayout({
@@ -20,8 +21,15 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${geistSans.variable} antialiased`}>
-                <Header />
-                <main>{children}</main>
+                <div className="flex flex-col h-screen overflow-hidden">
+                    <div className="flex flex-1 overflow-hidden">
+                        <DashboardSidebar />
+                        <div className="flex-1 overflow-y-auto bg-gray-50">
+                            <Header />
+                            <main className="border-l border-gray-200">{children}</main>
+                        </div>
+                    </div>
+                </div>
             </body>
         </html>
     );
