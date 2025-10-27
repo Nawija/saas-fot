@@ -4,7 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/ui/Loading";
 import { getGalleryHeroTemplate } from "@/components/gallery/hero/registry";
-import { Heart, X, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+    Heart,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    LogOut,
+    Download,
+} from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Photo {
     id: number;
@@ -30,12 +43,16 @@ export default function GalleryPhotosPage() {
     const searchParams = useSearchParams();
     const [collection, setCollection] = useState<Collection | null>(null);
     const [photos, setPhotos] = useState<Photo[]>([]);
+    const [displayedPhotos, setDisplayedPhotos] = useState<Photo[]>([]);
+    const [photosToShow, setPhotosToShow] = useState(20);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [viewMode, setViewMode] = useState<"gallery" | "single">("gallery");
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxAnimating, setLightboxAnimating] = useState(false);
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const [scrollPosition, setScrollPosition] = useState(0);
+    const loadMoreTriggerRef = useRef<HTMLDivElement>(null);
     // Zoom & pan state (mobile friendly)
     const [zoomScale, setZoomScale] = useState(1);
     const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -94,6 +111,49 @@ export default function GalleryPhotosPage() {
         fetchGallery();
     }, []);
 
+    // Update displayed photos when photos or photosToShow changes
+    useEffect(() => {
+        setDisplayedPhotos(photos.slice(0, photosToShow));
+    }, [photos, photosToShow]);
+
+    // Infinite scroll - Intersection Observer
+    useEffect(() => {
+        if (!loadMoreTriggerRef.current || lightboxOpen) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const target = entries[0];
+                if (
+                    target.isIntersecting &&
+                    !loadingMore &&
+                    photosToShow < photos.length
+                ) {
+                    setLoadingMore(true);
+                    // Simulate loading delay
+                    setTimeout(() => {
+                        setPhotosToShow((prev) =>
+                            Math.min(prev + 20, photos.length)
+                        );
+                        setLoadingMore(false);
+                    }, 500);
+                }
+            },
+            {
+                root: null,
+                rootMargin: "200px",
+                threshold: 0.1,
+            }
+        );
+
+        observer.observe(loadMoreTriggerRef.current);
+
+        return () => {
+            if (loadMoreTriggerRef.current) {
+                observer.unobserve(loadMoreTriggerRef.current);
+            }
+        };
+    }, [loadingMore, photosToShow, photos.length, lightboxOpen]);
+
     // Detect view mode based on URL
     useEffect(() => {
         const photoParam = searchParams.get("photo");
@@ -113,9 +173,9 @@ export default function GalleryPhotosPage() {
 
     // Open lightbox automatically when accessing via direct link
     useEffect(() => {
-        if (viewMode === "single" && photos.length > 0) {
+        if (viewMode === "single" && displayedPhotos.length > 0) {
             const photoParam = searchParams.get("photo");
-            const photoIndex = photos.findIndex(
+            const photoIndex = displayedPhotos.findIndex(
                 (p) => p.id === parseInt(photoParam || "")
             );
             if (photoIndex !== -1) {
@@ -124,7 +184,7 @@ export default function GalleryPhotosPage() {
                 document.body.style.overflow = "hidden";
             }
         }
-    }, [viewMode, photos, searchParams]);
+    }, [viewMode, displayedPhotos, searchParams]);
 
     // Keyboard navigation for lightbox
     useEffect(() => {
@@ -138,7 +198,7 @@ export default function GalleryPhotosPage() {
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [lightboxOpen, currentPhotoIndex, photos.length]);
+    }, [lightboxOpen, currentPhotoIndex, displayedPhotos.length]);
 
     const openLightbox = (index: number) => {
         // Save current scroll position
@@ -153,7 +213,7 @@ export default function GalleryPhotosPage() {
         document.body.style.overflow = "hidden";
 
         // Update URL
-        const photoId = photos[index]?.id;
+        const photoId = displayedPhotos[index]?.id;
         if (photoId) {
             const url = new URL(window.location.href);
             url.searchParams.set("photo", photoId.toString());
@@ -206,14 +266,27 @@ export default function GalleryPhotosPage() {
         }, 300);
     };
     const nextPhoto = () => {
-        const newIndex = (currentPhotoIndex + 1) % photos.length;
+        const newIndex = (currentPhotoIndex + 1) % displayedPhotos.length;
         setCurrentPhotoIndex(newIndex);
         // Reset zoom when changing photo
         setZoomScale(1);
         setPan({ x: 0, y: 0 });
 
+        // Auto-load more photos if approaching the end (within last 3 photos)
+        if (
+            newIndex >= displayedPhotos.length - 3 &&
+            photosToShow < photos.length &&
+            !loadingMore
+        ) {
+            setLoadingMore(true);
+            setTimeout(() => {
+                setPhotosToShow((prev) => Math.min(prev + 20, photos.length));
+                setLoadingMore(false);
+            }, 300);
+        }
+
         // Update URL
-        const photoId = photos[newIndex]?.id;
+        const photoId = displayedPhotos[newIndex]?.id;
         if (photoId) {
             const url = new URL(window.location.href);
             url.searchParams.set("photo", photoId.toString());
@@ -223,14 +296,15 @@ export default function GalleryPhotosPage() {
 
     const prevPhoto = () => {
         const newIndex =
-            (currentPhotoIndex - 1 + photos.length) % photos.length;
+            (currentPhotoIndex - 1 + displayedPhotos.length) %
+            displayedPhotos.length;
         setCurrentPhotoIndex(newIndex);
         // Reset zoom when changing photo
         setZoomScale(1);
         setPan({ x: 0, y: 0 });
 
         // Update URL
-        const photoId = photos[newIndex]?.id;
+        const photoId = displayedPhotos[newIndex]?.id;
         if (photoId) {
             const url = new URL(window.location.href);
             url.searchParams.set("photo", photoId.toString());
@@ -289,6 +363,64 @@ export default function GalleryPhotosPage() {
         }
     };
 
+    const handleDownload = async (onlyFavorites: boolean) => {
+        const photosToDownload = onlyFavorites
+            ? photos.filter((p) => p.isLiked)
+            : photos;
+
+        if (photosToDownload.length === 0) {
+            alert(
+                onlyFavorites
+                    ? "Brak ulubionych zdjęć do pobrania!"
+                    : "Brak zdjęć do pobrania!"
+            );
+            return;
+        }
+
+        try {
+            // Show loading message
+            const loadingMsg = `Przygotowywanie ${photosToDownload.length} zdjęć do pobrania...`;
+            console.log(loadingMsg);
+
+            // Call API to create ZIP
+            const response = await fetch(
+                `/api/gallery/${params.slug}/download`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        photoIds: photosToDownload.map((p) => p.id),
+                        onlyFavorites,
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Błąd pobierania");
+            }
+
+            // Get ZIP file
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = onlyFavorites
+                ? `${collection?.name || "galeria"}-ulubione.zip`
+                : `${collection?.name || "galeria"}-wszystkie.zip`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            alert(`✅ Pobrano ${photosToDownload.length} zdjęć jako plik ZIP!`);
+        } catch (error) {
+            console.error("Download error:", error);
+            alert("❌ Błąd podczas pobierania zdjęć. Spróbuj ponownie.");
+        }
+    };
+
     if (loading) {
         return <Loading />;
     }
@@ -343,9 +475,61 @@ export default function GalleryPhotosPage() {
                 <div className={lightboxOpen ? "hidden" : ""}>
                     <Hero />
                 </div>
+                <div className="bg-white flex items-center justify-between py-6 px-4 shadow-sm">
+                    <p className="font-semibold text-lg">{collection.name}</p>
+                    <div className="flex items-center justify-center gap-4">
+                        {/* Download Dropdown */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Download
+                                    size={25}
+                                    className="cursor-pointer"
+                                />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuItem
+                                    onClick={() => handleDownload(true)}
+                                    className="flex items-center gap-3 py-3"
+                                >
+                                    <Heart className="w-5 h-5 text-red-500 fill-current" />
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-sm">
+                                            Pobierz ulubione
+                                        </span>
+                                        <span className="text-xs text-gray-500">
+                                            {
+                                                photos.filter((p) => p.isLiked)
+                                                    .length
+                                            }{" "}
+                                            zdjęć
+                                        </span>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => handleDownload(false)}
+                                    className="flex items-center gap-3 py-3"
+                                >
+                                    <Download className="w-5 h-5 text-gray-700" />
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-sm">
+                                            Pobierz wszystko
+                                        </span>
+                                        <span className="text-xs text-gray-500">
+                                            {photos.length} zdjęć
+                                        </span>
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
 
+                        <LogOut
+                            size={25}
+                            className="text-red-600 cursor-pointer hover:text-red-700 transition-colors"
+                        />
+                    </div>
+                </div>
                 {/* Photos Grid - Masonry Layout */}
-                <div className="px-2 py-12">
+                <div className="px-2">
                     {photos.length === 0 ? (
                         <div className="text-center py-20 text-gray-500">
                             <p>Brak zdjęć w tej galerii</p>
@@ -359,7 +543,7 @@ export default function GalleryPhotosPage() {
                                     lightboxOpen ? "hidden" : ""
                                 }`}
                             >
-                                {photos.map((photo, index) => {
+                                {displayedPhotos.map((photo, index) => {
                                     // Calculate aspect ratio
                                     const aspectRatio =
                                         photo.width && photo.height
@@ -464,13 +648,34 @@ export default function GalleryPhotosPage() {
                                     );
                                 })}
                             </div>
+
+                            {/* Infinite Scroll Trigger & Loading Indicator */}
+                            <div
+                                ref={loadMoreTriggerRef}
+                                className="h-20 flex items-center justify-center mt-8"
+                            >
+                                {loadingMore && (
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div className="w-10 h-10 border-4 border-zinc-300 border-t-zinc-900 rounded-full animate-spin"></div>
+                                        <p className="text-gray-500 text-sm font-medium">
+                                            Ładowanie kolejnych zdjęć...
+                                        </p>
+                                    </div>
+                                )}
+                                {photosToShow >= photos.length &&
+                                    photos.length > 0 && (
+                                        <p className="text-gray-400 text-sm">
+                                            Wszystkie zdjęcia zostały załadowane
+                                        </p>
+                                    )}
+                            </div>
                         </>
                     )}
                 </div>
             </div>
 
             {/* Custom Lightbox */}
-            {lightboxOpen && photos[currentPhotoIndex] && (
+            {lightboxOpen && displayedPhotos[currentPhotoIndex] && (
                 <div
                     className={`fixed inset-0 bg-white flex items-center justify-center transition-opacity duration-300 ${
                         lightboxAnimating ? "opacity-0" : "opacity-100"
@@ -491,7 +696,7 @@ export default function GalleryPhotosPage() {
                     </button>
 
                     {/* Navigation Arrows */}
-                    {photos.length > 1 && (
+                    {displayedPhotos.length > 1 && (
                         <>
                             <button
                                 onClick={prevPhoto}
@@ -532,7 +737,7 @@ export default function GalleryPhotosPage() {
                                 : "opacity-100 translate-y-0"
                         }`}
                     >
-                        {currentPhotoIndex + 1} / {photos.length}
+                        {currentPhotoIndex + 1} / {displayedPhotos.length}
                     </div>
 
                     {/* Main Image Container */}
@@ -700,7 +905,7 @@ export default function GalleryPhotosPage() {
                     >
                         <img
                             ref={imageRef}
-                            src={photos[currentPhotoIndex].file_path}
+                            src={displayedPhotos[currentPhotoIndex].file_path}
                             alt={`Zdjęcie ${currentPhotoIndex + 1}`}
                             draggable="false"
                             className={`max-w-full max-h-full object-contain will-change-transform ${
@@ -736,22 +941,24 @@ export default function GalleryPhotosPage() {
                     >
                         <button
                             onClick={() =>
-                                handleLike(photos[currentPhotoIndex].id)
+                                handleLike(
+                                    displayedPhotos[currentPhotoIndex].id
+                                )
                             }
                             className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors  ${
-                                photos[currentPhotoIndex].isLiked
+                                displayedPhotos[currentPhotoIndex].isLiked
                                     ? "bg-red-500 text-white hover:bg-red-600"
                                     : "bg-gray-200 text-gray-500 hover:bg-gray-300"
                             }`}
                         >
                             <Heart
                                 className={`w-5 h-5 ${
-                                    photos[currentPhotoIndex].isLiked
+                                    displayedPhotos[currentPhotoIndex].isLiked
                                         ? "fill-current"
                                         : ""
                                 }`}
                             />
-                            {photos[currentPhotoIndex].likes}
+                            {displayedPhotos[currentPhotoIndex].likes}
                         </button>
                     </div>
                 </div>
