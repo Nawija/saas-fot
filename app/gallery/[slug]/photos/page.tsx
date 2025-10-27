@@ -149,16 +149,6 @@ export default function GalleryPhotosPage() {
     const template = collection.hero_template || "minimal";
     const HeroTemplate = getGalleryHeroTemplate(template);
 
-    const BaseBackButton = () => (
-        <button
-            onClick={() => router.push(`/gallery/${params.slug}`)}
-            className="absolute top-6 left-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-lg transition-colors"
-        >
-            <ArrowLeft className="w-5 h-5" />
-            Powrót
-        </button>
-    );
-
     const ScrollIndicator = () => (
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
             <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
@@ -176,7 +166,6 @@ export default function GalleryPhotosPage() {
                     image: collection.hero_image,
                 },
                 elements: {
-                    BackButton: BaseBackButton,
                     ScrollIndicator,
                 },
             })}
@@ -186,7 +175,6 @@ export default function GalleryPhotosPage() {
     return (
         <>
             <div className="min-h-screen bg-gray-50">
-                {/* Header with Hero (template-driven) */}
                 <Hero />
 
                 {/* Photos Grid - Masonry Layout */}
