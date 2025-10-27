@@ -4,7 +4,7 @@ import JSZip from "jszip";
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
         const body = await req.json();
@@ -53,9 +53,10 @@ export async function POST(
         const zipBlob = await zip.generateAsync({ type: "uint8array" });
 
         // Return ZIP file
+        const { slug } = await params;
         const fileName = onlyFavorites
-            ? `${params.slug}-ulubione.zip`
-            : `${params.slug}-wszystkie.zip`;
+            ? `${slug}-ulubione.zip`
+            : `${slug}-wszystkie.zip`;
 
         return new NextResponse(Buffer.from(zipBlob), {
             headers: {
