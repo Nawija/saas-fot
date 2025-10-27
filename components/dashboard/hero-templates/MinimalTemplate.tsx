@@ -3,7 +3,6 @@ import { HeroTemplateProps } from "./types";
 
 export function MinimalDesktop({
     title,
-    description,
     image,
 }: HeroTemplateProps) {
     return (
@@ -19,7 +18,7 @@ export function MinimalDesktop({
             )}
             <div className="absolute inset-0 bg-black/60" />
             <div className="absolute inset-0 flex items-center justify-center text-white">
-                <h1 className="text-3xl font-bold">{title}</h1>
+                <h1 className="text-sm font-bold">{title}</h1>
             </div>
         </div>
     );
@@ -27,7 +26,6 @@ export function MinimalDesktop({
 
 export function MinimalMobile({
     title,
-    description,
     image,
 }: HeroTemplateProps) {
     return (
@@ -43,7 +41,7 @@ export function MinimalMobile({
             )}
             <div className="absolute inset-0 bg-black/60" />
             <div className="absolute inset-0 flex items-center justify-center text-white">
-                <h1 className="text-2xl font-bold">{title}</h1>
+                <h1 className="text-sm font-bold">{title}</h1>
             </div>
         </div>
     );

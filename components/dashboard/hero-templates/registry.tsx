@@ -15,6 +15,7 @@ export const HERO_TEMPLATES: HeroTemplateDefinition[] = [
         Desktop: FullscreenDesktop,
         Mobile: FullscreenMobile,
     },
+
 ];
 
 // Helper do łatwego pobierania szablonu po kluczu

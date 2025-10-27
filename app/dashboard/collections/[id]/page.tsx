@@ -7,8 +7,7 @@ import { useRouter } from "next/navigation";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import Loading from "@/components/ui/Loading";
 import CollectionHeader from "@/components/dashboard/CollectionHeader";
-import HeroPreview from "@/components/dashboard/HeroPreview";
-import HeroTemplateSelector from "@/components/dashboard/HeroTemplateSelector";
+import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
 import PhotoUploadSection from "@/components/dashboard/PhotoUploadSection";
 import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
@@ -50,12 +49,10 @@ export default function CollectionDetailPage({
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [saving, setSaving] = useState(false);
-    const [previewTab, setPreviewTab] = useState<"landing" | "photos">(
-        "landing"
-    );
     const [selectedTemplate, setSelectedTemplate] = useState<string>("minimal");
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [pendingPhotoId, setPendingPhotoId] = useState<number | null>(null);
+    const [heroModalOpen, setHeroModalOpen] = useState(false);
 
     useEffect(() => {
         params.then((p) => {
@@ -107,6 +104,7 @@ export default function CollectionDetailPage({
             setCollection(result.collection);
             setSelectedTemplate(result.collection.hero_template || tpl);
             toast.success("Zapisano wygląd hero");
+            setHeroModalOpen(false);
         } catch (e: any) {
             toast.error(e?.message || "Nie udało się zapisać");
         } finally {
@@ -295,41 +293,35 @@ export default function CollectionDetailPage({
             <div className="max-w-7xl mx-auto">
                 <CollectionHeader collection={collection} photos={photos} />
 
-                {/* Hero Template Section */}
-                <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 mb-8">
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">
-                        Wygląd sekcji hero
-                    </h2>
-                    <p className="text-sm text-gray-600 mb-4">
-                        Kliknij aby podejrzeć. Zapisz gdy wybierzesz docelowy
-                        wygląd. Podgląd poniżej pokazuje wersję desktop i
-                        telefon.
-                    </p>
+                {/* Hero Template Section (launches full-screen modal) */}
+                <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100 mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900">
+                                Wygląd sekcji hero
+                            </h2>
+                            <p className="text-sm text-gray-600">
+                                Otwórz kreator, aby podejrzeć i wybrać szablon w
+                                pełnym ekranie.
+                            </p>
+                        </div>
 
-                    <div>
-                        <HeroPreview
-                            selectedTemplate={selectedTemplate}
-                            previewTab={previewTab}
-                            collectionName={collection.name}
-                            collectionDescription={collection.description}
-                            heroImage={collection.hero_image}
-                        />
-
-                        <HeroTemplateSelector
-                            templates={HERO_TEMPLATES}
-                            selectedTemplate={selectedTemplate}
-                            savedTemplate={
-                                collection.hero_template || "minimal"
-                            }
-                            saving={saving}
-                            onSelectTemplate={setSelectedTemplate}
-                            onSave={() => updateHeroTemplate(selectedTemplate)}
-                            onReset={() =>
-                                setSelectedTemplate(
-                                    collection.hero_template || "minimal"
-                                )
-                            }
-                        />
+                        <button
+                            onClick={() => setHeroModalOpen(true)}
+                            className="inline-flex items-center justify-center rounded-md bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700 shadow-sm"
+                        >
+                            Otwórz kreator
+                        </button>
+                    </div>
+                    <div className="rounded-lg border border-dashed border-gray-200 p-4 bg-gray-50 text-sm text-gray-600">
+                        Aktualny szablon:{" "}
+                        <span className="font-medium text-gray-900">
+                            {HERO_TEMPLATES.find(
+                                (t) =>
+                                    t.key ===
+                                    (collection.hero_template || "minimal")
+                            )?.label || "Minimal"}
+                        </span>
                     </div>
                 </div>
 
@@ -358,6 +350,22 @@ export default function CollectionDetailPage({
                         setPendingPhotoId(null);
                     }
                 }}
+            />
+            <HeroPreviewModal
+                open={heroModalOpen}
+                onClose={() => setHeroModalOpen(false)}
+                templates={HERO_TEMPLATES}
+                selectedTemplate={selectedTemplate}
+                savedTemplate={collection.hero_template || "minimal"}
+                saving={saving}
+                onSelectTemplate={setSelectedTemplate}
+                onSave={() => updateHeroTemplate(selectedTemplate)}
+                onReset={() =>
+                    setSelectedTemplate(collection.hero_template || "minimal")
+                }
+                collectionName={collection.name}
+                collectionDescription={collection.description}
+                heroImage={collection.hero_image}
             />
         </div>
     );
