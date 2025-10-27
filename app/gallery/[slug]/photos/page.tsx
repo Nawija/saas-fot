@@ -290,52 +290,89 @@ export default function GalleryPhotosPage() {
                             <div id="s" className="h-0 w-0 scroll-m-2" />
                             <div
                                 id="g"
-                                className={`columns-1 md:columns-2 lg:columns-3 gap-2 space-y-2 scroll-m-2 ${
+                                className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 auto-rows-[200px] ${
                                     lightboxOpen ? "hidden" : ""
                                 }`}
                             >
-                                {photos.map((photo, index) => (
-                                    <div
-                                        key={photo.id}
-                                        onClick={() => openLightbox(index)}
-                                        className="break-inside-avoid group relative block overflow-hidden bg-white transition-all duration-300 cursor-pointer"
-                                    >
-                                        <img
-                                            src={
-                                                photo.thumbnail_path ||
-                                                photo.file_path
-                                            }
-                                            alt={`Zdjęcie ${index + 1}`}
-                                            className="w-full h-auto"
-                                            loading="lazy"
-                                        />
+                                {photos.map((photo, index) => {
+                                    // Calculate aspect ratio
+                                    const aspectRatio =
+                                        photo.width && photo.height
+                                            ? photo.width / photo.height
+                                            : 1;
 
-                                        {/* Hover Overlay */}
-                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-end justify-between p-4">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    handleLike(photo.id);
-                                                }}
-                                                className={`opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
-                                                    photo.isLiked
-                                                        ? "bg-red-500 text-white"
-                                                        : "bg-white/90 text-gray-900"
-                                                }`}
-                                            >
-                                                <Heart
-                                                    className={`w-5 h-5 ${
+                                    // Determine span based on aspect ratio and index for variety
+                                    let colSpan = 1;
+                                    let rowSpan = 1;
+
+                                    // Wide photos (landscape)
+                                    if (aspectRatio > 1.5) {
+                                        colSpan = 2;
+                                        rowSpan = 1;
+                                    }
+                                    // Tall photos (portrait)
+                                    else if (aspectRatio < 0.7) {
+                                        colSpan = 1;
+                                        rowSpan = 2;
+                                    }
+                                    // Square-ish - occasionally make them bigger
+                                    else if (
+                                        aspectRatio >= 0.9 &&
+                                        aspectRatio <= 1.1
+                                    ) {
+                                        if (index % 7 === 0) {
+                                            colSpan = 2;
+                                            rowSpan = 2;
+                                        }
+                                    }
+
+                                    return (
+                                        <div
+                                            key={photo.id}
+                                            onClick={() => openLightbox(index)}
+                                            className="group relative overflow-hidden bg-gray-200 transition-all duration-300 cursor-pointer"
+                                            style={{
+                                                gridColumn: `span ${colSpan}`,
+                                                gridRow: `span ${rowSpan}`,
+                                            }}
+                                        >
+                                            <img
+                                                src={
+                                                    photo.thumbnail_path ||
+                                                    photo.file_path
+                                                }
+                                                alt={`Zdjęcie ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                                loading="lazy"
+                                            />
+
+                                            {/* Hover Overlay */}
+                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-end justify-between p-4">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleLike(photo.id);
+                                                    }}
+                                                    className={`opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
                                                         photo.isLiked
-                                                            ? "fill-current"
-                                                            : ""
+                                                            ? "bg-red-500 text-white"
+                                                            : "bg-white/90 text-gray-300"
                                                     }`}
-                                                />
-                                                {photo.likes}
-                                            </button>
+                                                >
+                                                    <Heart
+                                                        className={`w-5 h-5 ${
+                                                            photo.isLiked
+                                                                ? "fill-current"
+                                                                : ""
+                                                        }`}
+                                                    />
+                                                    {photo.likes}
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </>
                     )}
@@ -353,14 +390,14 @@ export default function GalleryPhotosPage() {
                     {/* Close Button */}
                     <button
                         onClick={closeLightbox}
-                        className={`fixed top-4 right-4 p-3 rounded-full bg-gray-800 hover:bg-gray-900 transition-all duration-300 shadow-xl z-10 ${
+                        className={`fixed top-4 right-4 p-3 rounded-full bg-gray-200 hover:bg-gray-300 transition-all duration-300  z-10 ${
                             lightboxAnimating
                                 ? "opacity-0 scale-75"
                                 : "opacity-100 scale-100"
                         }`}
                         aria-label="Zamknij"
                     >
-                        <X className="w-6 h-6 text-white" />
+                        <X className="w-6 h-6 text-gray-500" />
                     </button>
 
                     {/* Navigation Arrows */}
@@ -368,32 +405,38 @@ export default function GalleryPhotosPage() {
                         <>
                             <button
                                 onClick={prevPhoto}
-                                className={`fixed left-6 top-1/2 -translate-y-1/2 p-4 rounded-full bg-gray-800 hover:bg-gray-900 transition-all duration-300 shadow-xl z-10 ${
+                                className={`fixed left-6 top-1/2 -translate-y-1/2 p-4 z-10 ${
                                     lightboxAnimating
                                         ? "opacity-0 -translate-x-4"
                                         : "opacity-100 translate-x-0"
                                 }`}
                                 aria-label="Poprzednie zdjęcie"
                             >
-                                <ChevronLeft className="w-8 h-8 text-white" />
+                                <ChevronLeft
+                                    className="w-12 h-12 text-zinc-800"
+                                    strokeWidth={1}
+                                />
                             </button>
                             <button
                                 onClick={nextPhoto}
-                                className={`fixed right-6 top-1/2 -translate-y-1/2 p-4 rounded-full bg-gray-800 hover:bg-gray-900 transition-all duration-300 shadow-xl z-10 ${
+                                className={`fixed right-6 top-1/2 -translate-y-1/2 p-4 z-10 ${
                                     lightboxAnimating
                                         ? "opacity-0 translate-x-4"
                                         : "opacity-100 translate-x-0"
                                 }`}
                                 aria-label="Następne zdjęcie"
                             >
-                                <ChevronRight className="w-8 h-8 text-white" />
+                                <ChevronRight
+                                    className="w-12 h-12 text-zinc-800"
+                                    strokeWidth={1}
+                                />
                             </button>
                         </>
                     )}
 
                     {/* Photo Counter */}
                     <div
-                        className={`fixed top-4 left-4 px-4 py-2 rounded-lg bg-gray-800 text-white font-medium shadow-xl z-10 transition-all duration-300 ${
+                        className={`fixed top-4 left-4 px-4 py-2 rounded-lg bg-gray-200 text-gray-500 font-medium  z-10 transition-all duration-300 ${
                             lightboxAnimating
                                 ? "opacity-0 -translate-y-4"
                                 : "opacity-100 translate-y-0"
@@ -428,10 +471,10 @@ export default function GalleryPhotosPage() {
                             onClick={() =>
                                 handleLike(photos[currentPhotoIndex].id)
                             }
-                            className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors shadow-xl ${
+                            className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors  ${
                                 photos[currentPhotoIndex].isLiked
                                     ? "bg-red-500 text-white hover:bg-red-600"
-                                    : "bg-gray-800 text-white hover:bg-gray-900"
+                                    : "bg-gray-200 text-gray-500 hover:bg-gray-300"
                             }`}
                         >
                             <Heart
