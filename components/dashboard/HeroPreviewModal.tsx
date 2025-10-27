@@ -106,7 +106,7 @@ export default function HeroPreviewModal({
                                     delay: 0.1,
                                     ease: "easeOut",
                                 }}
-                                className="flex items-center justify-between px-6 sm:px-8 py-4 border-b border-gray-200 bg-white/70 backdrop-blur"
+                                className="flex items-center justify-between px-6 sm:px-8 py-4 border-b border-gray-200 bg-white/70"
                             >
                                 <div>
                                     <h2 className="text-base sm:text-lg font-semibold text-gray-900">
@@ -140,9 +140,9 @@ export default function HeroPreviewModal({
                                         delay: 0.2,
                                         ease: "easeOut",
                                     }}
-                                    className="lg:col-span-5 order-2 lg:order-1 overflow-y-auto"
+                                    className="lg:col-span-4 order-2 lg:order-1 overflow-y-auto"
                                 >
-                                    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm h-[80vh]">
+                                    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm h-[86vh]">
                                         <HeroTemplateSelector
                                             templates={templates}
                                             selectedTemplate={selectedTemplate}
@@ -187,7 +187,7 @@ export default function HeroPreviewModal({
                                                 </div>
                                             </div>
 
-                                            {/* Mobile phone overlay */}
+                                            {/* DESKTOP Mobile phone overlay*/}
                                             <div
                                                 className="hidden md:block absolute right-2 lg:right-6 -bottom-8 w-[170px] h-[360px] rounded-4xl border-8 border-black overflow-hidden shadow-2xl bg-black"
                                             >

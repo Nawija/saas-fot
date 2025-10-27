@@ -30,7 +30,7 @@ export default function HeroTemplateSelector({
     previewData,
 }: HeroTemplateSelectorProps) {
     return (
-        <div className="lg:flex items-start justify-between flex-col h-full w-full">
+        <div className="h-full w-full">
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 {templates.map((tpl, index) => {
                     const isSaved = savedTemplate === tpl.key;
@@ -68,7 +68,7 @@ export default function HeroTemplateSelector({
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-3 flex items-center justify-between bg-white">
+                            <div className="p-2 flex items-center justify-between bg-white">
                                 <div className="text-sm font-medium text-gray-900">
                                     {tpl.label}
                                 </div>
