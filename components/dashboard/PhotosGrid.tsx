@@ -18,7 +18,7 @@ interface PhotosGridProps {
 
 export default function PhotosGrid({ photos, onDeletePhoto }: PhotosGridProps) {
     return (
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+        <div>
             <h2 className="text-xl font-bold text-gray-900 mb-6">
                 Zdjęcia ({photos.length})
             </h2>
@@ -32,7 +32,7 @@ export default function PhotosGrid({ photos, onDeletePhoto }: PhotosGridProps) {
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                     {photos.map((photo) => (
                         <div
                             key={photo.id}

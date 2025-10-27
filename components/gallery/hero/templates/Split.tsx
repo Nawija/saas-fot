@@ -1,6 +1,7 @@
 // components/gallery/hero/templates/Split.tsx
 "use client";
 
+import Link from "next/link";
 import { GalleryHeroTemplate } from "../types";
 
 export const SplitTemplate: GalleryHeroTemplate = ({ data }) => {
@@ -16,8 +17,9 @@ export const SplitTemplate: GalleryHeroTemplate = ({ data }) => {
                             {data.description}
                         </p>
                     )}
+                    <Link href="#s" className="px-4 py-2 bg-white/30 border-gray-200 text-sm font-semibold">Zobacz zdjęcia</Link>
                 </div>
-            </div>
+             </div>
             <div className="relative order-1 md:order-2">
                 {data.image ? (
                     <img

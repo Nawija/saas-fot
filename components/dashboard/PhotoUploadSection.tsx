@@ -15,7 +15,7 @@ export default function PhotoUploadSection({
     onUpload,
 }: PhotoUploadSectionProps) {
     return (
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 mb-8">
+        <div className="bg-white rounded-2xl p-2 mb-2">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
                 Dodaj zdjęcia
             </h2>
@@ -31,7 +31,7 @@ export default function PhotoUploadSection({
                     id="photo-upload"
                 />
                 <div
-                    className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all ${
+                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
                         uploading
                             ? "border-blue-300 bg-blue-50"
                             : "border-gray-300 hover:border-blue-500 hover:bg-blue-50"

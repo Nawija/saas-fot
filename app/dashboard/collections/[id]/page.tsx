@@ -12,6 +12,7 @@ import PhotoUploadSection from "@/components/dashboard/PhotoUploadSection";
 import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
 import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
+import CopyLinkButton from "@/components/buttons/CopyLinkButton";
 
 interface Collection {
     id: number;
@@ -37,6 +38,14 @@ interface Photo {
 // HERO_TEMPLATES przeniesione do components/dashboard/hero-templates/registry.tsx
 // Importuj z rejestru zamiast deklarować tutaj
 
+function formatFileSize(bytes: number): string {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+}
+
 export default function CollectionDetailPage({
     params,
 }: {
@@ -54,6 +63,13 @@ export default function CollectionDetailPage({
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [pendingPhotoId, setPendingPhotoId] = useState<number | null>(null);
     const [heroModalOpen, setHeroModalOpen] = useState(false);
+    const [origin, setOrigin] = useState("");
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setOrigin(window.location.origin);
+        }
+    }, []);
 
     useEffect(() => {
         params.then((p) => {
@@ -289,53 +305,195 @@ export default function CollectionDetailPage({
         return null;
     }
 
-    return (
-        <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-8">
-            <div className="max-w-7xl mx-auto">
-                <CollectionHeader collection={collection} photos={photos} />
+    const currentTemplate = HERO_TEMPLATES.find(
+        (t) => t.key === (collection.hero_template || "minimal")
+    );
 
-                {/* Hero Template Section (launches full-screen modal) */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100 mb-8">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-900">
-                                Wygląd sekcji hero
-                            </h2>
-                            <p className="text-sm text-gray-600">
-                                Otwórz kreator, aby podejrzeć i wybrać szablon w
-                                pełnym ekranie.
-                            </p>
+    return (
+        <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
+            {/* Top Bar */}
+            <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <CollectionHeader collection={collection} photos={photos} />
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Left Sidebar - Hero Template & Stats */}
+                    <div className="lg:col-span-4 space-y-6">
+                        {/* Hero Template Card */}
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="border-b border-gray-200 px-5 py-4">
+                                <h2 className="text-base font-semibold text-gray-900">
+                                    Wygląd hero
+                                </h2>
+                                <p className="text-sm text-gray-600 mt-1">
+                                    Szablon strony galerii
+                                </p>
+                            </div>
+
+                            <div className="p-5">
+                                <div className="space-y-4">
+                                    {/* Template Preview */}
+                                    {currentTemplate && (
+                                        <div className="relative bg-gray-900 rounded-xl overflow-hidden border border-gray-200">
+                                            <div
+                                                className="w-full overflow-hidden"
+                                                style={{
+                                                    height: "300px",
+                                                }}
+                                            >
+                                                <div
+                                                    className="origin-top-left"
+                                                    style={{
+                                                        transform: "scale(0.5)",
+                                                        width: "200%",
+                                                        height: "200%",
+                                                    }}
+                                                >
+                                                    <currentTemplate.Desktop
+                                                        title={collection.name}
+                                                        description={
+                                                            collection.description
+                                                        }
+                                                        image={
+                                                            collection.hero_image
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Template Name */}
+                                    <div className="bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-200">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs font-medium text-gray-600">
+                                                Aktywny szablon
+                                            </span>
+                                            <span className="text-sm font-semibold text-gray-900">
+                                                {currentTemplate?.label ||
+                                                    "Minimal"}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Edit Button */}
+                                    <button
+                                        onClick={() => setHeroModalOpen(true)}
+                                        className="w-full bg-gray-900 hover:bg-gray-800 text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-150 text-sm"
+                                    >
+                                        Otwórz edytor
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
-                        <button
-                            onClick={() => setHeroModalOpen(true)}
-                            className="inline-flex items-center justify-center rounded-md bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700 shadow-sm"
-                        >
-                            Otwórz kreator
-                        </button>
+                        {/* Stats Card */}
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="border-b border-gray-200 px-5 py-4">
+                                <h2 className="text-base font-semibold text-gray-900">
+                                    Statystyki
+                                </h2>
+                            </div>
+                            <div className="p-5 space-y-3">
+                                <div className="flex items-center justify-between py-2">
+                                    <span className="text-sm text-gray-600">
+                                        Liczba zdjęć
+                                    </span>
+                                    <span className="text-sm font-semibold text-gray-900">
+                                        {photos.length}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-t border-gray-100">
+                                    <span className="text-sm text-gray-600">
+                                        Rozmiar
+                                    </span>
+                                    <span className="text-sm font-semibold text-gray-900">
+                                        {formatFileSize(
+                                            photos.reduce(
+                                                (sum, p) => sum + p.file_size,
+                                                0
+                                            )
+                                        )}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-t border-gray-100">
+                                    <span className="text-sm text-gray-600">
+                                        Data utworzenia
+                                    </span>
+                                    <span className="text-sm font-semibold text-gray-900">
+                                        {new Date(
+                                            collection.created_at
+                                        ).toLocaleDateString("pl-PL")}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="rounded-lg border border-dashed border-gray-200 p-4 bg-gray-50 text-sm text-gray-600">
-                        Aktualny szablon:{" "}
-                        <span className="font-medium text-gray-900">
-                            {HERO_TEMPLATES.find(
-                                (t) =>
-                                    t.key ===
-                                    (collection.hero_template || "minimal")
-                            )?.label || "Minimal"}
-                        </span>
+
+                    {/* Right Content - Upload & Gallery */}
+                    <div className="lg:col-span-8 space-y-6">
+                        {/* Copy Gallery Link */}
+                        <div className="mb-6">
+                            <CopyLinkButton
+                                url={`${origin}/gallery/${collection.slug}`}
+                                showUrl={true}
+                                label="Kopiuj"
+                                variant="default"
+                            />
+                        </div>
+                        {/* Upload Section */}
+                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                            <div className="border-b border-gray-200 px-5 py-4">
+                                <h2 className="text-base font-semibold text-gray-900">
+                                    Dodaj zdjęcia
+                                </h2>
+                                <p className="text-sm text-gray-600 mt-1">
+                                    Przeciągnij pliki lub kliknij aby wybrać
+                                </p>
+                            </div>
+                            <div className="p-5">
+                                <PhotoUploadSection
+                                    uploading={uploading}
+                                    uploadProgress={uploadProgress}
+                                    onUpload={handleUpload}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Gallery Section */}
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="border-b border-gray-200 px-5 py-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2 className="text-base font-semibold text-gray-900">
+                                            Galeria zdjęć
+                                        </h2>
+                                        <p className="text-sm text-gray-600 mt-1">
+                                            {photos.length}{" "}
+                                            {photos.length === 1
+                                                ? "zdjęcie"
+                                                : photos.length < 5
+                                                ? "zdjęcia"
+                                                : "zdjęć"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-5">
+                                {photos.length > 0 && (
+                                    <PhotosGrid
+                                        photos={photos}
+                                        onDeletePhoto={handleDeletePhotoClick}
+                                    />
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <PhotoUploadSection
-                    uploading={uploading}
-                    uploadProgress={uploadProgress}
-                    onUpload={handleUpload}
-                />
-
-                <PhotosGrid
-                    photos={photos}
-                    onDeletePhoto={handleDeletePhotoClick}
-                />
             </div>
 
             <ConfirmDialog

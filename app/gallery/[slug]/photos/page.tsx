@@ -184,7 +184,10 @@ export default function GalleryPhotosPage() {
                             <p>Brak zdjęć w tej galerii</p>
                         </div>
                     ) : (
-                        <div className="columns-1 md:columns-2 lg:columns-3 gap-2 space-y-2">
+                        <div
+                            id="s"
+                            className="columns-1 md:columns-2 lg:columns-3 gap-2 space-y-2 scroll-m-2"
+                        >
                             {photos.map((photo, index) => (
                                 <div
                                     key={photo.id}
