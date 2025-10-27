@@ -11,4 +11,5 @@ export interface HeroTemplateDefinition {
     label: string;
     Desktop: React.ComponentType<HeroTemplateProps>;
     Mobile: React.ComponentType<HeroTemplateProps>;
+    premium?: boolean; // Czy szablon jest dostępny tylko dla subskrybentów
 }

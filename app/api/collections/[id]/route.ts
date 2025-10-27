@@ -155,6 +155,8 @@ export async function PATCH(
             "cards",
         ]);
 
+        const premiumTemplates = new Set(["split", "overlay", "cards"]);
+
         // Buduj dynamiczne zapytanie UPDATE
         const updates: string[] = [];
         const values: any[] = [];
@@ -187,6 +189,29 @@ export async function PATCH(
                     { status: 400 }
                 );
             }
+
+            // Sprawdź czy szablon jest premium i czy użytkownik ma odpowiedni plan
+            if (premiumTemplates.has(hero_template)) {
+                const userResult = await query(
+                    "SELECT subscription_plan FROM users WHERE id = $1",
+                    [user.id]
+                );
+                const userPlan =
+                    userResult.rows[0]?.subscription_plan || "free";
+
+                if (userPlan === "free") {
+                    return NextResponse.json(
+                        {
+                            error: "Premium szablon niedostępny",
+                            message:
+                                "Ten szablon jest dostępny tylko dla subskrybentów. Przejdź na plan Basic, Pro lub Unlimited.",
+                            upgradeRequired: true,
+                        },
+                        { status: 403 }
+                    );
+                }
+            }
+
             updates.push(`hero_template = $${paramCount++}`);
             values.push(hero_template);
         }

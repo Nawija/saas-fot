@@ -54,21 +54,25 @@ function wrapTemplate(tpl: GalleryHeroTemplate) {
     return { Desktop, Mobile } as const;
 }
 
-const SOURCE: Array<{ key: string; label: string; tpl: GalleryHeroTemplate }> =
-    [
-        { key: "minimal", label: "Minimal", tpl: MinimalTemplate },
-        { key: "fullscreen", label: "Pełny ekran", tpl: FullscreenTemplate },
-        { key: "split", label: "Podział", tpl: SplitTemplate },
-        { key: "overlay", label: "Overlay", tpl: OverlayTemplate },
-        { key: "gradient", label: "Gradient", tpl: GradientTemplate },
-        // Alias
-        { key: "cards", label: "Karty", tpl: SplitTemplate },
-    ];
+const SOURCE: Array<{
+    key: string;
+    label: string;
+    tpl: GalleryHeroTemplate;
+    premium?: boolean;
+}> = [
+    { key: "minimal", label: "Minimal", tpl: MinimalTemplate },
+    { key: "fullscreen", label: "Pełny ekran", tpl: FullscreenTemplate },
+    { key: "split", label: "Podział", tpl: SplitTemplate, premium: true },
+    { key: "overlay", label: "Overlay", tpl: OverlayTemplate, premium: true },
+    { key: "gradient", label: "Gradient", tpl: GradientTemplate },
+    // Alias
+    { key: "cards", label: "Karty", tpl: SplitTemplate, premium: true },
+];
 
 export const HERO_TEMPLATES: HeroTemplateDefinition[] = SOURCE.map(
-    ({ key, label, tpl }) => {
+    ({ key, label, tpl, premium }) => {
         const { Desktop, Mobile } = wrapTemplate(tpl);
-        return { key, label, Desktop, Mobile };
+        return { key, label, Desktop, Mobile, premium };
     }
 );
 

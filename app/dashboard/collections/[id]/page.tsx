@@ -106,6 +106,17 @@ export default function CollectionDetailPage({
 
     async function updateHeroTemplate(tpl: string) {
         if (!collectionId || !collection) return;
+
+        // Sprawdź czy szablon jest premium
+        const template = HERO_TEMPLATES.find((t) => t.key === tpl);
+        if (template?.premium) {
+            // Pokaż ostrzeżenie o premium
+            toast.warning("Szablon premium", {
+                description:
+                    "Sprawdzam dostępność... Ten szablon może wymagać subskrypcji.",
+            });
+        }
+
         try {
             setSaving(true);
             const res = await fetch(`/api/collections/${collectionId}`, {
@@ -113,10 +124,28 @@ export default function CollectionDetailPage({
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ hero_template: tpl }),
             });
+
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
+
+                // Jeśli to błąd wymagający upgrade'u planu
+                if (res.status === 403 && err?.upgradeRequired) {
+                    toast.error(err?.error || "Szablon niedostępny", {
+                        description:
+                            err?.message ||
+                            "Ten szablon wymaga subskrypcji Basic, Pro lub Unlimited.",
+                        duration: 5000,
+                        action: {
+                            label: "Wybierz plan",
+                            onClick: () => router.push("/dashboard/billing"),
+                        },
+                    });
+                    return;
+                }
+
                 throw new Error(err?.error || "Błąd zapisu szablonu");
             }
+
             const result = await res.json();
             setCollection(result.collection);
             setSelectedTemplate(result.collection.hero_template || tpl);
