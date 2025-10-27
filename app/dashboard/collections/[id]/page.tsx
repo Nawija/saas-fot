@@ -11,6 +11,7 @@ import HeroPreview from "@/components/dashboard/HeroPreview";
 import HeroTemplateSelector from "@/components/dashboard/HeroTemplateSelector";
 import PhotoUploadSection from "@/components/dashboard/PhotoUploadSection";
 import PhotosGrid from "@/components/dashboard/PhotosGrid";
+import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
 
 interface Collection {
     id: number;
@@ -33,13 +34,8 @@ interface Photo {
     created_at: string;
 }
 
-const HERO_TEMPLATES = [
-    { key: "minimal", label: "Minimal" },
-    { key: "fullscreen", label: "Pełny ekran" },
-    { key: "split", label: "Podział 50/50" },
-    { key: "overlay", label: "Overlay" },
-    { key: "gradient", label: "Gradient" },
-];
+// HERO_TEMPLATES przeniesione do components/dashboard/hero-templates/registry.tsx
+// Importuj z rejestru zamiast deklarować tutaj
 
 export default function CollectionDetailPage({
     params,
