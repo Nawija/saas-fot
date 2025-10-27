@@ -36,7 +36,6 @@ export default function HeroPreviewModal({
     collectionDescription,
     heroImage,
 }: HeroPreviewModalProps) {
-    // Handle Esc key
     useEffect(() => {
         if (!open) return;
 
@@ -189,13 +188,7 @@ export default function HeroPreviewModal({
                                             </div>
 
                                             {/* Mobile phone overlay */}
-                                            <motion.div
-                                                whileHover={{
-                                                    scale: 1.05,
-                                                    transition: {
-                                                        duration: 0.3,
-                                                    },
-                                                }}
+                                            <div
                                                 className="hidden md:block absolute right-2 lg:right-6 -bottom-8 w-[170px] h-[360px] rounded-4xl border-8 border-black overflow-hidden shadow-2xl bg-black"
                                             >
                                                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-1.5 rounded-full bg-black/60 z-20" />
@@ -208,7 +201,7 @@ export default function HeroPreviewModal({
                                                         image={heroImage}
                                                     />
                                                 </div>
-                                            </motion.div>
+                                            </div>
 
                                             {/* Mobile-friendly stacked previews */}
                                             <div className="md:hidden mt-4 grid grid-cols-2 gap-3 relative">
