@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Copy, Check, Link as LinkIcon } from "lucide-react";
+import { Copy, Check, Link as LinkIcon, Eye } from "lucide-react";
+import MainButton from "./MainButton";
 
 interface CopyLinkButtonProps {
     url: string;
@@ -42,9 +43,7 @@ export default function CopyLinkButton({
             {showUrl && (
                 <div className="flex w-full items-center gap-2 px-3 py-2 rounded-xl bg-white border border-gray-200">
                     <LinkIcon className="w-4 h-4 text-gray-400 shrink-0" />
-                    <p className="text-base text-gray-800 flex-1">
-                        {url}
-                    </p>
+                    <p className="text-base text-gray-800 flex-1">{url}</p>
                 </div>
             )}
             <button
@@ -63,6 +62,7 @@ export default function CopyLinkButton({
                     </>
                 )}
             </button>
+            <MainButton href={url} icon={<Eye size={15} />} label="Zobacz" />
         </div>
     );
 }

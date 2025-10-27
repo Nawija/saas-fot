@@ -176,7 +176,8 @@ export default function HeroTemplateSelector({
                                 Szablon premium
                             </span>
                             <p className="mt-0.5">
-                                Dostępny dla planów Basic, Pro i Unlimited
+                                Dostępne dla użytkowników z aktywną subskrypcją
+                                (Basic, Pro, Unlimited)
                             </p>
                         </div>
                     </div>

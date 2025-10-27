@@ -264,16 +264,10 @@ export default function HeroPreviewModal({
                                 }}
                                 className="flex items-center justify-between px-6 sm:px-8 py-4 border-b border-gray-200 bg-white/70"
                             >
-                                <div>
-                                    <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-                                        Edytor wyglądu hero
-                                    </h2>
-                                    <p className="text-xs sm:text-sm text-gray-600">
-                                        Podgląd (desktop + mobile) po prawej,
-                                        wybór szablonów po lewej. Zapisz, aby
-                                        zastosować.
-                                    </p>
-                                </div>
+                                <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+                                    Edytor wyglądu hero
+                                </h2>
+
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}

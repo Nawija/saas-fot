@@ -5,6 +5,8 @@ import { FullscreenTemplate } from "./templates/Fullscreen";
 import { SplitTemplate } from "./templates/Split";
 import { OverlayTemplate } from "./templates/Overlay";
 import { GradientTemplate } from "./templates/Gradient";
+import { CinematicTemplate } from "./templates/Cinematic";
+import { EditorialTemplate } from "./templates/Editorial";
 
 export const GALLERY_HERO_TEMPLATES: Record<string, GalleryHeroTemplate> = {
     minimal: MinimalTemplate,
@@ -13,6 +15,8 @@ export const GALLERY_HERO_TEMPLATES: Record<string, GalleryHeroTemplate> = {
     overlay: OverlayTemplate,
     gradient: GradientTemplate,
     cards: SplitTemplate,
+    cinematic: CinematicTemplate,
+    editorial: EditorialTemplate,
 };
 
 export function getGalleryHeroTemplate(key?: string): GalleryHeroTemplate {

@@ -13,6 +13,7 @@ import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
 import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
 import CopyLinkButton from "@/components/buttons/CopyLinkButton";
+import { BookImage } from "lucide-react";
 
 interface Collection {
     id: number;
@@ -106,16 +107,6 @@ export default function CollectionDetailPage({
 
     async function updateHeroTemplate(tpl: string) {
         if (!collectionId || !collection) return;
-
-        // Sprawdź czy szablon jest premium
-        const template = HERO_TEMPLATES.find((t) => t.key === tpl);
-        if (template?.premium) {
-            // Pokaż ostrzeżenie o premium
-            toast.warning("Szablon premium", {
-                description:
-                    "Sprawdzam dostępność... Ten szablon może wymagać subskrypcji.",
-            });
-        }
 
         try {
             setSaving(true);
@@ -477,9 +468,10 @@ export default function CollectionDetailPage({
                         {/* Upload Section */}
                         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
-                                <h2 className="text-base font-semibold text-gray-900">
+                                <h2 className="text-lg font-semibold text-gray-800 tracking-tight">
                                     Dodaj zdjęcia
                                 </h2>
+
                                 <p className="text-sm text-gray-600 mt-1">
                                     Przeciągnij pliki lub kliknij aby wybrać
                                 </p>

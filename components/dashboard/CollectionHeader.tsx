@@ -77,29 +77,6 @@ export default function PremiumCollectionHeader({ collection, photos }: Props) {
                     <h1 className="text-lg sm:text-xl font-bold text-gray-900 line-clamp-1">
                         {collection.name}
                     </h1>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
-                        <span>
-                            {collection.photo_count}{" "}
-                            {collection.photo_count === 1
-                                ? "zdjęcie"
-                                : collection.photo_count < 5
-                                ? "zdjęcia"
-                                : "zdjęć"}
-                        </span>
-                        <span>•</span>
-                        <span>{formatFileSize(totalSize)}</span>
-                        <span>•</span>
-                        <span>
-                            {new Date(collection.created_at).toLocaleDateString(
-                                "pl-PL",
-                                {
-                                    day: "numeric",
-                                    month: "short",
-                                    year: "numeric",
-                                }
-                            )}
-                        </span>
-                    </div>
                 </div>
             </div>
 
@@ -137,16 +114,7 @@ export default function PremiumCollectionHeader({ collection, photos }: Props) {
                     )}
                 </div>
 
-                {/* View Gallery Button */}
-                <a
-                    href={galleryUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition shadow-sm"
-                >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Zobacz</span>
-                </a>
+               
             </div>
         </div>
     );

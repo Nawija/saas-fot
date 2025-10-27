@@ -153,9 +153,17 @@ export async function PATCH(
             "overlay",
             "gradient",
             "cards",
+            "cinematic",
+            "editorial",
         ]);
 
-        const premiumTemplates = new Set(["split", "overlay", "cards"]);
+        const premiumTemplates = new Set([
+            "split",
+            "overlay",
+            "cards",
+            "cinematic",
+            "editorial",
+        ]);
 
         // Buduj dynamiczne zapytanie UPDATE
         const updates: string[] = [];

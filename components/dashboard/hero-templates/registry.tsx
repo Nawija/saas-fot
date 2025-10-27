@@ -4,6 +4,8 @@ import { FullscreenTemplate } from "@/components/gallery/hero/templates/Fullscre
 import { SplitTemplate } from "@/components/gallery/hero/templates/Split";
 import { OverlayTemplate } from "@/components/gallery/hero/templates/Overlay";
 import { GradientTemplate } from "@/components/gallery/hero/templates/Gradient";
+import { CinematicTemplate } from "@/components/gallery/hero/templates/Cinematic";
+import { EditorialTemplate } from "@/components/gallery/hero/templates/Editorial";
 import { GalleryHeroTemplate } from "@/components/gallery/hero/types";
 
 // Adapter: wrap gallery hero templates (single responsive component via slot API)
@@ -63,10 +65,20 @@ const SOURCE: Array<{
     { key: "minimal", label: "Minimal", tpl: MinimalTemplate },
     { key: "fullscreen", label: "Pełny ekran", tpl: FullscreenTemplate },
     { key: "split", label: "Podział", tpl: SplitTemplate, premium: true },
-    { key: "overlay", label: "Overlay", tpl: OverlayTemplate, premium: true },
+    { key: "overlay", label: "Overlay", tpl: OverlayTemplate, premium: false },
     { key: "gradient", label: "Gradient", tpl: GradientTemplate },
-    // Alias
-    { key: "cards", label: "Karty", tpl: SplitTemplate, premium: true },
+    {
+        key: "cinematic",
+        label: "Cinematic",
+        tpl: CinematicTemplate,
+        premium: true,
+    },
+    {
+        key: "editorial",
+        label: "Editorial",
+        tpl: EditorialTemplate,
+        premium: true,
+    },
 ];
 
 export const HERO_TEMPLATES: HeroTemplateDefinition[] = SOURCE.map(

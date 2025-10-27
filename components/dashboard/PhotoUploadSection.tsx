@@ -2,6 +2,7 @@
 "use client";
 
 import { Upload } from "lucide-react";
+import Loading from "../ui/Loading";
 
 interface PhotoUploadSectionProps {
     uploading: boolean;
@@ -16,10 +17,6 @@ export default function PhotoUploadSection({
 }: PhotoUploadSectionProps) {
     return (
         <div className="bg-white rounded-2xl p-2 mb-2">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Dodaj zdjęcia
-            </h2>
-
             <label className="block">
                 <input
                     type="file"
@@ -34,10 +31,16 @@ export default function PhotoUploadSection({
                     className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
                         uploading
                             ? "border-blue-300 bg-blue-50"
-                            : "border-gray-300 hover:border-blue-500 hover:bg-blue-50"
+                            : "border-gray-300 hover:border-blue-200 hover:bg-blue-50"
                     }`}
                 >
-                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+                        {uploading ? (
+                            <Loading />
+                        ) : (
+                            <Upload className="w-12 h-12 text-blue-400" />
+                        )}
+                    </div>
                     {uploading ? (
                         <div>
                             <div className="text-gray-900 font-medium mb-2">
