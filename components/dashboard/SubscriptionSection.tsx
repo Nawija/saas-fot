@@ -154,16 +154,15 @@ export default function SubscriptionSection({
 
             {/* Resume button when subscription is scheduled to end but still active until then */}
             {canManage && subscription_status === "cancelled" && (
-
+                <div className="flex justify-end">
                     <MainButton
                         onClick={handleResume}
                         loading={resuming}
                         loadingText="Wznawianie..."
                         variant="success"
                         label="Wznów subskrypcję"
-                        className="w-full"
                     />
-
+                </div>
             )}
 
             <ConfirmDialog

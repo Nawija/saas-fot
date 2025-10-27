@@ -24,7 +24,7 @@ export default function HeroTemplateSelector({
 }: HeroTemplateSelectorProps) {
     return (
         <div>
-            <div className="flex items-center justify-start w-full overflow-x-auto gap-4 mb-6">
+            <div className="flex items-center justify-start overflow-x-auto gap-4 mb-6">
                 {templates.map((tpl) => {
                     const isSaved = savedTemplate === tpl.key;
                     const isPreview = selectedTemplate === tpl.key;

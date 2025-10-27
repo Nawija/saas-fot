@@ -14,6 +14,7 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import MainButton from "./MainButton";
 
 export default function DeleteAccountButton() {
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -85,14 +86,15 @@ export default function DeleteAccountButton() {
                             <li>Aktywna subskrypcja (zostanie anulowana)</li>
                             <li>Dane profilu i avatar</li>
                         </ul>
-                        <button
+
+                        <MainButton
+                            icon={<Trash2 className="w-4 h-4" />}
                             onClick={() => setConfirmDelete(true)}
-                            disabled={loading}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                            {loading ? "Usuwanie..." : "Usuń konto na zawsze"}
-                        </button>
+                            loading={loading}
+                            loadingText="Usuwanie..."
+                            variant="danger"
+                            label="Usuń konto na zawsze"
+                        />
                     </div>
                 </div>
             </div>

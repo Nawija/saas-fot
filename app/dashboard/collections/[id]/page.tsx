@@ -306,27 +306,31 @@ export default function CollectionDetailPage({
                         telefon.
                     </p>
 
-                    <HeroPreview
-                        selectedTemplate={selectedTemplate}
-                        previewTab={previewTab}
-                        collectionName={collection.name}
-                        collectionDescription={collection.description}
-                        heroImage={collection.hero_image}
-                    />
+                    <div>
+                        <HeroPreview
+                            selectedTemplate={selectedTemplate}
+                            previewTab={previewTab}
+                            collectionName={collection.name}
+                            collectionDescription={collection.description}
+                            heroImage={collection.hero_image}
+                        />
 
-                    <HeroTemplateSelector
-                        templates={HERO_TEMPLATES}
-                        selectedTemplate={selectedTemplate}
-                        savedTemplate={collection.hero_template || "minimal"}
-                        saving={saving}
-                        onSelectTemplate={setSelectedTemplate}
-                        onSave={() => updateHeroTemplate(selectedTemplate)}
-                        onReset={() =>
-                            setSelectedTemplate(
+                        <HeroTemplateSelector
+                            templates={HERO_TEMPLATES}
+                            selectedTemplate={selectedTemplate}
+                            savedTemplate={
                                 collection.hero_template || "minimal"
-                            )
-                        }
-                    />
+                            }
+                            saving={saving}
+                            onSelectTemplate={setSelectedTemplate}
+                            onSave={() => updateHeroTemplate(selectedTemplate)}
+                            onReset={() =>
+                                setSelectedTemplate(
+                                    collection.hero_template || "minimal"
+                                )
+                            }
+                        />
+                    </div>
                 </div>
 
                 <PhotoUploadSection
