@@ -141,7 +141,7 @@ export default function GalleryLandingPage() {
     const renderPrimaryAction = () => (
         <button
             onClick={handleViewGallery}
-            className="inline-flex items-center hover:bg-white/20 hover:border-white/10 gap-1 bg-white/10 px-4 py-2 border border-white/30 text-white/80 hover:text-white"
+            className="inline-flex items-center hover:bg-white/80 hover:border-black/20 gap-1 bg-white/90 px-6 py-3 border border-black/30 text-gray-800 hover:text-gray-700 font-semibold rounded transition"
         >
             <Eye size={20} />
             Zobacz jako gość

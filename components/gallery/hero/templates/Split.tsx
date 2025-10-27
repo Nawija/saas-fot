@@ -2,25 +2,74 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { GalleryHeroTemplate } from "../types";
 
 export const SplitTemplate: GalleryHeroTemplate = ({ data }) => {
     return (
-        <div className="relative h-screen w-full grid grid-cols-1 md:grid-cols-2">
-            <div className="relative order-2 md:order-1 flex items-center justify-center p-10 bg-white">
-                <div className="max-w-lg">
-                    <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
+        <div className="relative h-screen w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+            {/* TEKST */}
+            <motion.div
+                initial={{ opacity: 0, x: -40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="relative order-2 md:order-1 flex items-center justify-center p-10 bg-white"
+            >
+                <div className="max-w-lg text-center md:text-left">
+                    <motion.h1
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{
+                            delay: 0.2,
+                            duration: 0.8,
+                            ease: "easeOut",
+                        }}
+                        className="text-4xl md:text-6xl font-bold text-gray-900 mb-4"
+                    >
                         {data.name}
-                    </h1>
+                    </motion.h1>
+
                     {data.description && (
-                        <p className="text-lg md:text-xl text-gray-600 mb-12">
+                        <motion.p
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{
+                                delay: 0.4,
+                                duration: 0.8,
+                                ease: "easeOut",
+                            }}
+                            className="text-lg md:text-xl text-gray-600 mb-12"
+                        >
                             {data.description}
-                        </p>
+                        </motion.p>
                     )}
-                    <Link href="#s" className="px-6 py-3 bg-black rounded-xl text-white border-gray-200 text-sm font-semibold">Zobacz zdjęcia</Link>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                            delay: 0.6,
+                            duration: 0.6,
+                            ease: "easeOut",
+                        }}
+                    >
+                        <a
+                            href="#s"
+                            className="inline-block px-6 py-3 bg-black rounded-xl text-white border-gray-200 text-sm font-semibold hover:bg-gray-900 transition-colors duration-300"
+                        >
+                            Zobacz zdjęcia
+                        </a>
+                    </motion.div>
                 </div>
-             </div>
-            <div className="relative order-1 md:order-2">
+            </motion.div>
+
+            {/* OBRAZ */}
+            <motion.div
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="relative order-1 md:order-2"
+            >
                 {data.image ? (
                     <img
                         src={data.image}
@@ -30,7 +79,7 @@ export const SplitTemplate: GalleryHeroTemplate = ({ data }) => {
                 ) : (
                     <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-500" />
                 )}
-            </div>
+            </motion.div>
         </div>
     );
 };
