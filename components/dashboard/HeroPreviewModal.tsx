@@ -1,7 +1,7 @@
 // components/dashboard/HeroPreviewModal.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { HERO_TEMPLATES, getTemplateByKey } from "./hero-templates/registry";
@@ -64,6 +64,77 @@ export default function HeroPreviewModal({
     const template = getTemplateByKey(selectedTemplate);
     const Desktop = template.Desktop;
     const Mobile = template.Mobile;
+
+    // Scaled preview canvas that renders a fixed base resolution and scales to fit width (or box) like the thumbnails
+    function ScaledPreview({
+        BaseComp,
+        baseW,
+        baseH,
+        title,
+        description,
+        image,
+        fitBoth = false,
+    }: {
+        BaseComp: React.ComponentType<{
+            title: string;
+            description?: string;
+            image?: string;
+        }>;
+        baseW: number;
+        baseH: number;
+        title: string;
+        description?: string;
+        image?: string;
+        // if true, scale to fit both width and height (for phone box), else width only
+        fitBoth?: boolean;
+    }) {
+        const wrapperRef = useRef<HTMLDivElement | null>(null);
+        const [scale, setScale] = useState(1);
+
+        useLayoutEffect(() => {
+            const el = wrapperRef.current;
+            if (!el) return;
+
+            const compute = () => {
+                const w = el.clientWidth || 0;
+                const h = el.clientHeight || 0;
+                if (w === 0) return;
+                const sW = w / baseW;
+                const sH = h > 0 ? h / baseH : sW;
+                const s = fitBoth ? Math.min(sW, sH) : sW;
+                setScale(s);
+            };
+            compute();
+            const ro = new ResizeObserver(compute);
+            ro.observe(el);
+            return () => ro.disconnect();
+        }, [baseW, baseH, fitBoth]);
+
+        const height = Math.round(baseH * scale);
+
+        return (
+            <div
+                ref={wrapperRef}
+                className="relative w-full"
+                style={{ height }}
+            >
+                <div
+                    className="origin-top-left hero-preview-scope"
+                    style={{
+                        width: baseW,
+                        height: baseH,
+                        transform: `scale(${scale})`,
+                    }}
+                >
+                    <BaseComp
+                        title={title}
+                        description={description}
+                        image={image}
+                    />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <AnimatePresence>
@@ -177,55 +248,11 @@ export default function HeroPreviewModal({
                                             {/* Desktop frame */}
                                             <div className="relative hidden md:block mx-auto bg-black px-2 py-4 rounded-lg border border-gray-200 shadow-2xl w-[92%] md:w-[86%]">
                                                 <div className="aspect-video relative overflow-hidden bg-gray-900 rounded-b-lg">
-                                                    <Desktop
-                                                        title={collectionName}
-                                                        description={
-                                                            collectionDescription
-                                                        }
-                                                        image={heroImage}
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            {/* DESKTOP Mobile phone overlay*/}
-                                            <div
-                                                className="hidden md:block absolute right-2 lg:right-6 -bottom-8 w-[170px] h-[360px] rounded-4xl border-8 border-black overflow-hidden shadow-2xl bg-black"
-                                            >
-                                                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-1.5 rounded-full bg-black/60 z-20" />
-                                                <div className="absolute inset-0">
-                                                    <Mobile
-                                                        title={collectionName}
-                                                        description={
-                                                            collectionDescription
-                                                        }
-                                                        image={heroImage}
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            {/* Mobile-friendly stacked previews */}
-                                            <div className="md:hidden mt-4 grid grid-cols-2 gap-3 relative">
-                                                <div className="col-span-2">
-                                                    <div className="rounded-lg overflow-hidden border border-gray-200 bg-black">
-                                                        <div className="aspect-video relative">
-                                                            <Desktop
-                                                                title={
-                                                                    collectionName
-                                                                }
-                                                                description={
-                                                                    collectionDescription
-                                                                }
-                                                                image={
-                                                                    heroImage
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="rounded-xl absolute -top-2 -right-10 scale-50 overflow-hidden border-8 border-black bg-black">
-                                                    <div className="relative w-[120px] h-[260px]">
-                                                        <Mobile
+                                                    <div className="absolute inset-0 p-0 m-0">
+                                                        <ScaledPreview
+                                                            BaseComp={Desktop}
+                                                            baseW={1280}
+                                                            baseH={720}
                                                             title={
                                                                 collectionName
                                                             }
@@ -235,6 +262,76 @@ export default function HeroPreviewModal({
                                                             image={heroImage}
                                                         />
                                                     </div>
+                                                </div>
+                                            </div>
+
+                                            {/* DESKTOP Mobile phone overlay*/}
+                                            <div className="hidden md:block absolute right-2 lg:right-6 -bottom-8 w-[170px] h-[360px] rounded-4xl border-8 border-black overflow-hidden shadow-2xl bg-black">
+                                                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-1.5 rounded-full bg-black/60 z-20" />
+                                                <div className="absolute inset-0">
+                                                    <div className="w-full h-full">
+                                                        <ScaledPreview
+                                                            BaseComp={Mobile}
+                                                            baseW={390}
+                                                            baseH={844}
+                                                            title={
+                                                                collectionName
+                                                            }
+                                                            description={
+                                                                collectionDescription
+                                                            }
+                                                            image={heroImage}
+                                                            fitBoth
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Mobile-friendly stacked previews */}
+                                            <div className="md:hidden mt-4 grid grid-cols-2 gap-3 relative">
+                                                <div className="col-span-2">
+                                                    <div className="rounded-lg overflow-hidden border border-gray-200 bg-black">
+                                                        <div className="aspect-video relative">
+                                                            <div className="absolute inset-0">
+                                                                <ScaledPreview
+                                                                    BaseComp={
+                                                                        Desktop
+                                                                    }
+                                                                    baseW={1280}
+                                                                    baseH={720}
+                                                                    title={
+                                                                        collectionName
+                                                                    }
+                                                                    description={
+                                                                        collectionDescription
+                                                                    }
+                                                                    image={
+                                                                        heroImage
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    className="rounded-xl absolute -top-2 -right-10 overflow-hidden border-8 border-black bg-black"
+                                                    style={{
+                                                        width: 120,
+                                                        height: 260,
+                                                    }}
+                                                >
+                                                    <ScaledPreview
+                                                        BaseComp={Mobile}
+                                                        baseW={390}
+                                                        baseH={844}
+                                                        title={collectionName}
+                                                        description={
+                                                            collectionDescription
+                                                        }
+                                                        image={heroImage}
+                                                        fitBoth
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
