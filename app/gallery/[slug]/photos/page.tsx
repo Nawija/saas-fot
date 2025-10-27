@@ -88,6 +88,9 @@ export default function GalleryPhotosPage() {
     }, [lightboxOpen, currentPhotoIndex, photos.length]);
 
     const openLightbox = (index: number) => {
+        // Save current scroll position
+        setScrollPosition(window.scrollY);
+
         setCurrentPhotoIndex(index);
         setLightboxOpen(true);
         setLightboxAnimating(true);
@@ -121,21 +124,28 @@ export default function GalleryPhotosPage() {
             url.searchParams.delete("photo");
             window.history.replaceState({}, "", url.toString());
 
-            // Scroll to photo
+            // Restore scroll position
             setTimeout(() => {
-                const photoElement = document.querySelector(
-                    `#g > div:nth-child(${currentPhotoIndex + 1})`
-                );
-                if (photoElement) {
-                    photoElement.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                    });
-                }
-            }, 100);
+                window.scrollTo({
+                    top: scrollPosition,
+                    behavior: "instant",
+                });
+
+                // Then scroll to the photo smoothly
+                setTimeout(() => {
+                    const photoElement = document.querySelector(
+                        `#g > div:nth-child(${currentPhotoIndex + 1})`
+                    );
+                    if (photoElement) {
+                        photoElement.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                        });
+                    }
+                }, 50);
+            }, 50);
         }, 300);
     };
-
     const nextPhoto = () => {
         const newIndex = (currentPhotoIndex + 1) % photos.length;
         setCurrentPhotoIndex(newIndex);
