@@ -13,7 +13,6 @@ interface HeroPreviewProps {
 
 export default function HeroPreview({
     selectedTemplate,
-    previewTab,
     collectionName,
     collectionDescription,
     heroImage,
