@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { HERO_TEMPLATES, getTemplateByKey } from "./hero-templates/registry";
@@ -65,8 +66,8 @@ export default function HeroPreviewModal({
     const Desktop = template.Desktop;
     const Mobile = template.Mobile;
 
-    // Scaled preview canvas that renders a fixed base resolution and scales to fit width (or box) like the thumbnails
-    function ScaledPreview({
+    // Iframe-based preview so Tailwind breakpoints are evaluated per viewport
+    function IframePreview({
         BaseComp,
         baseW,
         baseH,
@@ -85,16 +86,16 @@ export default function HeroPreviewModal({
         title: string;
         description?: string;
         image?: string;
-        // if true, scale to fit both width and height (for phone box), else width only
         fitBoth?: boolean;
     }) {
         const wrapperRef = useRef<HTMLDivElement | null>(null);
+        const iframeRef = useRef<HTMLIFrameElement | null>(null);
+        const rootRef = useRef<ReactDOM.Root | null>(null);
         const [scale, setScale] = useState(1);
 
         useLayoutEffect(() => {
             const el = wrapperRef.current;
             if (!el) return;
-
             const compute = () => {
                 const w = el.clientWidth || 0;
                 const h = el.clientHeight || 0;
@@ -110,6 +111,91 @@ export default function HeroPreviewModal({
             return () => ro.disconnect();
         }, [baseW, baseH, fitBoth]);
 
+        // Mount React app into iframe for isolated viewport width
+        useEffect(() => {
+            const iframe = iframeRef.current;
+            if (!iframe) return;
+            const doc = iframe.contentDocument;
+            if (!doc) return;
+
+            doc.open();
+            doc.write(`<!DOCTYPE html><html><head><meta charset=\"utf-8\" />
+                <meta name=\"viewport\" content=\"width=${baseW}, initial-scale=1\" />
+                <style>html,body,#root{margin:0;padding:0;width:100%;height:100%;background:transparent;}</style>
+            </head><body><div id=\"root\"></div></body></html>`);
+            doc.close();
+
+            // Copy styles from parent document
+            try {
+                const parentSheets = Array.from(
+                    document.styleSheets
+                ) as CSSStyleSheet[];
+                const styleEl = doc.createElement("style");
+                let cssText = "";
+                for (const sheet of parentSheets) {
+                    try {
+                        const rules = sheet.cssRules;
+                        for (const rule of Array.from(rules)) {
+                            cssText += rule.cssText + "\n";
+                        }
+                    } catch {
+                        const ownerNode =
+                            sheet.ownerNode as HTMLLinkElement | null;
+                        if (ownerNode?.href) {
+                            const link = doc.createElement("link");
+                            link.rel = "stylesheet";
+                            link.href = ownerNode.href;
+                            doc.head.appendChild(link);
+                        }
+                    }
+                }
+                if (cssText) {
+                    styleEl.appendChild(doc.createTextNode(cssText));
+                    doc.head.appendChild(styleEl);
+                }
+            } catch {}
+
+            const mount = doc.getElementById("root");
+            if (!mount) return;
+            rootRef.current = ReactDOM.createRoot(mount);
+            rootRef.current.render(
+                <div
+                    className="hero-preview-scope"
+                    style={{ width: baseW, height: baseH }}
+                >
+                    <BaseComp
+                        title={title}
+                        description={description}
+                        image={image}
+                    />
+                </div>
+            );
+
+            return () => {
+                rootRef.current?.unmount();
+                rootRef.current = null;
+            };
+        }, [BaseComp, baseW, baseH]);
+
+        // Update on prop changes
+        useEffect(() => {
+            const iframe = iframeRef.current;
+            const doc = iframe?.contentDocument;
+            if (!doc || !rootRef.current) return;
+            rootRef.current.render(
+                <div
+                    className="hero-preview-scope"
+                    style={{ width: baseW, height: baseH }}
+                >
+                    <BaseComp
+                        title={title}
+                        description={description}
+                        image={image}
+                    />
+                </div>
+            );
+        }, [title, description, image, BaseComp, baseW, baseH]);
+
         const height = Math.round(baseH * scale);
 
         return (
@@ -118,20 +204,19 @@ export default function HeroPreviewModal({
                 className="relative w-full"
                 style={{ height }}
             >
-                <div
-                    className="origin-top-left hero-preview-scope"
+                <iframe
+                    ref={iframeRef}
+                    title="hero-preview-iframe"
                     style={{
                         width: baseW,
                         height: baseH,
                         transform: `scale(${scale})`,
+                        transformOrigin: "top left",
+                        border: "0",
+                        display: "block",
+                        background: "transparent",
                     }}
-                >
-                    <BaseComp
-                        title={title}
-                        description={description}
-                        image={image}
-                    />
-                </div>
+                />
             </div>
         );
     }
@@ -249,7 +334,7 @@ export default function HeroPreviewModal({
                                             <div className="relative hidden md:block mx-auto bg-black px-2 py-4 rounded-lg border border-gray-200 shadow-2xl w-[92%] md:w-[86%]">
                                                 <div className="aspect-video relative overflow-hidden bg-gray-900 rounded-b-lg">
                                                     <div className="absolute inset-0 p-0 m-0">
-                                                        <ScaledPreview
+                                                        <IframePreview
                                                             BaseComp={Desktop}
                                                             baseW={1280}
                                                             baseH={720}
@@ -270,7 +355,7 @@ export default function HeroPreviewModal({
                                                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-1.5 rounded-full bg-black/60 z-20" />
                                                 <div className="absolute inset-0">
                                                     <div className="w-full h-full">
-                                                        <ScaledPreview
+                                                        <IframePreview
                                                             BaseComp={Mobile}
                                                             baseW={390}
                                                             baseH={844}
@@ -293,7 +378,7 @@ export default function HeroPreviewModal({
                                                     <div className="rounded-lg overflow-hidden border border-gray-200 bg-black">
                                                         <div className="aspect-video relative">
                                                             <div className="absolute inset-0">
-                                                                <ScaledPreview
+                                                                <IframePreview
                                                                     BaseComp={
                                                                         Desktop
                                                                     }
@@ -321,7 +406,7 @@ export default function HeroPreviewModal({
                                                         height: 260,
                                                     }}
                                                 >
-                                                    <ScaledPreview
+                                                    <IframePreview
                                                         BaseComp={Mobile}
                                                         baseW={390}
                                                         baseH={844}
