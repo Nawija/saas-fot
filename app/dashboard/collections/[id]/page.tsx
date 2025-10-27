@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import Loading from "@/components/ui/Loading";
 import CollectionHeader from "@/components/dashboard/CollectionHeader";
-import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
+
 import PhotoUploadSection from "@/components/dashboard/PhotoUploadSection";
 import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
+import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
 
 interface Collection {
     id: number;
