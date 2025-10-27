@@ -1,6 +1,7 @@
 // components/dashboard/HeroTemplateSelector.tsx
 "use client";
 
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import {
@@ -29,6 +30,68 @@ export default function HeroTemplateSelector({
     onReset,
     previewData,
 }: HeroTemplateSelectorProps) {
+    function MiniPreview({
+        DesktopComp,
+        title,
+        description,
+        image,
+    }: {
+        DesktopComp: React.ComponentType<HeroTemplateProps>;
+        title: string;
+        description?: string;
+        image?: string;
+    }) {
+        const wrapperRef = useRef<HTMLDivElement | null>(null);
+        const [scale, setScale] = useState(0.2);
+        const baseW = 1280;
+        const baseH = 720;
+
+        useLayoutEffect(() => {
+            const el = wrapperRef.current;
+            if (!el) return;
+
+            const compute = () => {
+                const w = el.clientWidth;
+                if (w > 0) {
+                    const s = Math.max(0.12, Math.min(0.35, w / baseW));
+                    setScale(s);
+                }
+            };
+            compute();
+
+            const ro = new ResizeObserver(compute);
+            ro.observe(el);
+            return () => ro.disconnect();
+        }, []);
+
+        const height = Math.round(baseH * scale);
+
+        return (
+            <div
+                ref={wrapperRef}
+                className="relative w-full rounded-lg overflow-hidden bg-black/90 border border-gray-200/60 shadow-sm"
+                style={{ height }}
+            >
+                <div
+                    className="origin-top-left"
+                    style={{
+                        width: baseW,
+                        height: baseH,
+                        transform: `scale(${scale})`,
+                    }}
+                >
+                    <div className="relative w-full h-full">
+                        <DesktopComp
+                            title={title}
+                            description={description}
+                            image={image}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="h-full w-full">
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -56,18 +119,13 @@ export default function HeroTemplateSelector({
                             }`}
                             aria-pressed={isPreview}
                         >
-                            <div className="relative w-full bg-black transition-transform duration-300 group-hover:brightness-110">
-                                <div className="aspect-video w-full overflow-hidden">
-                                    <div className="relative w-full h-full">
-                                        <DesktopComp
-                                            title={
-                                                previewData?.title || tpl.label
-                                            }
-                                            image={previewData?.image}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                            {/* Faithful desktop miniature that scales to container width */}
+                            <MiniPreview
+                                DesktopComp={DesktopComp}
+                                title={previewData?.title || tpl.label}
+                                description={previewData?.description}
+                                image={previewData?.image}
+                            />
                             <div className="p-2 flex items-center justify-between bg-white">
                                 <div className="text-sm font-medium text-gray-900">
                                     {tpl.label}
