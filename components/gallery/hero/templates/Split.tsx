@@ -3,8 +3,7 @@
 
 import { GalleryHeroTemplate } from "../types";
 
-export const SplitTemplate: GalleryHeroTemplate = ({ data, elements }) => {
-    const Back = elements.BackButton;
+export const SplitTemplate: GalleryHeroTemplate = ({ data }) => {
     return (
         <div className="relative h-screen w-full grid grid-cols-1 md:grid-cols-2">
             <div className="relative order-2 md:order-1 flex items-center justify-center p-10 bg-white">
@@ -29,7 +28,6 @@ export const SplitTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                 ) : (
                     <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-500" />
                 )}
-                {Back && <Back />}
             </div>
         </div>
     );

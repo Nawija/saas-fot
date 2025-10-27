@@ -3,8 +3,7 @@
 
 import { GalleryHeroTemplate } from "../types";
 
-export const GradientTemplate: GalleryHeroTemplate = ({ data, elements }) => {
-    const Back = elements.BackButton;
+export const GradientTemplate: GalleryHeroTemplate = ({ data }) => {
     return (
         <div className="relative h-screen w-full bg-linear-to-br from-gray-900 via-slate-800 to-gray-700 overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center">
@@ -21,7 +20,7 @@ export const GradientTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                 </div>
             </div>
             <div className="absolute inset-0 bg-[radial-gradient(transparent,rgba(0,0,0,0.5))]" />
-            {Back && <Back />}
+
             <div className="relative z-10 h-full flex flex-col items-center justify-end text-white px-6 pb-16">
                 <div className="max-w-3xl mx-auto text-center">
                     <h1 className="text-5xl md:text-6xl font-extrabold mb-4 drop-shadow">
