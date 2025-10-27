@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Loading from "@/components/ui/Loading";
+import { getGalleryHeroTemplate } from "@/components/gallery/hero/registry";
 import { Eye, Lock } from "lucide-react";
 
 interface Collection {
@@ -103,6 +104,7 @@ export default function GalleryLandingPage() {
     }
 
     const template = collection.hero_template || "minimal";
+    const HeroTemplate = getGalleryHeroTemplate(template);
 
     const renderPasswordPrompt = () => (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
@@ -146,22 +148,35 @@ export default function GalleryLandingPage() {
         </button>
     );
 
-    const MinimalHero = () => (
+    // Unified render using existing templates but hiding their titles/buttons
+    return (
         <div className="relative h-screen w-full overflow-hidden">
+            {/* Render template inside a scoped container that hides text/buttons */}
             <div className="absolute inset-0">
-                {collection.hero_image ? (
-                    <img
-                        src={collection.hero_image}
-                        alt={collection.name}
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
-                )}
-                <div className="absolute inset-0 bg-black/80" />
+                <div className="hero-landing-scope relative h-full w-full">
+                    {HeroTemplate({
+                        data: {
+                            name: collection.name,
+                            description: collection.description,
+                            image: collection.hero_image,
+                        },
+                        elements: {},
+                    })}
+                </div>
+                <style jsx global>{`
+                    .hero-landing-scope h1,
+                    .hero-landing-scope h2,
+                    .hero-landing-scope p,
+                    .hero-landing-scope a,
+                    .hero-landing-scope button {
+                        display: none !important;
+                    }
+                `}</style>
             </div>
-            <div className="relative z-10 h-full flex flex-col items-center justify-center text-white px-4">
-                <div className="max-w-3xl mx-auto text-center">
+
+            {/* Center overlay with password form or view button */}
+            <div className="absolute inset-0 z-10 flex items-center justify-center text-white px-4">
+                <div className="max-w-md w-full flex items-center justify-center">
                     {showPasswordPrompt && collection.has_password
                         ? renderPasswordPrompt()
                         : renderPrimaryAction()}
@@ -169,124 +184,4 @@ export default function GalleryLandingPage() {
             </div>
         </div>
     );
-
-    const FullscreenHero = () => (
-        <div className="relative h-screen w-full overflow-hidden">
-            {collection.hero_image ? (
-                <img
-                    src={collection.hero_image}
-                    alt={collection.name}
-                    className="w-full h-full object-cover"
-                />
-            ) : (
-                <div className="w-full h-full bg-linear-to-br from-slate-800 to-slate-600" />
-            )}
-            <div className="absolute inset-0 bg-linear-to-b from-black/60 via-black/20 to-black/60" />
-            <div className="absolute inset-0 flex items-center justify-center text-white px-6">
-                <div className="text-center">
-                    {showPasswordPrompt && collection.has_password
-                        ? renderPasswordPrompt()
-                        : renderPrimaryAction()}
-                </div>
-            </div>
-        </div>
-    );
-
-    const SplitHero = () => (
-        <div className="relative h-screen w-full grid grid-cols-1 md:grid-cols-2">
-            <div className="relative order-2 md:order-1 flex items-center justify-center p-10 bg-white">
-                <div className="max-w-lg">
-                    <div className="text-gray-800">
-                        {showPasswordPrompt && collection.has_password ? (
-                            renderPasswordPrompt()
-                        ) : (
-                            <button
-                                onClick={handleViewGallery}
-                                className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors"
-                            >
-                                Zobacz zdjęcia
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </div>
-            <div className="relative order-1 md:order-2">
-                {collection.hero_image ? (
-                    <img
-                        src={collection.hero_image}
-                        alt={collection.name}
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-500" />
-                )}
-            </div>
-        </div>
-    );
-
-    const OverlayHero = () => (
-        <div className="relative h-screen w-full overflow-hidden">
-            <div className="absolute inset-0">
-                {collection.hero_image ? (
-                    <img
-                        src={collection.hero_image}
-                        alt={collection.name}
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
-                )}
-                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
-            </div>
-            <div className="relative z-10 h-full flex flex-col items-center justify-end text-white px-6 pb-16">
-                <div className="max-w-4xl mx-auto text-center">
-                    {showPasswordPrompt && collection.has_password
-                        ? renderPasswordPrompt()
-                        : renderPrimaryAction()}
-                </div>
-            </div>
-        </div>
-    );
-
-    const GradientHero = () => (
-        <div className="relative h-screen w-full bg-linear-to-br from-gray-900 via-slate-800 to-gray-700 overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-white/20 shadow-2xl">
-                    {collection.hero_image ? (
-                        <img
-                            src={collection.hero_image}
-                            alt={collection.name}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-full h-full bg-linear-to-br from-slate-600 to-slate-400" />
-                    )}
-                </div>
-            </div>
-            <div className="absolute inset-0 bg-[radial-gradient(transparent,rgba(0,0,0,0.5))]" />
-            <div className="relative z-10 h-full flex flex-col items-center justify-end text-white px-6 pb-16">
-                <div className="max-w-3xl mx-auto text-center">
-                    {showPasswordPrompt && collection.has_password
-                        ? renderPasswordPrompt()
-                        : renderPrimaryAction()}
-                </div>
-            </div>
-        </div>
-    );
-
-    switch (template) {
-        case "fullscreen":
-            return <FullscreenHero />;
-        case "split":
-            return <SplitHero />;
-        case "overlay":
-            return <OverlayHero />;
-        case "gradient":
-            return <GradientHero />;
-        case "cards":
-            return <SplitHero />;
-        case "minimal":
-        default:
-            return <MinimalHero />;
-    }
 }
