@@ -49,7 +49,9 @@ export async function POST(req: NextRequest) {
             key = R2Paths.collectionHero(user.id, parseInt(collectionId));
         } else {
             // Regular photo - 1200px szerokości
-            processedBuffer = await sharp(buffer)
+            const image = sharp(buffer);
+
+            processedBuffer = await image
                 .resize(1200, null, {
                     fit: "inside",
                     withoutEnlargement: true,
@@ -68,6 +70,11 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // Pobierz wymiary przetworzonego obrazu
+        const metadata = await sharp(processedBuffer).metadata();
+        const width = metadata.width || 0;
+        const height = metadata.height || 0;
+
         // Upload do R2
         const url = await uploadToR2(processedBuffer, key, contentType);
 
@@ -75,6 +82,8 @@ export async function POST(req: NextRequest) {
             ok: true,
             url,
             size: processedBuffer.length,
+            width,
+            height,
         });
     } catch (error: any) {
         console.error("Upload error:", error);

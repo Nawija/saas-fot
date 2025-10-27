@@ -161,6 +161,9 @@ export default function GalleryLandingPage() {
                             image: collection.hero_image,
                         },
                         elements: {},
+                        options: {
+                            disableAnimations: true,
+                        },
                     })}
                 </div>
                 <style jsx global>{`

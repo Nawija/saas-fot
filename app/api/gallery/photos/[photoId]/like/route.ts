@@ -9,9 +9,8 @@ export async function POST(
     try {
         const { photoId } = await params;
 
-        // Pobierz identyfikator gościa (IP lub wygeneruj cookie)
-        const guestId =
-            req.headers.get("x-forwarded-for") || "guest-" + Date.now();
+        // Pobierz identyfikator gościa (IP lub cookie)
+        const guestId = req.headers.get("x-forwarded-for") || "unknown";
 
         // Sprawdź czy już polubione
         const existingLike = await query(

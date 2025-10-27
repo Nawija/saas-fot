@@ -33,6 +33,8 @@ interface Photo {
     file_path: string;
     file_name: string;
     file_size: number;
+    width?: number;
+    height?: number;
     created_at: string;
 }
 
@@ -211,7 +213,7 @@ export default function CollectionDetailPage({
                 throw new Error(`Failed to upload ${file.name}`);
             }
 
-            const { url, size } = await uploadRes.json();
+            const { url, size, width, height } = await uploadRes.json();
 
             // Zapisz w bazie
             const saveRes = await fetch(
@@ -223,6 +225,8 @@ export default function CollectionDetailPage({
                         file_name: file.name,
                         file_path: url,
                         file_size: size,
+                        width,
+                        height,
                     }),
                 }
             );

@@ -45,24 +45,32 @@ export async function GET(
             }
         }
 
-        // Pobierz zdjęcia
+        // Pobierz identyfikator gościa (IP)
+        const guestId = req.headers.get("x-forwarded-for") || "unknown";
+
+        // Pobierz zdjęcia z informacją o polubienia przez tego gościa
         const photosResult = await query(
             `SELECT 
                 p.id, p.file_path, p.thumbnail_path, p.width, p.height,
-                COUNT(pl.id) as likes
+                COUNT(pl.id) as likes,
+                CASE WHEN guest_likes.id IS NOT NULL THEN true ELSE false END as is_liked
             FROM photos p
             LEFT JOIN photo_likes pl ON p.id = pl.photo_id
+            LEFT JOIN photo_likes guest_likes ON p.id = guest_likes.photo_id AND guest_likes.guest_identifier = $2
             WHERE p.collection_id = $1
-            GROUP BY p.id
+            GROUP BY p.id, guest_likes.id
             ORDER BY p.uploaded_at DESC`,
-            [collection.id]
+            [collection.id, guestId]
         );
 
-        // Dodaj informację czy gość polubił (na podstawie IP lub cookie)
         const photos = photosResult.rows.map((photo) => ({
-            ...photo,
+            id: photo.id,
+            file_path: photo.file_path,
+            thumbnail_path: photo.thumbnail_path,
+            width: photo.width,
+            height: photo.height,
             likes: parseInt(photo.likes) || 0,
-            isLiked: false, // TODO: sprawdź na podstawie guest_identifier
+            isLiked: photo.is_liked || false,
         }));
 
         return NextResponse.json({

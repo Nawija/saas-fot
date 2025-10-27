@@ -11,7 +11,12 @@ export interface GalleryHeroElements {
     ScrollIndicator?: () => React.ReactNode | null;
 }
 
+export interface GalleryHeroOptions {
+    disableAnimations?: boolean;
+}
+
 export type GalleryHeroTemplate = (ctx: {
     data: GalleryHeroData;
     elements: GalleryHeroElements;
+    options?: GalleryHeroOptions;
 }) => React.ReactNode;

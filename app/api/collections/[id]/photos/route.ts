@@ -34,7 +34,8 @@ export async function GET(
         // Pobierz zdjęcia
         const result = await query(
             `SELECT id, file_name, file_path, 
-             CAST(file_size AS INTEGER) as file_size, 
+             CAST(file_size AS INTEGER) as file_size,
+             width, height,
              created_at 
        FROM photos 
        WHERE collection_id = $1 
@@ -66,7 +67,8 @@ export async function POST(
             );
         }
 
-        const { file_name, file_path, file_size } = await request.json();
+        const { file_name, file_path, file_size, width, height } =
+            await request.json();
 
         // Upewnij się że file_size jest liczbą
         const fileSizeNum = parseInt(file_size);
@@ -106,10 +108,18 @@ export async function POST(
 
         // Dodaj zdjęcie
         const result = await query(
-            `INSERT INTO photos (collection_id, user_id, file_name, file_path, file_size) 
-       VALUES ($1, $2, $3, $4, $5) 
+            `INSERT INTO photos (collection_id, user_id, file_name, file_path, file_size, width, height) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7) 
        RETURNING *`,
-            [id, user.id, file_name, file_path, fileSizeNum]
+            [
+                id,
+                user.id,
+                file_name,
+                file_path,
+                fileSizeNum,
+                width || null,
+                height || null,
+            ]
         );
 
         // Zaktualizuj storage_used
