@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/ui/Loading";
 import { getGalleryHeroTemplate } from "@/components/gallery/hero/registry";
@@ -36,6 +36,59 @@ export default function GalleryPhotosPage() {
     const [lightboxAnimating, setLightboxAnimating] = useState(false);
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const [scrollPosition, setScrollPosition] = useState(0);
+    // Zoom & pan state (mobile friendly)
+    const [zoomScale, setZoomScale] = useState(1);
+    const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStartRef = useRef<{
+        x: number;
+        y: number;
+        panX: number;
+        panY: number;
+    } | null>(null);
+    const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(
+        null
+    );
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const imageRef = useRef<HTMLImageElement | null>(null);
+    const [isPinching, setIsPinching] = useState(false);
+    const pinchStartDistanceRef = useRef(0);
+    const pinchStartScaleRef = useRef(1);
+    const pinchStartPanRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+    const pinchMidpointRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+    // Helpers for premium smooth zooming/panning
+    const clampPan = (scale: number, next: { x: number; y: number }) => {
+        const cw = containerRef.current?.clientWidth || window.innerWidth;
+        const ch = containerRef.current?.clientHeight || window.innerHeight;
+        const iw = imageRef.current?.clientWidth || cw;
+        const ih = imageRef.current?.clientHeight || ch;
+        const maxX = ((scale - 1) * iw) / 2;
+        const maxY = ((scale - 1) * ih) / 2;
+        return {
+            x: Math.max(-maxX, Math.min(maxX, next.x)),
+            y: Math.max(-maxY, Math.min(maxY, next.y)),
+        };
+    };
+
+    const zoomAt = (clientX: number, clientY: number, nextScale: number) => {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) {
+            setZoomScale(nextScale);
+            return;
+        }
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const offsetX = clientX - centerX;
+        const offsetY = clientY - centerY;
+        setPan((prev) =>
+            clampPan(nextScale, {
+                x: prev.x - offsetX * (nextScale - zoomScale),
+                y: prev.y - offsetY * (nextScale - zoomScale),
+            })
+        );
+        setZoomScale(nextScale);
+    };
 
     useEffect(() => {
         fetchGallery();
@@ -94,6 +147,9 @@ export default function GalleryPhotosPage() {
         setCurrentPhotoIndex(index);
         setLightboxOpen(true);
         setLightboxAnimating(true);
+        // Reset zoom on open
+        setZoomScale(1);
+        setPan({ x: 0, y: 0 });
         document.body.style.overflow = "hidden";
 
         // Update URL
@@ -117,6 +173,9 @@ export default function GalleryPhotosPage() {
         setTimeout(() => {
             setLightboxOpen(false);
             setLightboxAnimating(false);
+            // Reset zoom on close
+            setZoomScale(1);
+            setPan({ x: 0, y: 0 });
             document.body.style.overflow = "auto";
 
             // Clear URL
@@ -149,6 +208,9 @@ export default function GalleryPhotosPage() {
     const nextPhoto = () => {
         const newIndex = (currentPhotoIndex + 1) % photos.length;
         setCurrentPhotoIndex(newIndex);
+        // Reset zoom when changing photo
+        setZoomScale(1);
+        setPan({ x: 0, y: 0 });
 
         // Update URL
         const photoId = photos[newIndex]?.id;
@@ -163,6 +225,9 @@ export default function GalleryPhotosPage() {
         const newIndex =
             (currentPhotoIndex - 1 + photos.length) % photos.length;
         setCurrentPhotoIndex(newIndex);
+        // Reset zoom when changing photo
+        setZoomScale(1);
+        setPan({ x: 0, y: 0 });
 
         // Update URL
         const photoId = photos[newIndex]?.id;
@@ -290,7 +355,7 @@ export default function GalleryPhotosPage() {
                             <div id="s" className="h-0 w-0 scroll-m-2" />
                             <div
                                 id="g"
-                                className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 auto-rows-[200px] ${
+                                className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 auto-rows-[250px] ${
                                     lightboxOpen ? "hidden" : ""
                                 }`}
                             >
@@ -301,26 +366,36 @@ export default function GalleryPhotosPage() {
                                             ? photo.width / photo.height
                                             : 1;
 
-                                    // Determine span based on aspect ratio and index for variety
+                                    // Determine spans for better layout
                                     let colSpan = 1;
                                     let rowSpan = 1;
 
-                                    // Wide photos (landscape)
-                                    if (aspectRatio > 1.5) {
+                                    // Very wide panoramas
+                                    if (aspectRatio > 2.5) {
+                                        colSpan = 3;
+                                        rowSpan = 1;
+                                    }
+                                    // Wide photos
+                                    else if (aspectRatio > 1.6) {
                                         colSpan = 2;
                                         rowSpan = 1;
                                     }
-                                    // Tall photos (portrait)
-                                    else if (aspectRatio < 0.7) {
+                                    // Very tall portraits
+                                    else if (aspectRatio < 0.5) {
+                                        colSpan = 1;
+                                        rowSpan = 3;
+                                    }
+                                    // Tall photos
+                                    else if (aspectRatio < 0.75) {
                                         colSpan = 1;
                                         rowSpan = 2;
                                     }
-                                    // Square-ish - occasionally make them bigger
+                                    // Square - occasionally make bigger
                                     else if (
                                         aspectRatio >= 0.9 &&
                                         aspectRatio <= 1.1
                                     ) {
-                                        if (index % 7 === 0) {
+                                        if (index % 6 === 0) {
                                             colSpan = 2;
                                             rowSpan = 2;
                                         }
@@ -330,7 +405,7 @@ export default function GalleryPhotosPage() {
                                         <div
                                             key={photo.id}
                                             onClick={() => openLightbox(index)}
-                                            className="group relative overflow-hidden bg-gray-200 transition-all duration-300 cursor-pointer"
+                                            className="group relative overflow-hidden bg-black cursor-pointer"
                                             style={{
                                                 gridColumn: `span ${colSpan}`,
                                                 gridRow: `span ${rowSpan}`,
@@ -342,32 +417,47 @@ export default function GalleryPhotosPage() {
                                                     photo.file_path
                                                 }
                                                 alt={`Zdjęcie ${index + 1}`}
-                                                className="w-full h-full object-cover"
+                                                draggable={false}
+                                                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-90"
                                                 loading="lazy"
+                                                onError={(e) => {
+                                                    // Fallback if thumbnail fails
+                                                    const img =
+                                                        e.target as HTMLImageElement;
+                                                    if (
+                                                        img.src !==
+                                                        photo.file_path
+                                                    ) {
+                                                        img.src =
+                                                            photo.file_path;
+                                                    }
+                                                }}
                                             />
 
                                             {/* Hover Overlay */}
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-end justify-between p-4">
+                                            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-between p-4 md:p-6">
                                                 <button
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
                                                         handleLike(photo.id);
                                                     }}
-                                                    className={`opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
+                                                    className={`transition-all duration-300 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold shadow-lg ${
                                                         photo.isLiked
-                                                            ? "bg-red-500 text-white"
-                                                            : "bg-white/90 text-gray-300"
+                                                            ? "bg-red-500 text-white scale-110"
+                                                            : "bg-white/95 text-gray-700 hover:bg-white"
                                                     }`}
                                                 >
                                                     <Heart
-                                                        className={`w-5 h-5 ${
+                                                        className={`w-5 h-5 transition-all ${
                                                             photo.isLiked
-                                                                ? "fill-current"
+                                                                ? "fill-current scale-110"
                                                                 : ""
                                                         }`}
                                                     />
-                                                    {photo.likes}
+                                                    <span className="font-bold">
+                                                        {photo.likes}
+                                                    </span>
                                                 </button>
                                             </div>
                                         </div>
@@ -446,16 +536,193 @@ export default function GalleryPhotosPage() {
                     </div>
 
                     {/* Main Image Container */}
-                    <div className="w-full h-full flex items-center justify-center p-4">
+                    <div
+                        ref={containerRef}
+                        className="w-full h-full flex items-center justify-center p-2 md:p-4 select-none"
+                        style={{ touchAction: "none" }}
+                        onDoubleClick={(e) => {
+                            e.preventDefault();
+                            const next = zoomScale > 1 ? 1 : 2.5;
+                            zoomAt(e.clientX, e.clientY, next);
+                        }}
+                        onWheel={(e) => {
+                            e.preventDefault();
+                            const delta = -e.deltaY;
+                            const factor = delta > 0 ? 1.1 : 0.9;
+                            const next = Math.max(
+                                1,
+                                Math.min(4, zoomScale * factor)
+                            );
+                            zoomAt(e.clientX, e.clientY, next);
+                        }}
+                        onMouseDown={(e) => {
+                            if (zoomScale === 1) return;
+                            setIsDragging(true);
+                            dragStartRef.current = {
+                                x: e.clientX,
+                                y: e.clientY,
+                                panX: pan.x,
+                                panY: pan.y,
+                            };
+                        }}
+                        onMouseMove={(e) => {
+                            if (!isDragging || !dragStartRef.current) return;
+                            const dx = e.clientX - dragStartRef.current.x;
+                            const dy = e.clientY - dragStartRef.current.y;
+                            const next = {
+                                x: dragStartRef.current.panX + dx,
+                                y: dragStartRef.current.panY + dy,
+                            };
+                            setPan(clampPan(zoomScale, next));
+                        }}
+                        onMouseUp={() => {
+                            setIsDragging(false);
+                            dragStartRef.current = null;
+                        }}
+                        onMouseLeave={() => {
+                            setIsDragging(false);
+                            dragStartRef.current = null;
+                        }}
+                        onTouchStart={(e) => {
+                            if (e.touches.length === 1) {
+                                const t = e.touches[0];
+                                // Double-tap detect
+                                const now = Date.now();
+                                if (
+                                    lastTapRef.current &&
+                                    now - lastTapRef.current.time < 300
+                                ) {
+                                    // Double tap
+                                    if (zoomScale > 1) {
+                                        setZoomScale(1);
+                                        setPan({ x: 0, y: 0 });
+                                    } else {
+                                        setZoomScale(2.5);
+                                    }
+                                    lastTapRef.current = null;
+                                } else {
+                                    lastTapRef.current = {
+                                        time: now,
+                                        x: t.clientX,
+                                        y: t.clientY,
+                                    };
+                                }
+
+                                if (zoomScale > 1) {
+                                    setIsDragging(true);
+                                    dragStartRef.current = {
+                                        x: t.clientX,
+                                        y: t.clientY,
+                                        panX: pan.x,
+                                        panY: pan.y,
+                                    };
+                                }
+                            }
+                        }}
+                        onTouchMove={(e) => {
+                            // Pinch-zoom handling
+                            if (e.touches.length === 2) {
+                                setIsPinching(true);
+                                const [t1, t2] = [e.touches[0], e.touches[1]];
+                                const dx = t2.clientX - t1.clientX;
+                                const dy = t2.clientY - t1.clientY;
+                                const dist = Math.hypot(dx, dy);
+                                if (pinchStartDistanceRef.current === 0) {
+                                    pinchStartDistanceRef.current = dist;
+                                    pinchStartScaleRef.current = zoomScale;
+                                    pinchStartPanRef.current = { ...pan };
+                                    const midX = (t1.clientX + t2.clientX) / 2;
+                                    const midY = (t1.clientY + t2.clientY) / 2;
+                                    pinchMidpointRef.current = {
+                                        x: midX,
+                                        y: midY,
+                                    };
+                                    return;
+                                }
+
+                                const ratio =
+                                    dist / pinchStartDistanceRef.current;
+                                const nextScale = Math.max(
+                                    1,
+                                    Math.min(
+                                        4,
+                                        pinchStartScaleRef.current * ratio
+                                    )
+                                );
+                                // Zoom around midpoint
+                                const rect =
+                                    containerRef.current?.getBoundingClientRect();
+                                if (rect) {
+                                    const centerX = rect.left + rect.width / 2;
+                                    const centerY = rect.top + rect.height / 2;
+                                    const offsetX =
+                                        pinchMidpointRef.current.x - centerX;
+                                    const offsetY =
+                                        pinchMidpointRef.current.y - centerY;
+                                    const baseScale =
+                                        pinchStartScaleRef.current;
+                                    const nextPan = clampPan(nextScale, {
+                                        x:
+                                            pinchStartPanRef.current.x -
+                                            offsetX * (nextScale - baseScale),
+                                        y:
+                                            pinchStartPanRef.current.y -
+                                            offsetY * (nextScale - baseScale),
+                                    });
+                                    setZoomScale(nextScale);
+                                    setPan(nextPan);
+                                }
+                                return;
+                            }
+
+                            if (!isDragging || !dragStartRef.current) return;
+                            if (e.touches.length !== 1) return;
+                            const t = e.touches[0];
+                            const dx = t.clientX - dragStartRef.current.x;
+                            const dy = t.clientY - dragStartRef.current.y;
+                            const next = {
+                                x: dragStartRef.current.panX + dx,
+                                y: dragStartRef.current.panY + dy,
+                            };
+                            setPan(clampPan(zoomScale, next));
+                        }}
+                        onTouchEnd={(e) => {
+                            if (e.touches.length < 2) {
+                                // End pinch
+                                setIsPinching(false);
+                                pinchStartDistanceRef.current = 0;
+                            }
+                            if (e.touches.length === 0) {
+                                setIsDragging(false);
+                                dragStartRef.current = null;
+                            }
+                        }}
+                    >
                         <img
+                            ref={imageRef}
                             src={photos[currentPhotoIndex].file_path}
                             alt={`Zdjęcie ${currentPhotoIndex + 1}`}
-                            className={`max-w-full max-h-full object-contain transition-all duration-300 ${
+                            draggable="false"
+                            className={`max-w-full max-h-full object-contain will-change-transform ${
                                 lightboxAnimating
                                     ? "opacity-0 scale-95"
-                                    : "opacity-100 scale-100"
+                                    : "opacity-100"
                             }`}
-                            style={{ maxHeight: "90vh", maxWidth: "90vw" }}
+                            style={{
+                                maxHeight: "95vh",
+                                maxWidth: "95vw",
+                                transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoomScale})`,
+                                transition:
+                                    isDragging || isPinching
+                                        ? "none"
+                                        : "transform 200ms ease",
+                                cursor:
+                                    zoomScale > 1
+                                        ? isDragging
+                                            ? "grabbing"
+                                            : "grab"
+                                        : "zoom-in",
+                            }}
                         />
                     </div>
 

@@ -141,7 +141,7 @@ export default function GalleryLandingPage() {
     const renderPrimaryAction = () => (
         <button
             onClick={handleViewGallery}
-            className="inline-flex items-center hover:bg-white/80 hover:border-black/20 gap-1 bg-white/90 px-6 py-3 border border-black/30 text-gray-800 hover:text-gray-700 font-semibold rounded transition"
+            className="inline-flex items-center hover:bg-white hover:border-black/20 gap-1 bg-white/80 px-6 py-3 border border-black/30 text-gray-800 hover:text-gray-700 font-semibold rounded transition"
         >
             <Eye size={20} />
             Zobacz jako gość
@@ -151,7 +151,7 @@ export default function GalleryLandingPage() {
     // Unified render using existing templates but hiding their titles/buttons
     return (
         <div className="relative h-screen w-full overflow-hidden">
-            {/* Render template inside a scoped container that hides text/buttons */}
+<div className="absolute inset-0 bg-black/90 w-full h-full z-10" />
             <div className="absolute inset-0">
                 <div className="hero-landing-scope relative h-full w-full">
                     {HeroTemplate({
