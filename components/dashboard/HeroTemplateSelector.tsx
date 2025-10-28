@@ -288,7 +288,7 @@ export default function HeroTemplateSelector({
                                 : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
                         }`}
                     >
-                        {saving ? "Zapisywanie..." : "Zapisz wybrany wygląd"}
+                        {saving ? "Zapisywanie..." : "Zapisz wygląd"}
                     </button>
                     <button
                         disabled={saving}
@@ -301,7 +301,7 @@ export default function HeroTemplateSelector({
                         }}
                         className="px-4 py-2 text-sm rounded-md border border-gray-200 hover:bg-gray-50 transition-all duration-200"
                     >
-                        Reset podglądu
+                        Reset
                     </button>
                 </div>
             </div>

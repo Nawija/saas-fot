@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lock, Globe, Eye } from "lucide-react";
+import { ArrowLeft, Lock, Globe } from "lucide-react";
 
 interface Collection {
     id: number;
@@ -29,38 +28,11 @@ interface Props {
     photos: Photo[];
 }
 
-function formatFileSize(bytes: number): string {
-    const numBytes = Number(bytes) || 0;
-    if (!numBytes) return "0 B";
-    const units = ["B", "KB", "MB", "GB", "TB"];
-    let size = numBytes;
-    let i = 0;
-    while (size >= 1024 && i < units.length - 1) {
-        size /= 1024;
-        i++;
-    }
-    return `${size.toFixed(size >= 100 ? 0 : 1)} ${units[i]}`;
-}
-
 export default function PremiumCollectionHeader({ collection, photos }: Props) {
     const router = useRouter();
-    const [origin, setOrigin] = useState("");
-
-    useEffect(() => {
-        if (typeof window !== "undefined") setOrigin(window.location.origin);
-    }, []);
-
-    const galleryUrl = useMemo(
-        () => `${origin}/gallery/${collection.slug}`,
-        [origin, collection.slug]
-    );
-    const totalSize = useMemo(
-        () => photos.reduce((sum, p) => sum + p.file_size, 0),
-        [photos]
-    );
 
     return (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex tems-center justify-between gap-4">
             {/* Left: Back button + Title */}
             <div className="flex items-center gap-4">
                 <button
@@ -113,8 +85,6 @@ export default function PremiumCollectionHeader({ collection, photos }: Props) {
                         </>
                     )}
                 </div>
-
-               
             </div>
         </div>
     );

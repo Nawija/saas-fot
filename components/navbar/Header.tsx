@@ -25,13 +25,13 @@ export default async function Header() {
                 {user ? (
                     <div className="flex items-center justify-center text-sm text-gray-500 gap-3">
                         {/* Slot for menu button - injected by DashboardLayoutClient */}
-                        <div id="dashboard-menu-slot" />
                         <UserDropdown
                             name={user.name}
                             email={user.email}
                             avatar={user.avatar}
                             provider={user.provider}
                         />
+                        <div id="dashboard-menu-slot" />
                     </div>
                 ) : (
                     <Link href="/login" className="underline">

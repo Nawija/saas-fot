@@ -19,11 +19,6 @@ const menuItems = [
         href: "/dashboard/billing",
         icon: CreditCard,
     },
-    {
-        label: "Profil",
-        href: "/dashboard/profile",
-        icon: User,
-    },
 ];
 
 interface DashboardSidebarProps {
@@ -54,7 +49,7 @@ export default function DashboardSidebar({
 
             {/* Sidebar */}
             <aside
-                className={`fixed top-0 left-0 h-screen w-64 bg-white z-40 lg:static lg:shadow-none transition-transform duration-300 ease-in-out ${
+                className={`fixed top-0 left-0 w-64 bg-white z-40 lg:static lg:shadow-none transition-transform duration-300 ease-in-out h-full ${
                     isOpen
                         ? "translate-x-0"
                         : "-translate-x-full lg:translate-x-0"
@@ -62,7 +57,10 @@ export default function DashboardSidebar({
             >
                 <div className="flex flex-col h-full">
                     {/* Navigation */}
-                    <nav className="flex-1 p-4 overflow-y-auto">
+                    <nav
+                        className="flex-1 p-4 overflow-y-auto"
+                        style={{ height: "calc(100vh - 73px)" }}
+                    >
                         <ul className="space-y-2">
                             {menuItems.map((item) => {
                                 const isActive =
@@ -95,6 +93,11 @@ export default function DashboardSidebar({
                             })}
                         </ul>
                     </nav>
+
+                    {/* Logout Button */}
+                    <div className="p-4 border-t border-gray-200">
+                        <LogoutButton />
+                    </div>
                 </div>
             </aside>
         </>
