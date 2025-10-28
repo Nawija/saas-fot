@@ -3,6 +3,7 @@
 
 import { Upload, Trash2, X } from "lucide-react";
 import MainButton from "../buttons/MainButton";
+import Image from "next/image";
 
 interface Photo {
     id: number;
@@ -35,21 +36,21 @@ export default function PhotosGrid({ photos, onDeletePhoto }: PhotosGridProps) {
                             key={photo.id}
                             className="group relative aspect-square rounded-lg overflow-hidden bg-gray-100"
                         >
-                            <img
+                            <Image
                                 src={photo.file_path}
                                 alt={photo.file_name}
+                                height={110}
+                                width={110}
                                 className="w-full h-full object-cover"
-                                loading="lazy"
                                 decoding="async"
                             />
-                            <div className="absolute inset-0 bg-white/50 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-start justify-end opacity-0 group-hover:opacity-100">
+                            <div className="absolute inset-0 lg:bg-white/50 lg:bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-start justify-end lg:opacity-0 group-hover:opacity-100">
                                 <button
                                     onClick={() => onDeletePhoto(photo.id)}
-                                    className="p-2 text-red-500 hover:text-red-600 transition-colors"
+                                    className="p-1 m-1 text-red-500 hover:text-red-600 rounded-full bg-white transition-colors"
                                 >
                                     <X size={22} />
                                 </button>
-                               
                             </div>
                         </div>
                     ))}

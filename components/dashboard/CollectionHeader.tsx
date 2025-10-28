@@ -56,7 +56,7 @@ export default function PremiumCollectionHeader({ collection, photos }: Props) {
             <div className="flex items-center gap-2">
                 {/* Password Badge (if protected) */}
                 {!collection.is_public && collection.password_plain && (
-                    <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium">
                         <Lock className="w-3.5 h-3.5" />
                         <span className="font-mono font-semibold">
                             {collection.password_plain}
@@ -66,17 +66,17 @@ export default function PremiumCollectionHeader({ collection, photos }: Props) {
 
                 {/* Status Badge */}
                 <div
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 md:py-1 rounded-full text-xs font-semibold
                     ${
                         collection.is_public
                             ? "bg-green-100 text-green-800"
-                            : "bg-amber-100 text-amber-800"
+                            : "border-amber-200 text-amber-800 text-xs border bg-amber-50"
                     }`}
                 >
                     {collection.is_public ? (
                         <>
                             <Globe className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Publiczna</span>
+                            <span className="inline">Publiczna</span>
                         </>
                     ) : (
                         <>

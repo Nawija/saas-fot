@@ -13,7 +13,7 @@ import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
 import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
 import CopyLinkButton from "@/components/buttons/CopyLinkButton";
-import { BookImage, Eye } from "lucide-react";
+import { BookImage, Eye, Trash2 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 
 interface Collection {
@@ -68,6 +68,7 @@ export default function CollectionDetailPage({
     const [selectedFont, setSelectedFont] = useState<string>("inter");
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [pendingPhotoId, setPendingPhotoId] = useState<number | null>(null);
+    const [confirmDeleteAllOpen, setConfirmDeleteAllOpen] = useState(false);
     const [heroModalOpen, setHeroModalOpen] = useState(false);
     const [origin, setOrigin] = useState("");
 
@@ -355,6 +356,35 @@ export default function CollectionDetailPage({
         setConfirmOpen(true);
     }
 
+    async function performDeleteAllPhotos() {
+        if (!collectionId || photos.length === 0) return;
+
+        try {
+            // Usuń wszystkie zdjęcia po kolei
+            const deletePromises = photos.map((photo) =>
+                fetch(`/api/collections/${collectionId}/photos/${photo.id}`, {
+                    method: "DELETE",
+                })
+            );
+
+            const results = await Promise.all(deletePromises);
+            const failedCount = results.filter((r) => !r.ok).length;
+
+            if (failedCount > 0) {
+                toast.error(`Nie udało się usunąć ${failedCount} zdjęć`);
+            } else {
+                toast.success("Wszystkie zdjęcia zostały usunięte");
+            }
+
+            // Odśwież listę
+            await fetchPhotos();
+            await fetchCollection();
+        } catch (error) {
+            console.error("Error deleting all photos:", error);
+            toast.error("Błąd podczas usuwania zdjęć");
+        }
+    }
+
     if (loading) {
         return <Loading />;
     }
@@ -545,6 +575,17 @@ export default function CollectionDetailPage({
                                     <h2 className="text-base font-semibold text-gray-900">
                                         Galeria zdjęć ({photos.length})
                                     </h2>
+                                    {photos.length > 0 && (
+                                        <MainButton
+                                            onClick={() =>
+                                                setConfirmDeleteAllOpen(true)
+                                            }
+                                            icon={<Trash2 size={15} />}
+                                            label="Usuń wszystkie"
+                                            variant="danger"
+                                            className="text-xs md:text-sm"
+                                        />
+                                    )}
                                 </div>
                             </div>
                             <div className="p-5">
@@ -574,6 +615,22 @@ export default function CollectionDetailPage({
                     }
                 }}
             />
+
+            <ConfirmDialog
+                open={confirmDeleteAllOpen}
+                onOpenChange={setConfirmDeleteAllOpen}
+                title="Usunąć wszystkie zdjęcia?"
+                description={`Ta operacja usunie ${photos.length} ${
+                    photos.length === 1 ? "zdjęcie" : "zdjęć"
+                } z tej kolekcji. Nie można tego cofnąć.`}
+                confirmLabel="Usuń wszystkie"
+                cancelLabel="Anuluj"
+                onConfirm={async () => {
+                    await performDeleteAllPhotos();
+                    setConfirmDeleteAllOpen(false);
+                }}
+            />
+
             <HeroPreviewModal
                 open={heroModalOpen}
                 onClose={() => setHeroModalOpen(false)}
