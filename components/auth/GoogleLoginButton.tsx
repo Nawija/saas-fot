@@ -11,7 +11,7 @@ export default function GoogleLoginButton({ onClick }: GoogleLoginButtonProps) {
                 </div>
                 <div className="relative flex justify-center text-sm">
                     <span className="px-2 bg-white text-gray-500">
-                        lub kontynuuj z
+                        or continue with
                     </span>
                 </div>
             </div>
@@ -26,7 +26,7 @@ export default function GoogleLoginButton({ onClick }: GoogleLoginButtonProps) {
                     alt="Google"
                     className="w-5 h-5"
                 />
-                <span className="font-medium">Zaloguj się przez Google</span>
+                <span className="font-medium">Sign in with Google</span>
             </button>
         </div>
     );

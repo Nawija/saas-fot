@@ -154,7 +154,7 @@ export default function RegisterPage() {
                                     }
                                     onSubmit={handleRegister}
                                     onBack={() => setShowCodeStep(false)}
-                                    onExpire={() => setError("Kod wygasł")}
+                                    onExpire={() => setError("Code expired")}
                                 />
                             </motion.div>
                         )}

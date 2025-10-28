@@ -25,16 +25,16 @@ export default function VerificationForm({
     return (
         <form onSubmit={onSubmit} className="space-y-4">
             <p className="text-center text-gray-600">
-                Wysłaliśmy 6-cyfrowy kod na adres <b>{email}</b>.
+                We sent a 6-digit code to <b>{email}</b>.
             </p>
 
             <div className="text-center text-sm text-gray-500 mb-2">
-                Kod wygaśnie za:{" "}
+                The code expires in:{" "}
                 <CountdownTimer minutes={5} onExpire={onExpire} />
             </div>
 
             <FormInput
-                label="Kod weryfikacyjny"
+                label="Verification code"
                 type="text"
                 value={code}
                 onChange={onCodeChange}
@@ -45,9 +45,9 @@ export default function VerificationForm({
 
             <MainButton
                 loading={loading}
-                loadingText="Rejestrowanie..."
+                loadingText="Registering..."
                 type="submit"
-                label="Potwierdź kod"
+                label="Confirm code"
                 className="w-full"
                 variant="success"
             />
@@ -56,7 +56,7 @@ export default function VerificationForm({
                 onClick={onBack}
                 className="w-full text-sm text-gray-500 hover:underline mt-2"
             >
-                Wróć
+                Back
             </button>
         </form>
     );

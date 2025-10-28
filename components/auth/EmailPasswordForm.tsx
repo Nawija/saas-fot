@@ -35,7 +35,7 @@ export default function EmailPasswordForm({
             />
 
             <FormInput
-                label="Hasło"
+                label="Password"
                 type="password"
                 value={password}
                 onChange={onPasswordChange}
@@ -43,7 +43,7 @@ export default function EmailPasswordForm({
             />
 
             <FormInput
-                label="Powtórz hasło"
+                label="Confirm password"
                 type="password"
                 value={confirmPassword}
                 onChange={onConfirmPasswordChange}
@@ -52,16 +52,16 @@ export default function EmailPasswordForm({
 
             <MainButton
                 loading={loading}
-                loadingText="Wysyłanie..."
+                loadingText="Sending..."
                 type="submit"
-                label="Zarejestruj się"
+                label="Sign up"
                 className="w-full"
             />
 
             <p className="mt-6 text-center text-sm">
-                Masz już konto?{" "}
+                Already have an account?{" "}
                 <Link href="/login" className="text-blue-600 hover:underline">
-                    Zaloguj się
+                    Log in
                 </Link>
             </p>
         </form>

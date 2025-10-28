@@ -92,7 +92,7 @@ export default function PricingCards({
             }
         } catch (error) {
             console.error("Checkout error:", error);
-            toast.error("Wystąpił błąd. Spróbuj ponownie.");
+            toast.error("Something went wrong. Please try again.");
         } finally {
             setIsLoading(null);
         }
@@ -125,7 +125,7 @@ export default function PricingCards({
                         {/* Popular Badge */}
                         {plan.popular && (
                             <div className="absolute top-0 right-0 bg-linear-to-r from-orange-400 to-orange-500 text-white px-4 py-1 text-xs font-bold uppercase tracking-tighter rounded-bl-lg shadow-sm">
-                                Polecany
+                                Popular
                             </div>
                         )}
 
@@ -133,7 +133,7 @@ export default function PricingCards({
                         {isCurrentPlan && (
                             <div className="absolute top-3 right-3 animate-pulse bg-emerald-400 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-sm">
                                 <Check size={14} />
-                                Obecny plan
+                                Current plan
                             </div>
                         )}
 
@@ -167,7 +167,7 @@ export default function PricingCards({
                                     </span>
                                     {!isFree && (
                                         <span className="text-sm text-gray-600">
-                                            /mies
+                                            /month
                                         </span>
                                     )}
                                 </div>
@@ -242,12 +242,12 @@ export default function PricingCards({
                                         </svg>
                                     </span>
                                 ) : isCurrentPlan ? (
-                                    "Aktualny plan"
+                                    "Current plan"
                                 ) : isFree ? (
-                                    "Twój plan"
+                                    "Your plan"
                                 ) : (
                                     <>
-                                        Wybierz {plan.name}
+                                        Choose {plan.name}
                                         <span className="ml-1">→</span>
                                     </>
                                 )}

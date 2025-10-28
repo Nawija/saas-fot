@@ -14,7 +14,7 @@ export default function NewCollectionPage() {
     const [userPlan, setUserPlan] = useState<string>("free");
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
     const [upgradeContext, setUpgradeContext] = useState({
-        title: "Funkcja dostępna w wyższych planach",
+        title: "Feature available on higher plans",
         description: "",
         feature: "",
     });
@@ -29,7 +29,7 @@ export default function NewCollectionPage() {
     const [preview, setPreview] = useState<string>("");
 
     useEffect(() => {
-        // Pobierz plan użytkownika
+        // Fetch user plan
         fetch("/api/user/me")
             .then((res) => (res.ok ? res.json() : Promise.reject(res)))
             .then((data) => {
@@ -38,7 +38,7 @@ export default function NewCollectionPage() {
                 }
             })
             .catch(() => {
-                // zostaw domyślnie "free" jeśli nie udało się pobrać
+                // leave default "free" if it couldn't be fetched
             });
     }, []);
 
@@ -76,13 +76,13 @@ export default function NewCollectionPage() {
         setLoading(true);
 
         try {
-            // KROK 1: Utwórz kolekcję (bez hero image)
+            // STEP 1: Create collection (without hero image)
             const res = await fetch("/api/collections", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
-                    hero_image: "", // Puste na razie
+                    hero_image: "", // Empty for now
                 }),
             });
 
@@ -94,21 +94,22 @@ export default function NewCollectionPage() {
             });
 
             if (!res.ok || !data.ok) {
-                // Sprawdź czy to błąd wymagający upgrade'u
+                // Check if it's an upgrade-required error
                 if (res.status === 403 && data.upgradeRequired) {
                     setUpgradeContext({
-                        title: data.error || "Funkcja niedostępna",
+                        title: data.error || "Feature unavailable",
                         description:
-                            data.message || "Ta funkcja wymaga wyższego planu.",
+                            data.message ||
+                            "This feature requires a higher plan.",
                         feature:
                             data.error === "Osiągnięto limit galerii"
-                                ? "Więcej galerii"
-                                : "Ochrona hasłem",
+                                ? "More galleries"
+                                : "Password protection",
                     });
                     setUpgradeDialogOpen(true);
                 } else {
                     toast.error(
-                        data.error || data.message || "Błąd tworzenia galerii"
+                        data.error || data.message || "Error creating gallery"
                     );
                 }
                 setLoading(false);
@@ -117,7 +118,7 @@ export default function NewCollectionPage() {
 
             const collectionId = data.collection.id;
 
-            // KROK 2: Upload hero image jeśli jest (z collectionId)
+            // STEP 2: Upload hero image if present (with collectionId)
             if (heroImage) {
                 const imageFormData = new FormData();
                 imageFormData.append("file", heroImage);
@@ -136,20 +137,20 @@ export default function NewCollectionPage() {
                         uploadRes.status === 413 &&
                         uploadData.upgradeRequired
                     ) {
-                        toast.error("Brak miejsca", {
+                        toast.error("Out of space", {
                             description:
                                 uploadData.message ||
-                                "Przekroczono limit storage. Przekierowuję do zakupu rozszerzenia...",
+                                "Storage limit exceeded. Redirecting to upgrade...",
                         });
                         router.push("/dashboard/billing");
                         return;
                     }
-                    toast.error(uploadData.error || "Błąd uploadu hero image");
+                    toast.error(uploadData.error || "Hero image upload failed");
                     return;
                 }
 
                 if (uploadData.ok) {
-                    // KROK 3: Zaktualizuj kolekcję z hero image URL
+                    // STEP 3: Update collection with hero image URL
                     await fetch(`/api/collections/${collectionId}`, {
                         method: "PATCH",
                         headers: { "Content-Type": "application/json" },
@@ -158,7 +159,7 @@ export default function NewCollectionPage() {
                         }),
                     });
 
-                    // KROK 4: Zaktualizuj storage_used
+                    // STEP 4: Update storage_used
                     const storageRes = await fetch("/api/user/update-storage", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -174,10 +175,10 @@ export default function NewCollectionPage() {
                         storageRes.status === 413 &&
                         storageData.upgradeRequired
                     ) {
-                        toast.error("Brak miejsca", {
+                        toast.error("Out of space", {
                             description:
                                 storageData.message ||
-                                "Przekroczono limit storage. Przekierowuję do zakupu rozszerzenia...",
+                                "Storage limit exceeded. Redirecting to upgrade...",
                         });
                         router.push("/dashboard/billing");
                         return;
@@ -185,11 +186,11 @@ export default function NewCollectionPage() {
                 }
             }
 
-            // Przekieruj do strony kolekcji (z możliwością dodania zdjęć)
+            // Redirect to collection page (to add photos)
             router.push(`/dashboard/collections/${collectionId}`);
         } catch (error) {
             console.error("Error:", error);
-            toast.error("Wystąpił błąd");
+            toast.error("An error occurred");
         } finally {
             setLoading(false);
         }
@@ -204,14 +205,14 @@ export default function NewCollectionPage() {
                     className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
                 >
                     <ArrowLeft className="w-5 h-5" />
-                    Powrót do galerii
+                    Back to galleries
                 </Link>
 
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                    Nowa galeria zdjęć
+                    New photo gallery
                 </h1>
                 <p className="text-gray-600 text-lg mb-10">
-                    Stwórz piękną galerię i podziel się nią ze swoimi klientami
+                    Create a beautiful gallery and share it with your clients
                 </p>
 
                 {/* Form */}
@@ -219,7 +220,7 @@ export default function NewCollectionPage() {
                     {/* Hero Image Upload */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <label className="block text-sm font-semibold text-gray-900 mb-3">
-                            Zdjęcie główne (Hero Image)
+                            Hero image
                         </label>
                         <div className="relative">
                             {preview ? (
@@ -231,7 +232,7 @@ export default function NewCollectionPage() {
                                     />
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <label className="cursor-pointer px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg">
-                                            Zmień zdjęcie
+                                            Change image
                                             <input
                                                 type="file"
                                                 accept="image/*"
@@ -245,11 +246,10 @@ export default function NewCollectionPage() {
                                 <label className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition-colors bg-gray-50">
                                     <Upload className="w-12 h-12 text-gray-400 mb-3" />
                                     <span className="text-sm font-medium text-gray-600">
-                                        Kliknij aby dodać zdjęcie
+                                        Click to add an image
                                     </span>
                                     <span className="text-xs text-gray-500 mt-1">
-                                        To zdjęcie będzie wyświetlane na całym
-                                        ekranie
+                                        This image will be displayed fullscreen
                                     </span>
                                     <input
                                         type="file"
@@ -266,7 +266,7 @@ export default function NewCollectionPage() {
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
                         <div>
                             <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                Nazwa galerii *
+                                Gallery name *
                             </label>
                             <input
                                 type="text"
@@ -275,14 +275,14 @@ export default function NewCollectionPage() {
                                 onChange={(e) =>
                                     handleNameChange(e.target.value)
                                 }
-                                placeholder="np. Ania & Tomek - Ślub"
+                                placeholder="e.g. Anna & Tom - Wedding"
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                Adres URL (slug)
+                                URL (slug)
                             </label>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-500">
@@ -298,18 +298,18 @@ export default function NewCollectionPage() {
                                             slug: e.target.value,
                                         })
                                     }
-                                    placeholder="ania-tomek-slub"
+                                    placeholder="anna-tom-wedding"
                                     className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                                 />
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
-                                Ten link będzie udostępniany klientom
+                                This link will be shared with clients
                             </p>
                         </div>
 
                         <div>
                             <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                Opis (opcjonalny)
+                                Description (optional)
                             </label>
                             <textarea
                                 value={formData.description}
@@ -319,7 +319,7 @@ export default function NewCollectionPage() {
                                         description: e.target.value,
                                     })
                                 }
-                                placeholder="Krótki opis galerii..."
+                                placeholder="Short description of the gallery..."
                                 rows={3}
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all resize-none"
                             />
@@ -329,7 +329,7 @@ export default function NewCollectionPage() {
                     {/* Privacy Settings */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                            Ustawienia prywatności
+                            Privacy settings
                         </h3>
 
                         <div className="flex items-center gap-4">
@@ -349,11 +349,9 @@ export default function NewCollectionPage() {
                             >
                                 <Globe className="w-5 h-5" />
                                 <div className="text-left">
-                                    <div className="font-semibold">
-                                        Publiczna
-                                    </div>
+                                    <div className="font-semibold">Public</div>
                                     <div className="text-xs text-gray-500">
-                                        Każdy z linkiem może zobaczyć
+                                        Anyone with the link can view
                                     </div>
                                 </div>
                             </button>
@@ -389,7 +387,7 @@ export default function NewCollectionPage() {
                                 <div className="text-left">
                                     <div className="flex items-center gap-2">
                                         <div className="font-semibold">
-                                            Z hasłem
+                                            Password-protected
                                         </div>
                                         {userPlan === "free" && (
                                             <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-semibold rounded">
@@ -399,8 +397,8 @@ export default function NewCollectionPage() {
                                     </div>
                                     <div className="text-xs text-gray-500">
                                         {userPlan === "free"
-                                            ? "Dostępne od planu Basic"
-                                            : "Wymaga hasła dostępu"}
+                                            ? "Available starting from Basic"
+                                            : "Requires an access password"}
                                     </div>
                                 </div>
                             </button>
@@ -409,7 +407,7 @@ export default function NewCollectionPage() {
                         {!formData.is_public && (
                             <div>
                                 <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                    Hasło dostępu
+                                    Access password
                                 </label>
                                 <input
                                     type="text"
@@ -420,11 +418,11 @@ export default function NewCollectionPage() {
                                             password: e.target.value,
                                         })
                                     }
-                                    placeholder="np. AniaITomek2024"
+                                    placeholder="e.g. AnnaAndTom2024"
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                                 />
                                 <p className="text-xs text-gray-500 mt-1">
-                                    Hasło, które otrzymają Twoi klienci
+                                    The password your clients will use
                                 </p>
                             </div>
                         )}
@@ -436,13 +434,13 @@ export default function NewCollectionPage() {
                             type="submit"
                             disabled={loading}
                             loading={loading}
-                            loadingText="Tworzenie..."
-                            label="Utwórz galerię"
+                            loadingText="Creating..."
+                            label="Create gallery"
                             className="w-full"
                         />
                         <MainButton
                             href="/dashboard/collections"
-                            label="Anuluj"
+                            label="Cancel"
                             variant="secondary"
                             className="w-full"
                         />

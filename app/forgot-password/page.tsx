@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.error || "Błąd wysyłania kodu");
+                throw new Error(data.error || "Failed to send code");
             }
 
             setStep("code");
@@ -51,12 +51,12 @@ export default function ForgotPasswordPage() {
         setError("");
 
         if (newPassword !== confirmPassword) {
-            setError("Hasła nie są zgodne");
+            setError("Passwords do not match");
             return;
         }
 
         if (newPassword.length < 8) {
-            setError("Hasło musi mieć minimum 8 znaków");
+            setError("Password must be at least 8 characters");
             return;
         }
 
@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.error || "Błąd resetowania hasła");
+                throw new Error(data.error || "Password reset failed");
             }
 
             setStep("success");
@@ -106,10 +106,10 @@ export default function ForgotPasswordPage() {
                                 transition={{ duration: 0.4 }}
                             >
                                 <h1 className="text-3xl font-semibold text-center mb-2">
-                                    Zapomniałeś hasła?
+                                    Forgot your password?
                                 </h1>
                                 <p className="text-center text-gray-500 mb-6">
-                                    Wyślemy Ci kod resetujący na email
+                                    We’ll send a reset code to your email
                                 </p>
 
                                 <ErrorMessage message={error} />
@@ -128,8 +128,8 @@ export default function ForgotPasswordPage() {
 
                                     <MainButton
                                         loading={loading}
-                                        loadingText="Wysyłanie..."
-                                        label="Wyślij kod"
+                                        loadingText="Sending..."
+                                        label="Send code"
                                         className="w-full"
                                     />
 
@@ -138,7 +138,7 @@ export default function ForgotPasswordPage() {
                                             href="/login"
                                             className="text-blue-600 hover:underline"
                                         >
-                                            Powrót do logowania
+                                            Back to login
                                         </Link>
                                     </p>
                                 </form>
@@ -154,18 +154,18 @@ export default function ForgotPasswordPage() {
                                 transition={{ duration: 0.4 }}
                             >
                                 <h1 className="text-3xl font-semibold text-center text-blue-700 mb-2">
-                                    Ustaw nowe hasło
+                                    Set a new password
                                 </h1>
                                 <p className="text-center text-gray-500 mb-2">
-                                    Kod wysłano na <b>{email}</b>
+                                    Code sent to <b>{email}</b>
                                 </p>
                                 <div className="text-center text-sm text-gray-500 mb-6">
-                                    Kod wygaśnie za:{" "}
+                                    The code expires in:{" "}
                                     <CountdownTimer
                                         minutes={10}
                                         onExpire={() =>
                                             setError(
-                                                "Kod wygasł. Spróbuj ponownie."
+                                                "The code has expired. Please try again."
                                             )
                                         }
                                     />
@@ -178,7 +178,7 @@ export default function ForgotPasswordPage() {
                                     className="space-y-4"
                                 >
                                     <FormInput
-                                        label="Kod weryfikacyjny"
+                                        label="Verification code"
                                         type="text"
                                         value={code}
                                         onChange={setCode}
@@ -188,7 +188,7 @@ export default function ForgotPasswordPage() {
                                     />
 
                                     <FormInput
-                                        label="Nowe hasło"
+                                        label="New password"
                                         type="password"
                                         value={newPassword}
                                         onChange={setNewPassword}
@@ -196,7 +196,7 @@ export default function ForgotPasswordPage() {
                                     />
 
                                     <FormInput
-                                        label="Potwierdź hasło"
+                                        label="Confirm password"
                                         type="password"
                                         value={confirmPassword}
                                         onChange={setConfirmPassword}
@@ -209,8 +209,8 @@ export default function ForgotPasswordPage() {
                                         className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 transition"
                                     >
                                         {loading
-                                            ? "Resetowanie..."
-                                            : "Zresetuj hasło"}
+                                            ? "Resetting..."
+                                            : "Reset password"}
                                     </button>
 
                                     <button
@@ -218,7 +218,7 @@ export default function ForgotPasswordPage() {
                                         onClick={() => setStep("email")}
                                         className="w-full text-sm text-gray-500 hover:underline mt-2"
                                     >
-                                        Wróć
+                                        Back
                                     </button>
                                 </form>
                             </motion.div>
@@ -249,10 +249,10 @@ export default function ForgotPasswordPage() {
                                         </svg>
                                     </div>
                                     <h1 className="text-3xl font-semibold text-green-600 mb-2">
-                                        Hasło zresetowane!
+                                        Password reset!
                                     </h1>
                                     <p className="text-gray-600">
-                                        Przekierowujemy Cię do logowania...
+                                        Redirecting you to login...
                                     </p>
                                 </div>
                             </motion.div>

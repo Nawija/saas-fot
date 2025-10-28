@@ -12,32 +12,32 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-    title: "SaaS Fot - Galerie zdjęć online dla fotografów | Udostępniaj, chroń hasłem, zarabiaj",
+    title: "Seovileo - Online photo galleries for photographers | Share, protect with password, deliver fast",
     description:
-        "Szybkie i piękne galerie zdjęć dla fotografów. Udostępniaj klientom, chroń hasłem, kompresuj do WebP, pobieraj ZIP-y i zarządzaj subskrypcją. Darmowy plan + watermark.",
+        "Beautiful, fast photo galleries for photographers. Share with clients, protect with passwords, auto WebP, ZIP downloads and subscription management. Free plan with watermark.",
     alternates: { canonical: "/" },
     openGraph: {
-        title: "SaaS Fot - Galerie zdjęć online dla fotografów",
+        title: "Seovileo - Online photo galleries for photographers",
         description:
-            "Twórz i wysyłaj profesjonalne galerie: ochrona hasłem, WebP, download ZIP, szablony hero i więcej.",
-        siteName: "SaaS Fot",
+            "Create and deliver professional galleries: password protection, WebP, ZIP download, hero templates and more.",
+        siteName: "Seovileo",
         type: "website",
     },
     twitter: {
         card: "summary_large_image",
-        title: "SaaS Fot - Galerie zdjęć online dla fotografów",
+        title: "Seovileo - Online photo galleries for photographers",
         description:
-            "Udostępniaj prywatne galerie klientom, chroń hasłem, optymalizuj obrazy i pobieraj ZIP-y.",
+            "Share private galleries with clients, protect with passwords, optimize images and offer ZIP downloads.",
     },
     keywords: [
-        "galerie zdjęć",
-        "galeria dla fotografa",
-        "udostępnianie zdjęć klientom",
-        "galeria na hasło",
+        "photo gallery",
+        "gallery for photographers",
+        "share photos with clients",
+        "password protected gallery",
         "webp",
         "zip download",
-        "portfolio foto",
-        "SaaS dla fotografów",
+        "photo portfolio",
+        "saas for photographers",
     ],
 };
 
@@ -45,21 +45,21 @@ export default function Home() {
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        name: "SaaS Fot",
+        name: "Seovileo",
         applicationCategory: "Photography",
         operatingSystem: "Web",
         offers: {
             "@type": "Offer",
             price: 0,
             priceCurrency: "PLN",
-            description: "Plan darmowy z watermarkiem i limitem galerii",
+            description: "Free plan with watermark and gallery limits",
         },
         featureList: [
-            "Galerie z ochroną hasłem",
-            "Konwersja do WebP",
-            "Pobieranie ZIP",
-            "Szablony hero",
-            "Linki publiczne i prywatne",
+            "Password-protected galleries",
+            "WebP conversion",
+            "ZIP download",
+            "Hero templates",
+            "Public and private links",
         ],
     };
 
@@ -70,32 +70,31 @@ export default function Home() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div className="text-center max-w-3xl mx-auto">
                         <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                            <Crown className="w-3.5 h-3.5" /> Dla fotografów
+                            <Crown className="w-3.5 h-3.5" /> For photographers
                         </span>
                         <h1 className="text-3xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mt-4">
-                            Piękne, szybkie i prywatne galerie zdjęć dla Twoich
-                            klientów
+                            Beautiful, fast and private photo galleries for your
+                            clients
                         </h1>
                         <p className="text-lg text-gray-600 mt-4">
-                            Twórz galerie w minutę, udostępniaj je linkiem lub
-                            chroń hasłem, a zdjęcia automatycznie
-                            zoptymalizujemy do WebP.
+                            Create galleries in minutes, share via link or
+                            protect with a password — we automatically optimize
+                            photos to WebP.
                         </p>
                         <div className="mt-8 flex items-center justify-center gap-3">
                             <MainButton
-                                label="Załóż konto"
+                                label="Sign up"
                                 href="/register"
                                 variant="primary"
                             />
                             <MainButton
-                                label="Zobacz plany"
+                                label="See plans"
                                 href="/dashboard/billing#plans"
                                 variant="secondary"
                             />
                         </div>
                         <p className="text-sm text-gray-500 mt-3">
-                            Bez karty na starcie. Zawsze możesz przejść na plan
-                            wyższy.
+                            No card required to start. You can upgrade any time.
                         </p>
                     </div>
                 </div>
@@ -109,56 +108,53 @@ export default function Home() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-10">
                         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                            Wszystko, czego potrzebujesz do oddania zdjęć
+                            Everything you need to deliver photos
                         </h2>
                         <p className="text-gray-600 mt-2">
-                            Od pierwszego uploadu po finalny ZIP — UX
-                            przygotowany dla Ciebie i Twoich klientów
+                            From the first upload to the final ZIP — a UX
+                            designed for you and your clients
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <FeatureCard
                             icon={<Camera className="w-5 h-5 text-blue-600" />}
-                            title="Galerie w minutę"
-                            desc="Szybkie tworzenie kolekcji, szablony hero, schludny grid i eleganckie typografie."
+                            title="Galleries in minutes"
+                            desc="Fast collection creation, hero templates, clean grid and elegant typography."
                         />
                         <FeatureCard
                             icon={<Lock className="w-5 h-5 text-amber-600" />}
-                            title="Ochrona hasłem"
-                            desc="Udostępniaj prywatne linki z hasłem. Publiczne - kiedy chcesz, prywatne - kiedy trzeba."
+                            title="Password protection"
+                            desc="Share private password-protected links. Public when you want, private when you need."
                         />
                         <FeatureCard
                             icon={
                                 <ImageIcon className="w-5 h-5 text-emerald-600" />
                             }
-                            title="WebP automatycznie"
-                            desc="Zdjęcia kompresujemy do WebP, a hero generujemy w wysokiej jakości - szybko i pięknie."
+                            title="Automatic WebP"
+                            desc="We compress photos to WebP and generate high-quality hero images — fast and beautiful."
                         />
                         <FeatureCard
                             icon={
                                 <Download className="w-5 h-5 text-indigo-600" />
                             }
-                            title="Pobieranie ZIP"
-                            desc="Klient pobiera całą galerię jednym kliknięciem. Ty kontrolujesz jakość i dostęp."
+                            title="ZIP download"
+                            desc="Clients download the entire gallery in one click. You control quality and access."
                         />
                         <FeatureCard
                             icon={<Cloud className="w-5 h-5 text-sky-600" />}
-                            title="Stabilna chmura"
-                            desc="Pliki trzymamy w chmurze klasy S3/R2. Szybki CDN i przewidywalna dostępność."
+                            title="Reliable cloud"
+                            desc="Files live in S3/R2-class storage with CDN — fast and dependable."
                         />
                         <FeatureCard
                             icon={<Shield className="w-5 h-5 text-rose-600" />}
-                            title="Watermark na Free"
-                            desc="Na darmowym planie nakładamy subtelny znak wodny. W planach płatnych - znikają."
+                            title="Watermark on Free"
+                            desc="On the free plan we apply a subtle watermark. Paid plans remove it."
                         />
                     </div>
 
                     <div className="text-center mt-10">
-                        <MainButton
-                            label="Wypróbuj za darmo"
-                            href="/register"
-                        />
+                        <MainButton label="Try for free" href="/register" />
                     </div>
                 </div>
             </section>
@@ -171,24 +167,24 @@ export default function Home() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-10">
                         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                            Od uploadu do linku w 3 krokach
+                            From upload to share link in 3 steps
                         </h2>
                     </div>
                     <div className="grid md:grid-cols-3 gap-6">
                         <StepCard
                             number="01"
-                            title="Stwórz galerię"
-                            desc="Nadaj nazwę i opcjonalny opis, wybierz publiczną lub na hasło."
+                            title="Create a gallery"
+                            desc="Name it, add an optional description and choose public or password-protected."
                         />
                         <StepCard
                             number="02"
-                            title="Dodaj zdjęcia"
-                            desc="My zajmiemy się WebP i rozmiarami. Ty skup się na zdjęciach."
+                            title="Add photos"
+                            desc="We handle WebP and sizes. You focus on the images."
                         />
                         <StepCard
                             number="03"
-                            title="Udostępnij link"
-                            desc="Wyślij klientom link lub zabezpiecz dostęp hasłem."
+                            title="Share the link"
+                            desc="Send clients a link or require a password for access."
                         />
                     </div>
                 </div>
@@ -202,20 +198,20 @@ export default function Home() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-2xl mx-auto">
                         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                            Prosty start. W każdej chwili możesz urosnąć
+                            Simple start. Upgrade anytime
                         </h2>
                         <p className="text-gray-600">
-                            Zacznij od darmowego planu. Gdy będziesz gotowy,
-                            przejdź na Basic lub wyżej i odblokuj ochronę hasłem
-                            oraz brak watermarków.
+                            Start on the free plan. When you’re ready, upgrade
+                            to Basic or higher to unlock password protection and
+                            remove watermarks.
                         </p>
                         <div className="mt-8 flex items-center justify-center gap-3">
                             <MainButton
-                                label="Zobacz plany"
+                                label="See plans"
                                 href="/dashboard/billing#plans"
                             />
                             <MainButton
-                                label="Rejestracja"
+                                label="Sign up"
                                 href="/register"
                                 variant="secondary"
                             />
@@ -231,29 +227,29 @@ export default function Home() {
             >
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-8">
-                        Najczęstsze pytania
+                        Frequently asked questions
                     </h2>
                     <div className="space-y-4">
                         <FaqItem
-                            q="Czy mogę chronić galerie hasłem?"
-                            a="Tak, od planu Basic możesz ustawić ochronę hasłem dla każdej galerii."
+                            q="Can I protect galleries with a password?"
+                            a="Yes, starting from the Basic plan you can protect any gallery with a password."
                         />
                         <FaqItem
-                            q="Czy zdjęcia są optymalizowane?"
-                            a="Tak. Konwertujemy do WebP i trzymamy rozsądne rozmiary, a obrazy ładują się szybko."
+                            q="Are photos optimized?"
+                            a="Yes. We convert to WebP and keep sensible sizes so images load fast."
                         />
                         <FaqItem
-                            q="Czy klienci mogą pobrać wszystkie zdjęcia?"
-                            a="Tak. Wystarczy użyć przycisku ZIP - pobieranie całej kolekcji jednym kliknięciem."
+                            q="Can clients download all photos?"
+                            a="Yes. Use the ZIP button to download the entire collection with one click."
                         />
                         <FaqItem
-                            q="Czy darmowy plan ma ograniczenia?"
-                            a="Tak. Maks. 3 galerie i watermark na zdjęciach. Zawsze możesz przejść na wyższy plan."
+                            q="Does the free plan have limits?"
+                            a="Yes. Up to 3 galleries and a watermark on photos. You can upgrade anytime."
                         />
                     </div>
 
                     <div className="text-center mt-10">
-                        <MainButton label="Załóż konto" href="/register" />
+                        <MainButton label="Sign up" href="/register" />
                     </div>
                 </div>
             </section>
@@ -263,16 +259,16 @@ export default function Home() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="rounded-2xl bg-white border border-emerald-100 p-8 text-center shadow-sm">
                         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                            Oddawaj zdjęcia szybciej i piękniej
+                            Deliver photos faster and beautifully
                         </h2>
                         <p className="text-gray-600 mt-2">
-                            Zarejestruj się i stwórz pierwszą galerię w mniej
-                            niż minutę.
+                            Sign up and create your first gallery in under a
+                            minute.
                         </p>
                         <div className="mt-6 flex items-center justify-center gap-3">
-                            <MainButton label="Rejestracja" href="/register" />
+                            <MainButton label="Sign up" href="/register" />
                             <MainButton
-                                label="Zobacz plany"
+                                label="See plans"
                                 href="/dashboard/billing#plans"
                                 variant="secondary"
                             />

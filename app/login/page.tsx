@@ -27,7 +27,7 @@ export default function LoginPage() {
             router.push("/dashboard");
             router.refresh();
         } catch (err: any) {
-            setError(err.message || "Błąd sieci lub serwera");
+            setError(err.message || "Network or server error");
         } finally {
             setLoading(false);
         }
@@ -74,9 +74,7 @@ export default function LoginPage() {
                             onSubmit={handleSubmit}
                         />
 
-                        <div className="my-4 text-center text-gray-400">
-                            lub
-                        </div>
+                        <div className="my-4 text-center text-gray-400">or</div>
 
                         <GoogleLoginButton onClick={handleGoogleLogin} />
                     </motion.div>

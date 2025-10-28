@@ -27,7 +27,7 @@ export default function UserDropdown({
     avatar,
     provider,
 }: UserDropdownProps) {
-    const displayName = name || email?.split("@")[0] || "Użytkownik";
+    const displayName = name || email?.split("@")[0] || "User";
     const avatarUrl = avatar && avatar.trim() !== "" ? avatar : "/avatar.jpg";
     const fallback = displayName.charAt(0).toUpperCase();
 
@@ -62,7 +62,7 @@ export default function UserDropdown({
                         className="flex items-center gap-2 cursor-pointer"
                     >
                         <CreditCard size={16} />
-                        <span>Subskrypcja i płatności</span>
+                        <span>Subscription & billing</span>
                     </Link>
                 </DropdownMenuItem>
 
@@ -72,7 +72,7 @@ export default function UserDropdown({
                         className="flex items-center gap-2 cursor-pointer"
                     >
                         <Settings size={16} />
-                        <span>Ustawienia profilu</span>
+                        <span>Profile settings</span>
                     </Link>
                 </DropdownMenuItem>
 

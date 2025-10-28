@@ -35,7 +35,7 @@ export default async function Header() {
                     </div>
                 ) : (
                     <Link href="/login" className="underline">
-                        Zaloguj się
+                        Log in
                     </Link>
                 )}
             </nav>

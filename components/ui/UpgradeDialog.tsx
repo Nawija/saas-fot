@@ -23,8 +23,8 @@ interface UpgradeDialogProps {
 export default function UpgradeDialog({
     open,
     onClose,
-    title = "Funkcja dostępna w wyższych planach",
-    description = "Ta funkcja jest dostępna dla użytkowników planów Basic, Pro i Unlimited.",
+    title = "Feature available on higher plans",
+    description = "This feature is available for Basic, Pro and Unlimited plans.",
     feature,
 }: UpgradeDialogProps) {
     const router = useRouter();
@@ -60,7 +60,7 @@ export default function UpgradeDialog({
                                     {feature}
                                 </h4>
                                 <p className="text-sm text-gray-600">
-                                    Dostępne od planu{" "}
+                                    Available starting from{" "}
                                     <strong className="text-black">
                                         Basic
                                     </strong>
@@ -72,28 +72,28 @@ export default function UpgradeDialog({
 
                 <div className="bg-gray-50 rounded-lg p-4">
                     <h4 className="font-semibold text-gray-900 mb-2 text-sm">
-                        Co zyskujesz z planem Basic:
+                        What you get with Basic:
                     </h4>
                     <ul className="space-y-1.5 text-sm text-gray-600">
                         <li className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            10 GB przestrzeni (5x więcej)
+                            10 GB storage (5x more)
                         </li>
                         <li className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            Do 20 galerii
+                            Up to 20 galleries
                         </li>
                         <li className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            Ochrona hasłem
+                            Password protection
                         </li>
                         <li className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            Brak watermarków
+                            No watermarks
                         </li>
                         <li className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            Szablony Premium
+                            Premium templates
                         </li>
                     </ul>
                 </div>
@@ -101,13 +101,13 @@ export default function UpgradeDialog({
                 <AlertDialogFooter className="flex-col sm:flex-row gap-1">
                     <MainButton
                         onClick={onClose}
-                        label="Może później"
+                        label="Maybe later"
                         variant="secondary"
                         className="w-full text-sm sm:w-auto"
                     />
                     <MainButton
                         href="/dashboard/billing#plans"
-                        label="Zobacz plany"
+                        label="See plans"
                         variant="primary"
                         className="w-full text-sm sm:w-auto"
                     />

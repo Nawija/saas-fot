@@ -23,7 +23,7 @@ export default function BillingPage() {
         fetchUser();
     }, []);
 
-    // Jeśli nawigujemy z kotwicą #plans, przewiń płynnie po załadowaniu danych
+    // If navigating with #plans hash, smooth scroll after data loads
     useEffect(() => {
         if (loading) return;
         if (typeof window === "undefined") return;
@@ -63,10 +63,10 @@ export default function BillingPage() {
                         <Shield className="w-10 h-10 text-gray-400" />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                        Wymagane logowanie
+                        Login required
                     </h2>
                     <p className="text-gray-600 text-lg">
-                        Zaloguj się, aby zobaczyć opcje płatności
+                        Please sign in to view billing options
                     </p>
                 </div>
             </div>
@@ -92,15 +92,15 @@ export default function BillingPage() {
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full mb-4">
                             <Crown className="w-4 h-4 text-orange-600" />
                             <span className="text-sm font-medium text-orange-600">
-                                Subskrypcja
+                                Subscription
                             </span>
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-                            Zarządzaj swoim planem
+                            Manage your plan
                         </h1>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Monitoruj wykorzystanie miejsca i wybierz plan
-                            idealnie dopasowany do Twoich potrzeb
+                            Monitor your storage usage and choose a plan that
+                            fits your needs
                         </p>
                     </div>
                 </div>
@@ -119,7 +119,7 @@ export default function BillingPage() {
                                     </div>
                                     <div>
                                         <p className="text-xs font-medium text-orange-600 mb-1">
-                                            Aktualny plan
+                                            Current plan
                                         </p>
                                         <h2 className="text-2xl font-bold text-gray-900 mb-1">
                                             {currentPlan.name}
@@ -130,12 +130,12 @@ export default function BillingPage() {
                                                     {currentPlan.price} zł
                                                 </span>
                                                 <span className="text-sm text-gray-600">
-                                                    /miesiąc
+                                                    /month
                                                 </span>
                                             </p>
                                         ) : (
                                             <p className="text-gray-600 text-sm font-medium">
-                                                Plan darmowy
+                                                Free plan
                                             </p>
                                         )}
                                     </div>
@@ -165,11 +165,11 @@ export default function BillingPage() {
                                             )}
                                             {user.subscription_status ===
                                             "active"
-                                                ? "Aktywna"
+                                                ? "Active"
                                                 : user.subscription_status ===
                                                   "cancelled"
-                                                ? "Anulowana"
-                                                : "Brak"}
+                                                ? "Cancelled"
+                                                : "None"}
                                         </span>
                                     </div>
                                 </div>
@@ -184,10 +184,10 @@ export default function BillingPage() {
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="text-base font-semibold text-gray-900">
-                                        Wykorzystanie miejsca
+                                        Storage usage
                                     </h3>
                                     <p className="text-xs text-gray-600">
-                                        Śledź, ile przestrzeni już wykorzystałeś
+                                        Track how much space you’ve used
                                     </p>
                                 </div>
                                 <div className="text-right">
@@ -223,22 +223,22 @@ export default function BillingPage() {
                                     <p className="text-xs font-medium text-gray-700">
                                         {storagePercent < 0.1 &&
                                         storagePercent > 0
-                                            ? "< 0.1% wykorzystane"
+                                            ? "< 0.1% used"
                                             : `${storagePercent.toFixed(
                                                   1
-                                              )}% wykorzystane`}
+                                              )}% used`}
                                     </p>
                                     <p className="text-xs text-gray-600">
                                         {storagePercent < 50 &&
-                                            "🎉 Dużo wolnego miejsca!"}
+                                            "🎉 Plenty of space!"}
                                         {storagePercent >= 50 &&
                                             storagePercent < 80 &&
-                                            "✅ W sam raz"}
+                                            "✅ Looking good"}
                                         {storagePercent >= 80 &&
                                             storagePercent < 90 &&
-                                            "⚡ Rozważ upgrade"}
+                                            "⚡ Consider upgrading"}
                                         {storagePercent >= 90 &&
-                                            "⚠️ Czas na większy plan!"}
+                                            "⚠️ Time for a bigger plan!"}
                                     </p>
                                 </div>
                             </div>
@@ -255,13 +255,12 @@ export default function BillingPage() {
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="text-sm font-semibold text-gray-900 mb-1">
-                                                    Portal klienta
+                                                    Customer portal
                                                 </h4>
                                                 <p className="text-xs text-gray-600 mb-2">
-                                                    Zaktualizuj metodę
-                                                    płatności, zarządzaj
-                                                    subskrypcją lub pobierz
-                                                    faktury
+                                                    Update your payment method,
+                                                    manage your subscription, or
+                                                    download invoices
                                                 </p>
                                                 <a
                                                     href="https://app.lemonsqueezy.com/my-orders"
@@ -270,7 +269,7 @@ export default function BillingPage() {
                                                     className="inline-flex items-center gap-2 text-indigo-700 hover:text-indigo-900 text-sm font-semibold group transition-colors"
                                                 >
                                                     <span>
-                                                        Otwórz Lemon Squeezy
+                                                        Open Lemon Squeezy
                                                     </span>
                                                     <svg
                                                         className="w-4 h-4 transition-transform group-hover:translate-x-1"
@@ -304,16 +303,16 @@ export default function BillingPage() {
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="text-xl font-bold text-red-900 mb-2">
-                                        Brakuje miejsca na zdjęcia
+                                        Running out of space for photos
                                     </h3>
                                     <p className="text-red-700 mb-3">
-                                        Wykorzystałeś już{" "}
+                                        You’ve already used{" "}
                                         <strong>
                                             {storagePercent.toFixed(0)}%
                                         </strong>{" "}
-                                        dostępnego miejsca! Czas pomyśleć o
-                                        uaktualnieniu planu, aby mieć więcej
-                                        przestrzeni na swoje galerie.
+                                        of your available storage! Consider
+                                        upgrading your plan to get more space
+                                        for your galleries.
                                     </p>
                                     <button
                                         onClick={() => {
@@ -327,7 +326,7 @@ export default function BillingPage() {
                                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors duration-200 shadow-sm hover:shadow-md"
                                     >
                                         <TrendingUp className="w-4 h-4" />
-                                        Zobacz dostępne plany
+                                        See available plans
                                     </button>
                                 </div>
                             </div>
@@ -340,13 +339,13 @@ export default function BillingPage() {
                     <div className="text-center mb-10">
                         <h2 className="text-3xl font-bold text-gray-900 mb-3">
                             {user.subscription_plan === "free"
-                                ? "Wybierz idealny plan dla siebie"
-                                : "Zmień lub uaktualnij swój plan"}
+                                ? "Choose the perfect plan for you"
+                                : "Change or upgrade your plan"}
                         </h2>
                         <p className="text-gray-600 max-w-2xl mx-auto">
                             {user.subscription_plan === "free"
-                                ? "Rozpocznij przygodę z większą przestrzenią i dodatkowymi funkcjami"
-                                : "Dostosuj plan do swoich potrzeb. Możesz zmienić go w każdej chwili."}
+                                ? "Get started with more storage and additional features"
+                                : "Adjust your plan to your needs. You can change it any time."}
                         </p>
                     </div>
 
@@ -364,28 +363,27 @@ export default function BillingPage() {
                             <Shield className="w-7 h-7 text-orange-600" />
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 mb-2">
-                            Bezpieczne płatności
+                            Secure payments
                         </h3>
                         <p className="text-gray-600 text-sm mb-4">
-                            Wszystkie transakcje są obsługiwane przez{" "}
-                            <strong>Lemon Squeezy</strong> - zaufaną platformę
-                            płatności używaną przez tysiące firm na całym
-                            świecie.
+                            All transactions are handled by{" "}
+                            <strong>Lemon Squeezy</strong> — a trusted payment
+                            platform used by thousands of businesses worldwide.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-gray-500">
                             <div className="flex items-center gap-2">
                                 <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                <span>Anuluj w każdej chwili</span>
+                                <span>Cancel anytime</span>
                             </div>
                             <div className="hidden sm:block w-1 h-1 bg-gray-300 rounded-full"></div>
                             <div className="flex items-center gap-2">
                                 <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                <span>Bez ukrytych opłat</span>
+                                <span>No hidden fees</span>
                             </div>
                             <div className="hidden sm:block w-1 h-1 bg-gray-300 rounded-full"></div>
                             <div className="flex items-center gap-2">
                                 <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                <span>Natychmiastowy dostęp</span>
+                                <span>Instant access</span>
                             </div>
                         </div>
                     </div>

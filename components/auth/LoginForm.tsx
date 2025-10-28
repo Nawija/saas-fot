@@ -30,7 +30,7 @@ export default function LoginForm({
             />
 
             <FormInput
-                label="Hasło"
+                label="Password"
                 type="password"
                 value={password}
                 onChange={onPasswordChange}
@@ -42,25 +42,25 @@ export default function LoginForm({
                     href="/forgot-password"
                     className="text-sm text-blue-600 hover:underline"
                 >
-                    Zapomniałeś hasła?
+                    Forgot password?
                 </Link>
             </div>
 
             <MainButton
                 loading={loading}
-                loadingText="Logowanie..."
+                loadingText="Logging in..."
                 type="submit"
-                label="Zaloguj się"
+                label="Log in"
                 className="w-full"
             />
 
             <p className="mt-6 text-center text-sm">
-                Nie masz konta?{" "}
+                Don’t have an account?{" "}
                 <Link
                     href="/register"
                     className="text-blue-600 hover:underline"
                 >
-                    Zarejestruj się
+                    Sign up
                 </Link>
             </p>
         </form>

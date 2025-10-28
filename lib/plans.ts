@@ -1,5 +1,7 @@
 // Plany subskrypcji
 
+// Subscription plans
+
 export type SubscriptionPlan = "free" | "basic" | "pro" | "unlimited";
 
 export interface Plan {
@@ -7,34 +9,34 @@ export interface Plan {
     name: string;
     price: number;
     priceMonthly: number;
-    storage: number; // w bajtach
+    storage: number; // in bytes
     storageLabel: string;
-    maxCollections: number; // maksymalna liczba galerii
+    maxCollections: number; // maximum number of galleries
     features: string[];
     lemonSqueezyVariantId?: string;
     popular?: boolean;
 }
 
-// Limity storage w bajtach
+// Storage limits in bytes
 const GB = 1024 * 1024 * 1024;
 
 export const PLANS: Record<SubscriptionPlan, Plan> = {
     free: {
         id: "free",
-        name: "Darmowy",
+        name: "Free",
         price: 0,
         priceMonthly: 0,
         storage: 2 * GB, // 2GB
         storageLabel: "",
-        maxCollections: 3, // Limit 3 galerii
+        maxCollections: 3, // Limit 3 galleries
         features: [
-            "2 GB przestrzeni (1000+ zdjęć)",
-            "Do 3 galerii",
-            "Zdjecia do 1300px",
-            "Publiczne linki do galerii",
-            "Watermark na zdjęciach",
-            "Automatyczny konwert WebP",
-            "Pobieranie zdjęć z watermarkiem",
+            "2 GB storage (1000+ photos)",
+            "Up to 3 galleries",
+            "Photos up to 1300px",
+            "Public gallery links",
+            "Watermark on photos",
+            "Automatic WebP conversion",
+            "ZIP download with watermark",
         ],
     },
     basic: {
@@ -43,18 +45,18 @@ export const PLANS: Record<SubscriptionPlan, Plan> = {
         price: 8,
         priceMonthly: 8,
         storage: 10 * GB, // 10GB
-        storageLabel: "Szablony Premium",
-        maxCollections: 20, // Limit 20 galerii
+        storageLabel: "Premium templates",
+        maxCollections: 20, // Limit 20 galleries
         features: [
-            "10 GB przestrzeni",
-            "Do 20 galerii",
-            "Szablony Premium",
-            "Zdjecia do 1920px",
-            "Publiczne linki do galerii",
-            "Prywatne linki z ochroną hasłem",
-            "Brak Watermark na zdjęciach",
-            "Automatyczny konwert WebP",
-            "Pobieranie zdjęć bez watermark",
+            "10 GB storage",
+            "Up to 20 galleries",
+            "Premium templates",
+            "Photos up to 1920px",
+            "Public gallery links",
+            "Private links with password protection",
+            "No watermark on photos",
+            "Automatic WebP conversion",
+            "ZIP download without watermark",
         ],
         lemonSqueezyVariantId: process.env.NEXT_PUBLIC_LS_VARIANT_BASIC,
     },
@@ -64,19 +66,19 @@ export const PLANS: Record<SubscriptionPlan, Plan> = {
         price: 16,
         priceMonthly: 16,
         storage: 100 * GB, // 100GB
-        storageLabel: "Szablony Premium",
-        maxCollections: Infinity, // Nielimitowane
+        storageLabel: "Premium templates",
+        maxCollections: Infinity, // Unlimited
         features: [
-            "100 GB przestrzeni",
-            "Nielimitowane galerie",
-            "Szablony Galerii Premium",
-            "Zdjecia do 2400px",
-            "Publiczne linki do galerii",
-            "Prywatne linki z ochroną hasłem",
-            "Brak Watermark na zdjęciach",
-            "Automatyczny konwert WebP/PNG",
-            "Pobieranie zdjęć bez watermark",
-            "Priorytetowe wsparcie",
+            "100 GB storage",
+            "Unlimited galleries",
+            "Premium Gallery Templates",
+            "Photos up to 2400px",
+            "Public gallery links",
+            "Private links with password protection",
+            "No watermark on photos",
+            "Automatic WebP/PNG conversion",
+            "ZIP download without watermark",
+            "Priority support",
         ],
         lemonSqueezyVariantId: process.env.NEXT_PUBLIC_LS_VARIANT_PRO,
         popular: true,
@@ -86,27 +88,27 @@ export const PLANS: Record<SubscriptionPlan, Plan> = {
         name: "Unlimited",
         price: 40,
         priceMonthly: 40,
-        storage: Infinity, // Bez limitu
-        storageLabel: "Szablony Premium",
-        maxCollections: Infinity, // Nielimitowane
+        storage: Infinity, // No limit
+        storageLabel: "Premium templates",
+        maxCollections: Infinity, // Unlimited
         features: [
-            "Nielimitowana przestrzeń",
-            "Nielimitowane galerie",
-            "Szablony Galerii Premium",
-            "Zdjecia do 3000px",
-            "Publiczne linki do galerii",
-            "Prywatne linki z ochroną hasłem",
-            "Brak Watermark na zdjęciach",
-            "Automatyczny konwert WebP/PNG",
-            "Pobieranie zdjęć bez watermark",
-            "Priorytetowe wsparcie",
+            "Unlimited storage",
+            "Unlimited galleries",
+            "Premium Gallery Templates",
+            "Photos up to 3000px",
+            "Public gallery links",
+            "Private links with password protection",
+            "No watermark on photos",
+            "Automatic WebP/PNG conversion",
+            "ZIP download without watermark",
+            "Priority support",
         ],
         lemonSqueezyVariantId: process.env.NEXT_PUBLIC_LS_VARIANT_UNLIMITED,
     },
 };
 
 /**
- * Sprawdza czy użytkownik może przesłać plik o danym rozmiarze
+ * Checks if the user can upload a file of a given size
  */
 export function canUploadFile(
     currentStorageUsed: number,
@@ -125,9 +127,9 @@ export function canUploadFile(
         const remaining = planDetails.storage - currentStorageUsed;
         return {
             canUpload: false,
-            reason: `Brak miejsca. Dostępne: ${formatBytes(
+            reason: `Out of space. Available: ${formatBytes(
                 remaining
-            )}, potrzebne: ${formatBytes(fileSize)}`,
+            )}, needed: ${formatBytes(fileSize)}`,
         };
     }
 
@@ -135,12 +137,12 @@ export function canUploadFile(
 }
 
 /**
- * Formatuje bajty na czytelny format
+ * Formats bytes into a readable string
  */
 export function formatBytes(bytes: number, decimals: number = 2): string {
-    // Zabezpieczenie przed NaN, undefined, null
+    // Guard against NaN, undefined, null
     if (!bytes || isNaN(bytes) || bytes === 0) return "0 B";
-    if (bytes === Infinity) return "Nielimitowane";
+    if (bytes === Infinity) return "Unlimited";
 
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
@@ -152,7 +154,7 @@ export function formatBytes(bytes: number, decimals: number = 2): string {
 }
 
 /**
- * Oblicza procent wykorzystania storage
+ * Calculates percent of storage used
  */
 export function getStorageUsagePercent(
     used: number,

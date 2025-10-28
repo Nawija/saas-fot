@@ -46,9 +46,9 @@ export default function CollectionSettingsModal({
         <AlertDialog open={open} onOpenChange={onClose}>
             <AlertDialogContent className="max-w-md">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Ustawienia dostępu</AlertDialogTitle>
+                    <AlertDialogTitle>Access settings</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Wybierz, kto może zobaczyć tę kolekcję
+                        Choose who can view this collection
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
@@ -79,10 +79,10 @@ export default function CollectionSettingsModal({
                             </div>
                             <div className="flex-1">
                                 <h3 className="font-semibold text-gray-900 mb-1">
-                                    Publiczna
+                                    Public
                                 </h3>
                                 <p className="text-sm text-gray-600">
-                                    Każdy z linkiem może zobaczyć tę galerię
+                                    Anyone with the link can view this gallery
                                 </p>
                             </div>
                         </div>
@@ -126,7 +126,7 @@ export default function CollectionSettingsModal({
                             <div className="flex-1">
                                 <div className="flex items-center gap-2">
                                     <h3 className="font-semibold text-gray-900 mb-1">
-                                        Chroniona hasłem
+                                        Password-protected
                                     </h3>
                                     {isFree && (
                                         <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded">
@@ -136,8 +136,8 @@ export default function CollectionSettingsModal({
                                 </div>
                                 <p className="text-sm text-gray-600">
                                     {isFree
-                                        ? "Dostępne od planu Basic"
-                                        : "Wymaga hasła aby zobaczyć galerię"}
+                                        ? "Available starting from Basic"
+                                        : "A password is required to view this gallery"}
                                 </p>
                             </div>
                         </div>
@@ -147,17 +147,18 @@ export default function CollectionSettingsModal({
                     {!isPublic && (
                         <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
                             <label className="text-sm font-medium text-gray-700">
-                                Hasło dostępu
+                                Access password
                             </label>
                             <input
                                 type="text"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Wpisz hasło..."
+                                placeholder="Enter a password..."
                                 className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none transition-colors"
                             />
                             <p className="text-xs text-gray-500">
-                                To hasło będzie wymagane do otwarcia galerii
+                                This password will be required to open the
+                                gallery
                             </p>
                         </div>
                     )}
@@ -166,13 +167,13 @@ export default function CollectionSettingsModal({
                 <AlertDialogFooter>
                     <MainButton
                         onClick={onClose}
-                        label="Anuluj"
+                        label="Cancel"
                         variant="secondary"
                         disabled={saving}
                     />
                     <MainButton
                         onClick={handleSave}
-                        label="Zapisz zmiany"
+                        label="Save changes"
                         variant="primary"
                         loading={saving}
                         disabled={!isPublic && !password}
