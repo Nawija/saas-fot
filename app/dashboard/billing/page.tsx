@@ -23,6 +23,20 @@ export default function BillingPage() {
         fetchUser();
     }, []);
 
+    // Jeśli nawigujemy z kotwicą #plans, przewiń płynnie po załadowaniu danych
+    useEffect(() => {
+        if (loading) return;
+        if (typeof window === "undefined") return;
+        if (window.location.hash === "#plans") {
+            const el = document.getElementById("plans");
+            if (el) {
+                setTimeout(() => {
+                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 60);
+            }
+        }
+    }, [loading]);
+
     const fetchUser = async () => {
         try {
             const res = await fetch("/api/user/me");
@@ -92,7 +106,7 @@ export default function BillingPage() {
                 </div>
             </div>
 
-            <section id="plans" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Current Plan Card */}
                 <div className="mb-10">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300">
@@ -304,11 +318,10 @@ export default function BillingPage() {
                                     <button
                                         onClick={() => {
                                             document
-                                                .getElementById(
-                                                    "pricing-section"
-                                                )
+                                                .getElementById("plans")
                                                 ?.scrollIntoView({
                                                     behavior: "smooth",
+                                                    block: "start",
                                                 });
                                         }}
                                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors duration-200 shadow-sm hover:shadow-md"
@@ -323,7 +336,7 @@ export default function BillingPage() {
                 )}
 
                 {/* Pricing Plans Section */}
-                <div id="pricing-section" className="mb-10 scroll-mt-20">
+                <div id="plans" className="mb-10 scroll-mt-6">
                     <div className="text-center mb-10">
                         <h2 className="text-3xl font-bold text-gray-900 mb-3">
                             {user.subscription_plan === "free"

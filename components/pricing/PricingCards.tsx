@@ -174,7 +174,9 @@ export default function PricingCards({
                                 {plan?.storageLabel && (
                                     <p className="text-xs text-gray-600 mt-1 font-medium flex items-center gap-1">
                                         <Star className="text-yellow-500 fill-amber-400" />{" "}
-                                        <span className="text-orange-800">{plan.storageLabel}</span>
+                                        <span className="text-orange-800">
+                                            {plan.storageLabel}
+                                        </span>
                                     </p>
                                 )}
                             </div>
@@ -214,11 +216,11 @@ export default function PricingCards({
                                         ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                                         : isFree
                                         ? "bg-white border-2 border-gray-300 text-gray-700 cursor-default"
-                                        : `${colors.button} text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5`
+                                        : `${colors.button} text-white shadow-md hover:shadow-lg transform`
                                 }`}
                             >
                                 {isLoading === plan.id ? (
-                                    <span className="flex items-center justify-center gap-2">
+                                    <span className="flex items-center justify-center py-1 gap-2">
                                         <svg
                                             className="animate-spin h-4 w-4"
                                             viewBox="0 0 24 24"
@@ -238,7 +240,6 @@ export default function PricingCards({
                                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                             />
                                         </svg>
-                                        Ładowanie...
                                     </span>
                                 ) : isCurrentPlan ? (
                                     "Aktualny plan"
