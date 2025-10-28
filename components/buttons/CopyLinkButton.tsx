@@ -97,15 +97,9 @@ export default function CopyLinkButton({
                 <div
                     className={`relative flex w-full items-center gap-2 px-3 py-2 rounded-xl bg-white border-2 border-gray-200`}
                 >
-                    <div className="absolute h-full w-full top-0 left-0">
-                        <div
-                            className={`border-2  w-full h-full rounded-xl ${
-                                copied
-                                    ? "animate-border-shimmer"
-                                    : "border-transparent"
-                            }`}
-                        />
-                    </div>
+                    {copied && (
+                        <div className="absolute inset-0 rounded-xl pointer-events-none animate-border-shimmer" />
+                    )}
                     <LinkIcon className="w-4 h-4 text-gray-400 shrink-0 relative z-10" />
                     <p className="text-base text-gray-800 flex-1 truncate relative z-10">
                         {url}

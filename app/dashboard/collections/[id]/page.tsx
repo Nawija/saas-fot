@@ -385,7 +385,7 @@ export default function CollectionDetailPage({
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <h2 className="text-base font-semibold text-gray-900">
-                                    Wygląd hero
+                                    Wygląd powitalny
                                 </h2>
                                 <p className="text-sm text-gray-600 mt-1">
                                     Szablon strony galerii

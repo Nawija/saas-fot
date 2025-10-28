@@ -88,26 +88,27 @@ html {
 }
 
 .animate-border-shimmer {
-    position: relative;
+    position: absolute;
+    inset: 0;
     border: 2px solid transparent;
-    /* keep the interior transparent so the overlay never hides the content
-       and only the border shows the conic gradient sweep */
-    background: linear-gradient(transparent, transparent) padding-box,
-        conic-gradient(
-                from var(--angle),
-                transparent 0deg,
-                transparent 60deg,
-                transparent 100deg,
-                #fb923c 120deg,
-                #fbbf24 180deg,
-                #34d399 240deg,
-                transparent 300deg,
-                transparent 360deg
-            )
-            border-box;
-    /* single quick sweep */
+    border-radius: inherit;
+    background: conic-gradient(
+            from var(--angle),
+            transparent 0deg,
+            transparent 60deg,
+            #fb923c 120deg,
+            #fbbf24 180deg,
+            #34d399 240deg,
+            transparent 300deg,
+            transparent 360deg
+        )
+        border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
     animation: border-shimmer 0.6s ease-out 1 forwards;
-    border-radius: 0.75rem;
     pointer-events: none;
 }
 
