@@ -19,9 +19,9 @@ export default function LogoutButton() {
     return (
         <button
             onClick={handleLogout}
-            className="flex items-center justify-start gap-1.5 w-full h-full font-medium text-sm"
+            className="flex items-center justify-start text-red-700 gap-1.5 hover:bg-red-50 p-2 rounded-lg w-full h-full font-medium text-sm"
         >
-            <LogOut size={18} strokeWidth={3} />
+            <LogOut size={18} strokeWidth={2} className="text-red-700" />
             <span>Wyloguj</span>
         </button>
     );

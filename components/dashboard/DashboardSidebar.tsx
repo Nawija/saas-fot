@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Images, CreditCard, User } from "lucide-react";
-import Image from "next/image";
+import { Images, CreditCard } from "lucide-react";
 import LogoutButton from "../buttons/LogoutButton";
 
 const menuItems = [

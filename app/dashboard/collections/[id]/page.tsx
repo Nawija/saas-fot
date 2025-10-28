@@ -535,7 +535,7 @@ export default function CollectionDetailPage({
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-base font-semibold text-gray-900">
-                                        Galeria zdjęć
+                                        Galeria zdjęć ({photos.length})
                                     </h2>
                                 </div>
                             </div>

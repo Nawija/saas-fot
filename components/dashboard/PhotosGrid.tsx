@@ -19,10 +19,6 @@ interface PhotosGridProps {
 export default function PhotosGrid({ photos, onDeletePhoto }: PhotosGridProps) {
     return (
         <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-6">
-                Zdjęcia ({photos.length})
-            </h2>
-
             {photos.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
                     <Upload className="w-16 h-16 mx-auto mb-4 opacity-30" />

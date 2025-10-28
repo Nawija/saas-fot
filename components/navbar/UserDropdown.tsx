@@ -76,15 +76,14 @@ export default function UserDropdown({
                     </Link>
                 </DropdownMenuItem>
 
-                {/* Opcja zmiany hasła tylko dla użytkowników z emailem */}
                 {provider === "email" && (
-                    <DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                         <ChangePassword />
                     </DropdownMenuItem>
                 )}
 
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild>
                     <LogoutButton />
                 </DropdownMenuItem>
             </DropdownMenuContent>

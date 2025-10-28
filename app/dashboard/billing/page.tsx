@@ -84,31 +84,31 @@ export default function BillingPage() {
                 <div className="mb-10">
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
                         {/* Plan Header with Gradient */}
-                        <div className="bg-linear-to-r from-blue-400 to-indigo-400 px-8 py-6">
+                        <div className="bg-linear-to-b rounded-t-2xl from-orange-100 to-amber-50 border border-orange-300 px-8 py-6">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div className="text-white">
-                                    <p className="text-sm font-medium text-green-200 mb-1">
+                                <div className="text-orange-800">
+                                    <p className="text-sm font-medium text-orange-800 mb-1">
                                         Aktualny plan
                                     </p>
                                     <h2 className="text-3xl font-bold mb-1">
                                         {currentPlan.name}
                                     </h2>
                                     {currentPlan.price > 0 ? (
-                                        <p className="text-blue-100">
-                                            <span className="text-2xl font-semibold text-white">
+                                        <p className="text-orange-800">
+                                            <span className="text-2xl font-semibold">
                                                 ${currentPlan.price}
                                             </span>
                                             /miesiąc
                                         </p>
                                     ) : (
-                                        <p className="text-blue-100">
+                                        <p className="text-orange-800">
                                             Plan darmowy
                                         </p>
                                     )}
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="text-right">
-                                        <p className="text-xs text-green-200 mb-1">
+                                        <p className="text-xs text-orange-800 mb-1">
                                             Status subskrybcji
                                         </p>
                                         <span
