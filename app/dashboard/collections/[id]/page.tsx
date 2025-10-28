@@ -14,6 +14,7 @@ import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
 import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
 import CollectionSettingsModal from "@/components/dashboard/CollectionSettingsModal";
 import CopyLinkButton from "@/components/buttons/CopyLinkButton";
+import UpgradeDialog from "@/components/ui/UpgradeDialog";
 import {
     BookImage,
     Eye,
@@ -84,6 +85,12 @@ export default function CollectionDetailPage({
     const [savingSettings, setSavingSettings] = useState(false);
     const [origin, setOrigin] = useState("");
     const [userPlan, setUserPlan] = useState<string>("free");
+    const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
+    const [upgradeContext, setUpgradeContext] = useState({
+        title: "Funkcja dostępna w wyższych planach",
+        description: "",
+        feature: "",
+    });
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -177,16 +184,14 @@ export default function CollectionDetailPage({
 
                 // Jeśli to błąd wymagający upgrade'u planu
                 if (res.status === 403 && err?.upgradeRequired) {
-                    toast.error(err?.error || "Szablon niedostępny", {
+                    setUpgradeContext({
+                        title: err?.error || "Szablon niedostępny",
                         description:
                             err?.message ||
                             "Ten szablon wymaga subskrypcji Basic, Pro lub Unlimited.",
-                        duration: 5000,
-                        action: {
-                            label: "Wybierz plan",
-                            onClick: () => router.push("/dashboard/billing"),
-                        },
+                        feature: "Szablony Premium",
                     });
+                    setUpgradeDialogOpen(true);
                     return;
                 }
 
@@ -644,11 +649,7 @@ export default function CollectionDetailPage({
                                             <Lock size={16} />
                                         )
                                     }
-                                    label={
-                                        collection.is_public
-                                            ? "Publiczna"
-                                            : "Chroniona"
-                                    }
+                                    label="Ustawienia kolekcji"
                                     variant="secondary"
                                     className="w-full"
                                 />
@@ -779,6 +780,24 @@ export default function CollectionDetailPage({
                 onSave={handleSaveSettings}
                 saving={savingSettings}
                 userPlan={userPlan}
+                onUpgradeRequired={() => {
+                    setSettingsModalOpen(false);
+                    setUpgradeContext({
+                        title: "Galeria chroniona hasłem",
+                        description:
+                            "Ochrona hasłem jest dostępna od planu Basic. Przejdź na wyższy plan.",
+                        feature: "Ochrona hasłem",
+                    });
+                    setUpgradeDialogOpen(true);
+                }}
+            />
+
+            <UpgradeDialog
+                open={upgradeDialogOpen}
+                onClose={() => setUpgradeDialogOpen(false)}
+                title={upgradeContext.title}
+                description={upgradeContext.description}
+                feature={upgradeContext.feature}
             />
         </div>
     );

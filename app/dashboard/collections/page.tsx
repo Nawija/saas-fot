@@ -170,11 +170,6 @@ export default function CollectionsPage() {
                                             {collection.name}
                                         </h3>
                                     </Link>
-                                    {collection.description && (
-                                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                                            {collection.description}
-                                        </p>
-                                    )}
 
                                     {/* Stats */}
                                     <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">

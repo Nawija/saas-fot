@@ -92,7 +92,7 @@ export default function BillingPage() {
                 </div>
             </div>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <section id="plans" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Current Plan Card */}
                 <div className="mb-10">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300">
@@ -377,7 +377,7 @@ export default function BillingPage() {
                         </div>
                     </div>
                 </div>
-            </main>
+            </section>
         </div>
     );
 }

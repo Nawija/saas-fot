@@ -6,11 +6,18 @@ import Link from "next/link";
 import { ArrowLeft, Upload, Lock, Globe } from "lucide-react";
 import { toast } from "sonner";
 import MainButton from "@/components/buttons/MainButton";
+import UpgradeDialog from "@/components/ui/UpgradeDialog";
 
 export default function NewCollectionPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [userPlan, setUserPlan] = useState<string>("free");
+    const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
+    const [upgradeContext, setUpgradeContext] = useState({
+        title: "Funkcja dostępna w wyższych planach",
+        description: "",
+        feature: "",
+    });
     const [formData, setFormData] = useState({
         name: "",
         slug: "",
@@ -89,14 +96,16 @@ export default function NewCollectionPage() {
             if (!res.ok || !data.ok) {
                 // Sprawdź czy to błąd wymagający upgrade'u
                 if (res.status === 403 && data.upgradeRequired) {
-                    toast.error(data.error || "Funkcja niedostępna", {
-                        description: data.message,
-                        duration: 6000,
-                        action: {
-                            label: "Zmień plan",
-                            onClick: () => router.push("/dashboard/billing"),
-                        },
+                    setUpgradeContext({
+                        title: data.error || "Funkcja niedostępna",
+                        description:
+                            data.message || "Ta funkcja wymaga wyższego planu.",
+                        feature:
+                            data.error === "Osiągnięto limit galerii"
+                                ? "Więcej galerii"
+                                : "Ochrona hasłem",
                     });
+                    setUpgradeDialogOpen(true);
                 } else {
                     toast.error(
                         data.error || data.message || "Błąd tworzenia galerii"
@@ -353,21 +362,13 @@ export default function NewCollectionPage() {
                                 type="button"
                                 onClick={() => {
                                     if (userPlan === "free") {
-                                        toast.error(
-                                            "Galeria na hasło tylko dla subskrybentów",
-                                            {
-                                                description:
-                                                    "Ochrona hasłem jest dostępna od planu Basic. Przejdź na wyższy plan.",
-                                                duration: 5000,
-                                                action: {
-                                                    label: "Zmień plan",
-                                                    onClick: () =>
-                                                        router.push(
-                                                            "/dashboard/billing"
-                                                        ),
-                                                },
-                                            }
-                                        );
+                                        setUpgradeContext({
+                                            title: "Galeria chroniona hasłem",
+                                            description:
+                                                "Ochrona hasłem jest dostępna od planu Basic. Przejdź na wyższy plan.",
+                                            feature: "Ochrona hasłem",
+                                        });
+                                        setUpgradeDialogOpen(true);
                                         return;
                                     }
                                     setFormData({
@@ -447,6 +448,14 @@ export default function NewCollectionPage() {
                         />
                     </div>
                 </form>
+
+                <UpgradeDialog
+                    open={upgradeDialogOpen}
+                    onClose={() => setUpgradeDialogOpen(false)}
+                    title={upgradeContext.title}
+                    description={upgradeContext.description}
+                    feature={upgradeContext.feature}
+                />
             </div>
         </div>
     );

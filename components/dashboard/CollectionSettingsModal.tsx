@@ -20,6 +20,7 @@ interface CollectionSettingsModalProps {
     onSave: (isPublic: boolean, password?: string) => Promise<void>;
     saving: boolean;
     userPlan?: string; // plan użytkownika do sprawdzania limitów
+    onUpgradeRequired?: () => void; // callback gdy użytkownik próbuje użyć premium feature
 }
 
 export default function CollectionSettingsModal({
@@ -30,6 +31,7 @@ export default function CollectionSettingsModal({
     onSave,
     saving,
     userPlan = "free",
+    onUpgradeRequired,
 }: CollectionSettingsModalProps) {
     const [isPublic, setIsPublic] = useState(initialIsPublic);
     const [password, setPassword] = useState(initialPassword || "");
@@ -88,12 +90,20 @@ export default function CollectionSettingsModal({
 
                     {/* Protected Option */}
                     <button
-                        onClick={() => !isFree && setIsPublic(false)}
-                        disabled={isFree}
+                        onClick={() => {
+                            if (isFree && onUpgradeRequired) {
+                                onUpgradeRequired();
+                                return;
+                            }
+                            if (!isFree) {
+                                setIsPublic(false);
+                            }
+                        }}
+                        disabled={isFree && !onUpgradeRequired}
                         className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
                             !isPublic
                                 ? "border-amber-500 bg-amber-50"
-                                : isFree
+                                : isFree && !onUpgradeRequired
                                 ? "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
                                 : "border-gray-200 hover:border-gray-300"
                         }`}
