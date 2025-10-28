@@ -50,7 +50,7 @@ export default function LoginPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h1 className="text-3xl font-semibold text-center text-blue-700 mb-2">
+                        <h1 className="text-3xl font-semibold text-center mb-2">
                             Welcome
                         </h1>
                         <p className="text-center text-gray-500 mb-6">

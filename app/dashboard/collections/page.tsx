@@ -14,6 +14,7 @@ import {
     Globe,
     Lock,
 } from "lucide-react";
+import MainButton from "@/components/buttons/MainButton";
 
 interface Collection {
     id: number;
@@ -98,13 +99,13 @@ export default function CollectionsPage() {
                             klientom
                         </p>
                     </div>
-                    <Link
+
+                    <MainButton
                         href="/dashboard/collections/new"
-                        className="mt-6 md:mt-0 inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                        <Plus className="w-5 h-5" />
-                        Nowa galeria
-                    </Link>
+                        className="mt-6 md:mt-0"
+                        label=" Nowa galeria"
+                        icon={<Plus className="w-5 h-5" />}
+                    />
                 </div>
 
                 {/* Collections Grid */}

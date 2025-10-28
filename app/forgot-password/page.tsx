@@ -8,6 +8,7 @@ import Link from "next/link";
 import FormInput from "@/components/auth/FormInput";
 import ErrorMessage from "@/components/auth/ErrorMessage";
 import CountdownTimer from "@/components/CountdownTimer";
+import MainButton from "@/components/buttons/MainButton";
 
 export default function ForgotPasswordPage() {
     const router = useRouter();
@@ -104,7 +105,7 @@ export default function ForgotPasswordPage() {
                                 exit={{ opacity: 0, x: 50 }}
                                 transition={{ duration: 0.4 }}
                             >
-                                <h1 className="text-3xl font-semibold text-center text-blue-700 mb-2">
+                                <h1 className="text-3xl font-semibold text-center mb-2">
                                     Zapomniałeś hasła?
                                 </h1>
                                 <p className="text-center text-gray-500 mb-6">
@@ -125,15 +126,12 @@ export default function ForgotPasswordPage() {
                                         required
                                     />
 
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 transition"
-                                    >
-                                        {loading
-                                            ? "Wysyłanie..."
-                                            : "Wyślij kod"}
-                                    </button>
+                                    <MainButton
+                                        loading={loading}
+                                        loadingText="Wysyłanie..."
+                                        label="Wyślij kod"
+                                        className="w-full"
+                                    />
 
                                     <p className="text-center text-sm text-gray-600 mt-4">
                                         <Link
