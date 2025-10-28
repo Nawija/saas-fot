@@ -131,9 +131,9 @@ export default function PricingCards({
 
                         {/* Current Plan Badge */}
                         {isCurrentPlan && (
-                            <div className="absolute top-3 left-3 bg-emerald-400 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-sm">
+                            <div className="absolute top-3 right-3 animate-pulse bg-emerald-400 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-sm">
                                 <Check size={14} />
-                                Twój plan
+                                Obecny plan
                             </div>
                         )}
 

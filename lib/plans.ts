@@ -27,7 +27,7 @@ export const PLANS: Record<SubscriptionPlan, Plan> = {
         storageLabel: "2 GB",
         features: [
             "2 GB przestrzeni",
-            "Do 5 galerii",
+            "Do 3 galerii",
             "Podstawowe udostępnianie",
             "Watermark na zdjęciach",
         ],

@@ -14,6 +14,7 @@ import {
     Coffee,
 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
+import PricingCards from "@/components/pricing/PricingCards";
 
 export default async function DashboardPage() {
     const user = await getUser();
@@ -224,65 +225,8 @@ export default async function DashboardPage() {
                         Zacznij za darmo lub wybierz plan Premium dla większych
                         możliwości
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        {plans.map((plan, index) => (
-                            <div
-                                key={index}
-                                className={`relative bg-white rounded-xl p-8 border-2 transition-all duration-200 ${
-                                    plan.popular
-                                        ? "border-blue-200 shadow-lg scale-105"
-                                        : "border-gray-200 hover:border-blue-300 hover:shadow-md"
-                                }`}
-                            >
-                                {plan.popular && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                                        <span className="bg-blue-200 text-blue-800 text-sm font-semibold px-4 py-1 rounded-full">
-                                            Najpopularniejszy
-                                        </span>
-                                    </div>
-                                )}
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                                    {plan.name}
-                                </h3>
-                                <div className="mb-6">
-                                    <span className="text-4xl font-bold text-gray-900">
-                                        {plan.price}
-                                    </span>
-                                    <span className="text-gray-600">/mies</span>
-                                </div>
-                                <ul className="space-y-3 mb-8">
-                                    {plan.features.map((feature, i) => (
-                                        <li
-                                            key={i}
-                                            className="flex items-start"
-                                        >
-                                            <svg
-                                                className="w-5 h-5 text-green-500 mr-2 shrink-0 mt-0.5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M5 13l4 4L19 7"
-                                                />
-                                            </svg>
-                                            <span className="text-gray-700 text-sm">
-                                                {feature}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                <MainButton
-                                    href="/dashboard/billing"
-                                    label="Wybierz plan"
-                                    className="w-full"
-                                />
-                            </div>
-                        ))}
+                    <div className="py-12">
+                        <PricingCards />
                     </div>
                     <p className="text-center text-sm text-gray-600">
                         Plan Free: 2 GB storage • Wszystkie podstawowe funkcje •

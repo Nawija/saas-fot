@@ -43,12 +43,12 @@ export async function POST(req: NextRequest) {
                     fit: "cover",
                     position: "center",
                 })
-                .webp({ quality: 90 })
+                .webp({ quality: 85 }) // Obniżone z 90 na 85 - optymalizacja
                 .toBuffer();
 
             key = R2Paths.collectionHero(user.id, parseInt(collectionId));
         } else {
-            // Regular photo - 1200px szerokości
+            // Regular photo - 1200px szerokości (optymalne dla web)
             const image = sharp(buffer);
 
             processedBuffer = await image
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
                     fit: "inside",
                     withoutEnlargement: true,
                 })
-                .webp({ quality: 85 })
+                .webp({ quality: 82 }) // Obniżone z 85 na 82 - większa oszczędność
                 .toBuffer();
 
             // Użyj ID zdjęcia lub timestamp
