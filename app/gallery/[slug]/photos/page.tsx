@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Loading from "@/components/ui/Loading";
-import { getGalleryHeroTemplate } from "@/components/gallery/hero/registry";
-import DownloadMenu from "@/components/gallery/DownloadMenu";
 import GalleryHeader from "@/components/gallery/GalleryHeader";
 import GalleryGrid from "@/components/gallery/GalleryGrid";
 import type { Photo, Collection } from "@/types/gallery";

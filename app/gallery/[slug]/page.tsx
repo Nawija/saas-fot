@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Loading from "@/components/ui/Loading";
 import { getGalleryHeroTemplate } from "@/components/gallery/hero/registry";
 import { Eye, Lock } from "lucide-react";
+import LoadingGallery from "../loading";
 
 interface Collection {
     id: number;
@@ -31,7 +31,6 @@ export default function GalleryLandingPage() {
         fetchCollection();
     }, []);
 
-    // Inject selected Google Font for landing preview as well
     useEffect(() => {
         if (!collection?.hero_font) return;
         const FONT_MAP: Record<string, { href: string }> = {
@@ -101,7 +100,6 @@ export default function GalleryLandingPage() {
             const data = await res.json();
 
             if (data.ok) {
-                // Zapisz token dostępu w sessionStorage
                 sessionStorage.setItem(`gallery_${params.slug}`, data.token);
                 router.push(`/gallery/${params.slug}/photos`);
             } else {
@@ -113,18 +111,18 @@ export default function GalleryLandingPage() {
     };
 
     if (loading) {
-        return <Loading />;
+        return <LoadingGallery />;
     }
 
     if (error || !collection) {
         return (
             <div className="h-screen flex items-center justify-center bg-black text-white">
-                <div className="text-center">
-                    <h1 className="text-4xl font-bold mb-4">
+                <div className="text-center tracking-tight">
+                    <h1 className="text-3xl font-semibold mb-3">
                         {error || "Nie znaleziono galerii"}
                     </h1>
-                    <p className="text-gray-400">
-                        Sprawdź czy link jest prawidłowy
+                    <p className="text-neutral-500 text-sm uppercase">
+                        Sprawdź poprawność linku
                     </p>
                 </div>
             </div>
@@ -135,40 +133,38 @@ export default function GalleryLandingPage() {
     const HeroTemplate = getGalleryHeroTemplate(template);
     const fontKey = collection.hero_font || "inter";
     const FONT_FAMILY: Record<string, string> = {
-        inter: "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
-        playfair:
-            "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif",
-        poppins:
-            "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+        inter: "'Inter', sans-serif",
+        playfair: "'Playfair Display', serif",
+        poppins: "'Poppins', sans-serif",
     };
 
     const renderPasswordPrompt = () => (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 w-full">
             <form
                 onSubmit={handlePasswordSubmit}
-                className="max-w-sm mx-auto bg-black/60 rounded-xl p-8 border border-white/20"
+                className="max-w-sm mx-auto bg-black/70 border border-neutral-700 p-10 backdrop-blur-md text-center"
             >
-                <Lock className="w-12 h-12 mx-auto mb-4 text-white" />
-                <h3 className="text-2xl font-bold mb-2">
-                    Galeria chroniona hasłem
-                </h3>
-                <p className="text-gray-300 mb-6">
-                    Wprowadź hasło aby zobaczyć zdjęcia
+                <Lock className="w-10 h-10 mx-auto mb-6 text-white/90" />
+                <h3 className="text-xl font-semibold mb-1">Galeria prywatna</h3>
+                <p className="text-neutral-400 text-sm mb-8">
+                    Wprowadź hasło, aby uzyskać dostęp
                 </p>
                 <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Wprowadź hasło"
-                    className="w-full px-6 py-2 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-gray-300 mb-4 focus:outline-none focus:ring-2 focus:ring-white/50 text-center text-lg"
+                    placeholder="Hasło"
+                    className="w-full px-5 py-3 bg-black border border-neutral-700 text-white placeholder-neutral-500 text-center focus:outline-none focus:border-white transition"
                     autoFocus
                 />
-                {error && <p className="text-red-300 mb-4 text-sm">{error}</p>}
+                {error && (
+                    <p className="text-red-400 text-sm mt-3 mb-4">{error}</p>
+                )}
                 <button
                     type="submit"
-                    className="w-full px-8 py-2 bg-white text-gray-900 font-bold rounded-xl shadow-2xl hover:bg-gray-100 transition-all duration-300 text-lg"
+                    className="w-full mt-4 px-6 py-3 bg-white text-black font-medium tracking-wide uppercase text-sm border border-white hover:bg-transparent hover:text-white transition-all"
                 >
-                    Wejdź do galerii
+                    Wejdź
                 </button>
             </form>
         </div>
@@ -177,17 +173,16 @@ export default function GalleryLandingPage() {
     const renderPrimaryAction = () => (
         <button
             onClick={handleViewGallery}
-            className="inline-flex items-center hover:bg-white hover:border-black/20 gap-1 bg-white/80 px-6 py-3 border border-black/30 text-gray-800 hover:text-gray-700 font-semibold rounded transition"
+            className="inline-flex items-center justify-center gap-2 bg-transparent border border-white px-8 py-3 text-white uppercase tracking-wide text-sm hover:bg-white hover:text-black transition-all duration-300"
         >
-            <Eye size={20} />
+            <Eye size={18} />
             Zobacz jako gość
         </button>
     );
 
-    // Unified render using existing templates but hiding their titles/buttons
     return (
-        <div className="relative h-screen w-full overflow-hidden">
-            <div className="absolute inset-0 bg-black/90 w-full h-full z-10" />
+        <div className="relative h-screen w-full overflow-hidden bg-black">
+            <div className="absolute inset-0 bg-black/70 lg:bg-black/80 z-10" />
             <div className="absolute inset-0">
                 <div className="hero-landing-scope relative h-full w-full">
                     <div style={{ fontFamily: FONT_FAMILY[fontKey] }}>
@@ -198,9 +193,7 @@ export default function GalleryLandingPage() {
                                 image: collection.hero_image,
                             },
                             elements: {},
-                            options: {
-                                disableAnimations: true,
-                            },
+                            options: { disableAnimations: true },
                         })}
                     </div>
                 </div>
@@ -215,9 +208,8 @@ export default function GalleryLandingPage() {
                 `}</style>
             </div>
 
-            {/* Center overlay with password form or view button */}
-            <div className="absolute inset-0 z-10 flex items-center justify-center text-white px-4">
-                <div className="max-w-md w-full flex items-center justify-center">
+            <div className="absolute inset-0 z-20 flex items-center justify-center text-white px-4">
+                <div className="max-w-md w-full">
                     {showPasswordPrompt && collection.has_password
                         ? renderPasswordPrompt()
                         : renderPrimaryAction()}

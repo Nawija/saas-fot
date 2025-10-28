@@ -1,3 +1,3 @@
-import Loading from "@/components/ui/Loading";
+import LoadingGallery from "@/components/ui/LoadingGallery";
 
-export default Loading
+export default LoadingGallery;
