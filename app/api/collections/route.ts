@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { query } from "@/lib/db";
 import { createErrorResponse } from "@/lib/utils/apiHelpers";
+import { PLANS, SubscriptionPlan } from "@/lib/plans";
 
 export async function GET() {
     try {
@@ -48,6 +49,62 @@ export async function POST(req: NextRequest) {
             return createErrorResponse("Nazwa i slug są wymagane", 400);
         }
 
+        // Pobierz plan użytkownika i sprawdź limit galerii
+        const userResult = await query(
+            "SELECT subscription_plan FROM users WHERE id = $1",
+            [user.id]
+        );
+        const userPlan = (userResult.rows[0]?.subscription_plan ||
+            "free") as SubscriptionPlan;
+        const planDetails = PLANS[userPlan];
+
+        console.log("POST /api/collections received:", {
+            name,
+            slug,
+            is_public,
+            hasPassword: !!password,
+            userPlan,
+        });
+
+        // Sprawdź liczbę istniejących galerii
+        const countResult = await query(
+            "SELECT COUNT(*) as count FROM collections WHERE user_id = $1",
+            [user.id]
+        );
+        const currentCount = parseInt(countResult.rows[0]?.count || "0");
+
+        if (currentCount >= planDetails.maxCollections) {
+            return NextResponse.json(
+                {
+                    error: "Osiągnięto limit galerii",
+                    message: `Plan ${planDetails.name} umożliwia maksymalnie ${
+                        planDetails.maxCollections
+                    } ${
+                        planDetails.maxCollections === 3 ? "galerie" : "galerii"
+                    }. Przejdź na wyższy plan, aby tworzyć więcej galerii.`,
+                    upgradeRequired: true,
+                    currentPlan: userPlan,
+                },
+                { status: 403 }
+            );
+        }
+
+        // Plan FREE nie może tworzyć chronionych galerii
+        if (userPlan === "free" && is_public === false) {
+            return NextResponse.json(
+                {
+                    message:
+                        "Ochrona hasłem jest dostępna od planu Basic. Przejdź na wyższy plan.",
+                    upgradeRequired: true,
+                    currentPlan: userPlan,
+                },
+                { status: 403 }
+            );
+        }
+
+        // Dla FREE automatycznie ustaw is_public na true
+        const finalIsPublic = userPlan === "free" ? true : is_public ?? false;
+
         // Sprawdź czy slug jest unikalny dla tego użytkownika
         const existing = await query(
             "SELECT id FROM collections WHERE user_id = $1 AND slug = $2",
@@ -81,7 +138,7 @@ export async function POST(req: NextRequest) {
                 hero_image || null,
                 passwordHash,
                 password || null,
-                is_public || false,
+                finalIsPublic,
             ]
         );
 

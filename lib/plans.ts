@@ -9,6 +9,7 @@ export interface Plan {
     priceMonthly: number;
     storage: number; // w bajtach
     storageLabel: string;
+    maxCollections: number; // maksymalna liczba galerii
     features: string[];
     lemonSqueezyVariantId?: string;
     popular?: boolean;
@@ -25,6 +26,7 @@ export const PLANS: Record<SubscriptionPlan, Plan> = {
         priceMonthly: 0,
         storage: 2 * GB, // 2GB
         storageLabel: "",
+        maxCollections: 3, // Limit 3 galerii
         features: [
             "2 GB przestrzeni (1000-2000 zdjęć)",
             "Do 3 galerii",
@@ -42,6 +44,7 @@ export const PLANS: Record<SubscriptionPlan, Plan> = {
         priceMonthly: 8,
         storage: 10 * GB, // 10GB
         storageLabel: "Szablony Premium",
+        maxCollections: 20, // Limit 20 galerii
         features: [
             "10 GB przestrzeni",
             "Do 20 galerii",
@@ -62,6 +65,7 @@ export const PLANS: Record<SubscriptionPlan, Plan> = {
         priceMonthly: 16,
         storage: 100 * GB, // 100GB
         storageLabel: "Szablony Premium",
+        maxCollections: Infinity, // Nielimitowane
         features: [
             "100 GB przestrzeni",
             "Nielimitowane galerie",
@@ -84,7 +88,7 @@ export const PLANS: Record<SubscriptionPlan, Plan> = {
         priceMonthly: 40,
         storage: Infinity, // Bez limitu
         storageLabel: "Szablony Premium",
-
+        maxCollections: Infinity, // Nielimitowane
         features: [
             "Nielimitowana przestrzeń",
             "Nielimitowane galerie",

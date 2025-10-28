@@ -12,15 +12,16 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                 <Image
                     src={data.image}
                     alt={data.name}
+                    quality={100}
                     fill
-                    className="w-full h-full object-cover opacity-60"
+                    className="object-cover"
                 />
             ) : (
-                <div className="w-full h-full bg-linear-to-br from-gray-900 to-gray-700" />
+                <div className="w-full h-full bg-black" />
             )}
             <div className="absolute w-1/3 h-px bg-white top-24 left-0 z-10" />
             <div className="absolute w-1/3 h-px bg-white bottom-24 right-0 z-10" />
-            <div className="absolute inset-0 bg-linear-to-b from-transparent to-zinc-900/80" />
+            <div className="absolute inset-0 bg-linear-to-b from-black/50 to-black/90" />
             <div className="absolute top-1/2 -translate-y-1/2 text-center left-1/2 -translate-x-1/2 p-8 text-white">
                 <div className="mx-auto min-w-sm max-w-7xl">
                     <h1 className="text-4xl md:text-6xl font-bold mb-3">

@@ -83,6 +83,7 @@ export default function CollectionDetailPage({
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
     const [savingSettings, setSavingSettings] = useState(false);
     const [origin, setOrigin] = useState("");
+    const [userPlan, setUserPlan] = useState<string>("free");
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -145,6 +146,13 @@ export default function CollectionDetailPage({
                 }
             } else {
                 router.push("/dashboard/collections");
+            }
+
+            // Pobierz plan użytkownika
+            const userRes = await fetch("/api/user");
+            if (userRes.ok) {
+                const userData = await userRes.json();
+                setUserPlan(userData.user?.subscription_plan || "free");
             }
         } catch (error) {
             console.error("Error fetching collection:", error);
@@ -770,6 +778,7 @@ export default function CollectionDetailPage({
                 passwordPlain={collection.password_plain}
                 onSave={handleSaveSettings}
                 saving={savingSettings}
+                userPlan={userPlan}
             />
         </div>
     );

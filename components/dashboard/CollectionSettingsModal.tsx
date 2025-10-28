@@ -19,6 +19,7 @@ interface CollectionSettingsModalProps {
     passwordPlain?: string;
     onSave: (isPublic: boolean, password?: string) => Promise<void>;
     saving: boolean;
+    userPlan?: string; // plan użytkownika do sprawdzania limitów
 }
 
 export default function CollectionSettingsModal({
@@ -28,9 +29,12 @@ export default function CollectionSettingsModal({
     passwordPlain: initialPassword,
     onSave,
     saving,
+    userPlan = "free",
 }: CollectionSettingsModalProps) {
     const [isPublic, setIsPublic] = useState(initialIsPublic);
     const [password, setPassword] = useState(initialPassword || "");
+
+    const isFree = userPlan === "free";
 
     const handleSave = async () => {
         await onSave(isPublic, isPublic ? undefined : password);
@@ -84,10 +88,13 @@ export default function CollectionSettingsModal({
 
                     {/* Protected Option */}
                     <button
-                        onClick={() => setIsPublic(false)}
+                        onClick={() => !isFree && setIsPublic(false)}
+                        disabled={isFree}
                         className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
                             !isPublic
                                 ? "border-amber-500 bg-amber-50"
+                                : isFree
+                                ? "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
                                 : "border-gray-200 hover:border-gray-300"
                         }`}
                     >
@@ -107,11 +114,20 @@ export default function CollectionSettingsModal({
                                 />
                             </div>
                             <div className="flex-1">
-                                <h3 className="font-semibold text-gray-900 mb-1">
-                                    Chroniona hasłem
-                                </h3>
+                                <div className="flex items-center gap-2">
+                                    <h3 className="font-semibold text-gray-900 mb-1">
+                                        Chroniona hasłem
+                                    </h3>
+                                    {isFree && (
+                                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded">
+                                            Basic+
+                                        </span>
+                                    )}
+                                </div>
                                 <p className="text-sm text-gray-600">
-                                    Wymaga hasła aby zobaczyć galerię
+                                    {isFree
+                                        ? "Dostępne od planu Basic"
+                                        : "Wymaga hasła aby zobaczyć galerię"}
                                 </p>
                             </div>
                         </div>

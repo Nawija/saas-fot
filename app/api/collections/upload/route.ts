@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { createErrorResponse } from "@/lib/utils/apiHelpers";
 import { uploadToR2, R2Paths } from "@/lib/r2";
+import { query } from "@/lib/db";
 import sharp from "sharp";
-
 export async function POST(req: NextRequest) {
     try {
         const user = await getUser();
@@ -11,6 +11,13 @@ export async function POST(req: NextRequest) {
         if (!user) {
             return createErrorResponse("Nie zalogowano", 401);
         }
+
+        // Pobierz plan użytkownika
+        const userResult = await query(
+            "SELECT subscription_plan FROM users WHERE id = $1",
+            [user.id]
+        );
+        const userPlan = userResult.rows[0]?.subscription_plan || "free";
 
         const formData = await req.formData();
         const file = formData.get("file") as File;
@@ -39,25 +46,51 @@ export async function POST(req: NextRequest) {
         if (type === "hero") {
             // Hero image - 1920x1080
             processedBuffer = await sharp(buffer)
-                .resize(1920, 1080, {
+                .resize(2560, 1440, {
                     fit: "cover",
                     position: "center",
                 })
-                .webp({ quality: 85 }) // Obniżone z 90 na 85 - optymalizacja
+                .webp({ quality: 90 })
                 .toBuffer();
 
             key = R2Paths.collectionHero(user.id, parseInt(collectionId));
         } else {
-            // Regular photo - 1200px szerokości (optymalne dla web)
-            const image = sharp(buffer);
+            // Regular photo - 1300px szerokości (optymalne dla web)
+            let image = sharp(buffer).resize(1300, null, {
+                fit: "inside",
+                withoutEnlargement: true,
+            });
 
-            processedBuffer = await image
-                .resize(1200, null, {
-                    fit: "inside",
-                    withoutEnlargement: true,
-                })
-                .webp({ quality: 82 }) // Obniżone z 85 na 82 - większa oszczędność
-                .toBuffer();
+            // Dla planu FREE dodaj watermark
+            if (userPlan === "free") {
+                // Pobierz wymiary obrazu PRZED przetworzeniem
+                const metadata = await image.metadata();
+                const imgWidth = metadata.width || 1300;
+                const imgHeight = metadata.height || 800;
+
+                // Stwórz watermark SVG jako buffer
+                const watermarkSvg = `
+                <svg width="140" height="45" viewBox="0 0 140 45">
+                  <rect width="140" height="45" rx="4" fill="white" fill-opacity="0.9"/>
+                  <text x="70" y="28" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1f2937" text-anchor="middle">
+                    Seovileo
+                  </text>
+                </svg>
+                `;
+                const watermarkBuffer = Buffer.from(watermarkSvg);
+
+                // Watermark w prawym dolnym rogu z marginesem 15px
+                // Używamy top/left licząc od końca (dół/prawo)
+                image = image.composite([
+                    {
+                        input: watermarkBuffer,
+                        top: imgHeight - 45 - 15, // wysokość watermarku (45px) + margines (15px) od dołu
+                        left: imgWidth - 140 - 15, // szerokość watermarku (140px) + margines (15px) od prawej
+                    },
+                ]);
+            }
+
+            processedBuffer = await image.webp({ quality: 85 }).toBuffer();
 
             // Użyj ID zdjęcia lub timestamp
             const fileExt = "webp";

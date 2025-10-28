@@ -187,6 +187,26 @@ export async function PATCH(
             values.push(description);
         }
         if (is_public !== undefined) {
+            // Sprawdź czy plan FREE próbuje ustawić protected
+            const userResult = await query(
+                "SELECT subscription_plan FROM users WHERE id = $1",
+                [user.id]
+            );
+            const userPlan = userResult.rows[0]?.subscription_plan || "free";
+
+            if (userPlan === "free" && is_public === false) {
+                return NextResponse.json(
+                    {
+                        error: "Funkcja niedostępna",
+                        message:
+                            "Ochrona hasłem jest dostępna od planu Basic. Przejdź na wyższy plan.",
+                        upgradeRequired: true,
+                        currentPlan: userPlan,
+                    },
+                    { status: 403 }
+                );
+            }
+
             updates.push(`is_public = $${paramCount++}`);
             values.push(is_public);
         }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Lock, Globe } from "lucide-react";
@@ -10,6 +10,7 @@ import MainButton from "@/components/buttons/MainButton";
 export default function NewCollectionPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [userPlan, setUserPlan] = useState<string>("free");
     const [formData, setFormData] = useState({
         name: "",
         slug: "",
@@ -19,6 +20,18 @@ export default function NewCollectionPage() {
     });
     const [heroImage, setHeroImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string>("");
+
+    useEffect(() => {
+        // Pobierz plan użytkownika
+        fetch("/api/user")
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.user?.subscription_plan) {
+                    setUserPlan(data.user.subscription_plan);
+                }
+            })
+            .catch(console.error);
+    }, []);
 
     const generateSlug = (name: string) => {
         return name
@@ -66,8 +79,28 @@ export default function NewCollectionPage() {
 
             const data = await res.json();
 
-            if (!data.ok) {
-                toast.error(data.error || "Błąd tworzenia galerii");
+            console.log("Collection creation response:", {
+                status: res.status,
+                data,
+            });
+
+            if (!res.ok || !data.ok) {
+                // Sprawdź czy to błąd wymagający upgrade'u
+                if (res.status === 403 && data.upgradeRequired) {
+                    toast.error(data.error || "Funkcja niedostępna", {
+                        description: data.message,
+                        duration: 6000,
+                        action: {
+                            label: "Zmień plan",
+                            onClick: () => router.push("/dashboard/billing"),
+                        },
+                    });
+                } else {
+                    toast.error(
+                        data.error || data.message || "Błąd tworzenia galerii"
+                    );
+                }
+                setLoading(false);
                 return;
             }
 
@@ -316,25 +349,55 @@ export default function NewCollectionPage() {
 
                             <button
                                 type="button"
-                                onClick={() =>
+                                onClick={() => {
+                                    if (userPlan === "free") {
+                                        toast.error(
+                                            "Galeria na hasło tylko dla subskrybentów",
+                                            {
+                                                description:
+                                                    "Ochrona hasłem jest dostępna od planu Basic. Przejdź na wyższy plan.",
+                                                duration: 5000,
+                                                action: {
+                                                    label: "Zmień plan",
+                                                    onClick: () =>
+                                                        router.push(
+                                                            "/dashboard/billing"
+                                                        ),
+                                                },
+                                            }
+                                        );
+                                        return;
+                                    }
                                     setFormData({
                                         ...formData,
                                         is_public: false,
-                                    })
-                                }
+                                    });
+                                }}
+                                disabled={userPlan === "free"}
                                 className={`flex-1 flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                                     !formData.is_public
                                         ? "border-blue-500 bg-blue-50"
+                                        : userPlan === "free"
+                                        ? "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
                                         : "border-gray-200 hover:border-gray-300"
                                 }`}
                             >
                                 <Lock className="w-5 h-5" />
                                 <div className="text-left">
-                                    <div className="font-semibold">
-                                        Z hasłem
+                                    <div className="flex items-center gap-2">
+                                        <div className="font-semibold">
+                                            Z hasłem
+                                        </div>
+                                        {userPlan === "free" && (
+                                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-semibold rounded">
+                                                Basic+
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                        Wymaga hasła dostępu
+                                        {userPlan === "free"
+                                            ? "Dostępne od planu Basic"
+                                            : "Wymaga hasła dostępu"}
                                     </div>
                                 </div>
                             </button>
@@ -367,17 +430,19 @@ export default function NewCollectionPage() {
                     {/* Submit */}
                     <div className="flex items-center gap-4">
                         <MainButton
+                            type="submit"
                             disabled={loading}
                             loading={loading}
                             loadingText="Tworzenie..."
                             label="Utwórz galerię"
+                            className="w-full"
                         />
-                        <Link
+                        <MainButton
                             href="/dashboard/collections"
-                            className="px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors"
-                        >
-                            Anuluj
-                        </Link>
+                            label="Anuluj"
+                            variant="secondary"
+                            className="w-full"
+                        />
                     </div>
                 </form>
             </div>

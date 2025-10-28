@@ -101,7 +101,7 @@ export default function PricingCards({
     const plans = Object.values(PLANS);
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 max-w-7xl mx-auto py-12">
             {plans.map((plan) => {
                 const isCurrentPlan = plan.id === currentPlan;
                 const isFree = plan.id === "free";

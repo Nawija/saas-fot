@@ -208,7 +208,7 @@ export default function GalleryLandingPage() {
                 `}</style>
             </div>
 
-            <div className="absolute inset-0 z-20 flex items-center justify-center text-white px-4">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center text-white px-4">
                 <div className="max-w-md w-full">
                     {showPasswordPrompt && collection.has_password
                         ? renderPasswordPrompt()
