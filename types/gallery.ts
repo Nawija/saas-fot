@@ -14,4 +14,5 @@ export interface Collection {
     description?: string;
     hero_image?: string;
     hero_template?: string;
+    hero_font?: string;
 }

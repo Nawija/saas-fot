@@ -38,6 +38,39 @@ export default function GalleryPhotosPage() {
         fetchGallery();
     }, []);
 
+    // Inject selected Google Font for this collection
+    useEffect(() => {
+        if (!collection?.hero_font) return;
+        const FONT_MAP: Record<string, { href: string; family: string }> = {
+            inter: {
+                href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+                family: "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+            },
+            playfair: {
+                href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap",
+                family: "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif",
+            },
+            poppins: {
+                href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap",
+                family: "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+            },
+        };
+        const font = FONT_MAP[collection.hero_font as keyof typeof FONT_MAP];
+        if (!font) return;
+        const id = "gallery-font-link";
+        let link = document.getElementById(id) as HTMLLinkElement | null;
+        if (!link) {
+            link = document.createElement("link");
+            link.id = id;
+            link.rel = "stylesheet";
+            document.head.appendChild(link);
+        }
+        link.href = font.href;
+        return () => {
+            // Keep cached to avoid flicker on navigation
+        };
+    }, [collection?.hero_font]);
+
     // Update displayed photos when photos or photosToShow changes
     useEffect(() => {
         setDisplayedPhotos(photos.slice(0, photosToShow));

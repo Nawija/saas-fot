@@ -11,6 +11,14 @@ export interface GalleryHeroProps {
 export default function GalleryHero({ collection }: GalleryHeroProps) {
     const template = collection.hero_template || "minimal";
     const HeroTemplate = getGalleryHeroTemplate(template);
+    const fontKey = collection.hero_font || "inter";
+    const FONT_FAMILY: Record<string, string> = {
+        inter: "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+        playfair:
+            "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif",
+        poppins:
+            "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+    };
 
     const ScrollIndicator = () => (
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
@@ -21,7 +29,7 @@ export default function GalleryHero({ collection }: GalleryHeroProps) {
     );
 
     return (
-        <>
+        <div style={{ fontFamily: FONT_FAMILY[fontKey] }}>
             {HeroTemplate({
                 data: {
                     name: collection.name,
@@ -30,6 +38,6 @@ export default function GalleryHero({ collection }: GalleryHeroProps) {
                 },
                 elements: { ScrollIndicator },
             })}
-        </>
+        </div>
     );
 }

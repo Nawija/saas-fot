@@ -18,6 +18,10 @@ interface HeroTemplateSelectorProps {
     onSave: () => void;
     onReset: () => void;
     previewData?: Pick<HeroTemplateProps, "title" | "description" | "image">;
+    // Typography controls
+    selectedFont?: string; // key of the selected font
+    onSelectFont?: (fontKey: string) => void;
+    savedFont?: string; // the persisted font for comparison
 }
 
 export default function HeroTemplateSelector({
@@ -29,7 +33,62 @@ export default function HeroTemplateSelector({
     onSave,
     onReset,
     previewData,
+    selectedFont,
+    onSelectFont,
+    savedFont,
 }: HeroTemplateSelectorProps) {
+    // Local registry of available fonts for the editor (Google Fonts)
+    const FONT_OPTIONS: Array<{
+        key: string;
+        label: string;
+        cssFamily: string; // CSS font-family to apply
+        googleHref: string; // <link> href for Google Fonts
+    }> = [
+        {
+            key: "inter",
+            label: "Inter",
+            cssFamily:
+                "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+            googleHref:
+                "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        },
+        {
+            key: "playfair",
+            label: "Playfair Display",
+            cssFamily:
+                "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif",
+            googleHref:
+                "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap",
+        },
+        {
+            key: "poppins",
+            label: "Poppins",
+            cssFamily:
+                "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+            googleHref:
+                "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap",
+        },
+    ];
+
+    // Ensure the selected font is loaded in the parent document for mini-previews
+    useEffect(() => {
+        if (!selectedFont) return;
+        const font = FONT_OPTIONS.find((f) => f.key === selectedFont);
+        if (!font) return;
+        const id = "hero-font-link";
+        let link = document.getElementById(id) as HTMLLinkElement | null;
+        if (!link) {
+            link = document.createElement("link");
+            link.id = id;
+            link.rel = "stylesheet";
+            document.head.appendChild(link);
+        }
+        link.href = font.googleHref;
+        return () => {
+            // do not remove on unmount to avoid flicker if re-opened; keep cached
+        };
+    }, [selectedFont]);
+
     function MiniPreview({
         DesktopComp,
         title,
@@ -78,6 +137,9 @@ export default function HeroTemplateSelector({
                         width: baseW,
                         height: baseH,
                         transform: `scale(${scale})`,
+                        fontFamily:
+                            FONT_OPTIONS.find((f) => f.key === selectedFont)
+                                ?.cssFamily || undefined,
                     }}
                 >
                     <div className="relative w-full h-full">
@@ -94,6 +156,33 @@ export default function HeroTemplateSelector({
 
     return (
         <div className="h-full w-full">
+            {/* Typography selector */}
+            <div className="mb-8">
+                <label className="block text-xs font-medium text-gray-700 mb-2">
+                    Czcionka hero
+                </label>
+                <div className="flex flex-wrap gap-2">
+                    {FONT_OPTIONS.map((f) => {
+                        const isActive = selectedFont === f.key;
+                        return (
+                            <button
+                                key={f.key}
+                                type="button"
+                                onClick={() => onSelectFont?.(f.key)}
+                                className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
+                                    isActive
+                                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                                        : "border-gray-200 hover:bg-gray-50"
+                                }`}
+                                style={{ fontFamily: f.cssFamily }}
+                            >
+                                {f.label}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 {templates.map((tpl, index) => {
                     const isSaved = savedTemplate === tpl.key;
@@ -185,10 +274,16 @@ export default function HeroTemplateSelector({
 
                 <div className="flex items-center justify-end gap-2">
                     <button
-                        disabled={saving || selectedTemplate === savedTemplate}
+                        disabled={
+                            saving ||
+                            (selectedTemplate === savedTemplate &&
+                                (selectedFont || "") === (savedFont || ""))
+                        }
                         onClick={onSave}
                         className={`px-4 py-2 text-sm rounded-md text-white transition-all duration-200 ${
-                            saving || selectedTemplate === savedTemplate
+                            saving ||
+                            (selectedTemplate === savedTemplate &&
+                                (selectedFont || "") === (savedFont || ""))
                                 ? "bg-gray-300 cursor-not-allowed"
                                 : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
                         }`}
@@ -197,7 +292,13 @@ export default function HeroTemplateSelector({
                     </button>
                     <button
                         disabled={saving}
-                        onClick={onReset}
+                        onClick={() => {
+                            // Reset local font preview immediately
+                            if (onSelectFont) {
+                                onSelectFont(savedFont || "inter");
+                            }
+                            onReset();
+                        }}
                         className="px-4 py-2 text-sm rounded-md border border-gray-200 hover:bg-gray-50 transition-all duration-200"
                     >
                         Reset podglądu

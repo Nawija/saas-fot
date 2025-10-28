@@ -144,6 +144,7 @@ export async function PATCH(
             password,
             is_public,
             hero_template,
+            hero_font,
         } = body;
 
         const allowedTemplates = new Set([
@@ -164,6 +165,8 @@ export async function PATCH(
             "cinematic",
             "editorial",
         ]);
+
+        const allowedFonts = new Set(["inter", "playfair", "poppins"]);
 
         // Buduj dynamiczne zapytanie UPDATE
         const updates: string[] = [];
@@ -222,6 +225,16 @@ export async function PATCH(
 
             updates.push(`hero_template = $${paramCount++}`);
             values.push(hero_template);
+        }
+        if (hero_font !== undefined) {
+            if (typeof hero_font !== "string" || !allowedFonts.has(hero_font)) {
+                return NextResponse.json(
+                    { error: "Invalid hero_font value" },
+                    { status: 400 }
+                );
+            }
+            updates.push(`hero_font = $${paramCount++}`);
+            values.push(hero_font);
         }
         if (password !== undefined) {
             const bcrypt = require("bcrypt");

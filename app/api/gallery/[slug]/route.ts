@@ -10,7 +10,7 @@ export async function GET(
         const { slug } = await params;
         const result = await query(
             `SELECT 
-                id, name, slug, description, hero_image, hero_template, is_public,
+                id, name, slug, description, hero_image, hero_template, hero_font, is_public,
                 CASE WHEN password_hash IS NOT NULL THEN true ELSE false END as has_password
             FROM collections 
             WHERE slug = $1`,

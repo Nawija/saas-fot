@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${geistSans.variable} antialiased`}>
+            <body className={` antialiased`}>
                 <AppToaster />
                 <main>{children}</main>
             </body>

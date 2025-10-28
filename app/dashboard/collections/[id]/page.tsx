@@ -22,6 +22,7 @@ interface Collection {
     description: string;
     hero_image: string;
     hero_template?: string;
+    hero_font?: string;
     is_public: boolean;
     password_plain?: string;
     created_at: string;
@@ -63,6 +64,7 @@ export default function CollectionDetailPage({
     const [uploadProgress, setUploadProgress] = useState(0);
     const [saving, setSaving] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState<string>("minimal");
+    const [selectedFont, setSelectedFont] = useState<string>("inter");
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [pendingPhotoId, setPendingPhotoId] = useState<number | null>(null);
     const [heroModalOpen, setHeroModalOpen] = useState(false);
@@ -86,6 +88,33 @@ export default function CollectionDetailPage({
         fetchPhotos();
     }, [collectionId]);
 
+    // Inject Google Font for the dashboard preview card (reflects saved font)
+    useEffect(() => {
+        const fontKey = collection?.hero_font || "inter";
+        const FONT_MAP: Record<string, { href: string }> = {
+            inter: {
+                href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+            },
+            playfair: {
+                href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap",
+            },
+            poppins: {
+                href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap",
+            },
+        };
+        const font = FONT_MAP[fontKey as keyof typeof FONT_MAP];
+        const id = "dashboard-hero-font";
+        if (!font) return;
+        let link = document.getElementById(id) as HTMLLinkElement | null;
+        if (!link) {
+            link = document.createElement("link");
+            link.id = id;
+            link.rel = "stylesheet";
+            document.head.appendChild(link);
+        }
+        link.href = font.href;
+    }, [collection?.hero_font]);
+
     async function fetchCollection() {
         if (!collectionId) return;
         try {
@@ -97,6 +126,9 @@ export default function CollectionDetailPage({
                 if (data?.hero_template) {
                     setSelectedTemplate(data.hero_template);
                 }
+                if (data?.hero_font) {
+                    setSelectedFont(data.hero_font);
+                }
             } else {
                 router.push("/dashboard/collections");
             }
@@ -107,7 +139,7 @@ export default function CollectionDetailPage({
         }
     }
 
-    async function updateHeroTemplate(tpl: string) {
+    async function updateHeroSettings(tpl: string, font: string) {
         if (!collectionId || !collection) return;
 
         try {
@@ -115,7 +147,7 @@ export default function CollectionDetailPage({
             const res = await fetch(`/api/collections/${collectionId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ hero_template: tpl }),
+                body: JSON.stringify({ hero_template: tpl, hero_font: font }),
             });
 
             if (!res.ok) {
@@ -142,7 +174,8 @@ export default function CollectionDetailPage({
             const result = await res.json();
             setCollection(result.collection);
             setSelectedTemplate(result.collection.hero_template || tpl);
-            toast.success("Zapisano wygląd hero");
+            setSelectedFont(result.collection.hero_font || font);
+            toast.success("Zapisano wygląd hero i czcionkę");
             setHeroModalOpen(false);
         } catch (e: any) {
             toast.error(e?.message || "Nie udało się zapisać");
@@ -375,6 +408,14 @@ export default function CollectionDetailPage({
                                                         transform: "scale(0.5)",
                                                         width: "200%",
                                                         height: "200%",
+                                                        fontFamily:
+                                                            (collection?.hero_font ===
+                                                                "playfair" &&
+                                                                "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif") ||
+                                                            (collection?.hero_font ===
+                                                                "poppins" &&
+                                                                "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif") ||
+                                                            "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
                                                     }}
                                                 >
                                                     <currentTemplate.Desktop
@@ -493,19 +534,9 @@ export default function CollectionDetailPage({
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <div className="flex items-center justify-between">
-                                    <div>
-                                        <h2 className="text-base font-semibold text-gray-900">
-                                            Galeria zdjęć
-                                        </h2>
-                                        <p className="text-sm text-gray-600 mt-1">
-                                            {photos.length}{" "}
-                                            {photos.length === 1
-                                                ? "zdjęcie"
-                                                : photos.length < 5
-                                                ? "zdjęcia"
-                                                : "zdjęć"}
-                                        </p>
-                                    </div>
+                                    <h2 className="text-base font-semibold text-gray-900">
+                                        Galeria zdjęć
+                                    </h2>
                                 </div>
                             </div>
                             <div className="p-5">
@@ -543,13 +574,17 @@ export default function CollectionDetailPage({
                 savedTemplate={collection.hero_template || "minimal"}
                 saving={saving}
                 onSelectTemplate={setSelectedTemplate}
-                onSave={() => updateHeroTemplate(selectedTemplate)}
-                onReset={() =>
-                    setSelectedTemplate(collection.hero_template || "minimal")
+                onSave={({ template, font }) =>
+                    updateHeroSettings(template, font)
                 }
+                onReset={() => {
+                    setSelectedTemplate(collection.hero_template || "minimal");
+                    setSelectedFont(collection.hero_font || "inter");
+                }}
                 collectionName={collection.name}
                 collectionDescription={collection.description}
                 heroImage={collection.hero_image}
+                selectedFont={selectedFont}
             />
         </div>
     );

@@ -16,11 +16,12 @@ interface HeroPreviewModalProps {
     savedTemplate: string;
     saving: boolean;
     onSelectTemplate: (key: string) => void;
-    onSave: () => void;
+    onSave: (settings: { template: string; font: string }) => void;
     onReset: () => void;
     collectionName: string;
     collectionDescription?: string;
     heroImage?: string;
+    selectedFont?: string; // current saved font to initialize the picker
 }
 
 export default function HeroPreviewModal({
@@ -36,7 +37,47 @@ export default function HeroPreviewModal({
     collectionName,
     collectionDescription,
     heroImage,
+    selectedFont: savedFont,
 }: HeroPreviewModalProps) {
+    // Google Fonts options for the editor
+    const FONT_OPTIONS: Array<{
+        key: string;
+        label: string;
+        cssFamily: string;
+        googleHref: string;
+    }> = [
+        {
+            key: "inter",
+            label: "Inter",
+            cssFamily:
+                "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+            googleHref:
+                "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        },
+        {
+            key: "playfair",
+            label: "Playfair Display",
+            cssFamily:
+                "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif",
+            googleHref:
+                "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap",
+        },
+        {
+            key: "poppins",
+            label: "Poppins",
+            cssFamily:
+                "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+            googleHref:
+                "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap",
+        },
+    ];
+
+    const [selectedFont, setSelectedFont] = useState<string>("inter");
+
+    // Sync local font state with parent-provided value when editor opens or it changes
+    useEffect(() => {
+        if (savedFont) setSelectedFont(savedFont);
+    }, [savedFont, open]);
     useEffect(() => {
         if (!open) return;
 
@@ -75,6 +116,8 @@ export default function HeroPreviewModal({
         description,
         image,
         fitBoth = false,
+        fontCssFamily,
+        fontHref,
     }: {
         BaseComp: React.ComponentType<{
             title: string;
@@ -87,6 +130,8 @@ export default function HeroPreviewModal({
         description?: string;
         image?: string;
         fitBoth?: boolean;
+        fontCssFamily?: string;
+        fontHref?: string;
     }) {
         const wrapperRef = useRef<HTMLDivElement | null>(null);
         const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -155,13 +200,30 @@ export default function HeroPreviewModal({
                 }
             } catch {}
 
+            // Ensure selected Google Font is loaded inside iframe
+            if (fontHref) {
+                const id = "hero-font-link";
+                let link = doc.getElementById(id) as HTMLLinkElement | null;
+                if (!link) {
+                    link = doc.createElement("link");
+                    link.id = id;
+                    link.rel = "stylesheet";
+                    doc.head.appendChild(link);
+                }
+                link.href = fontHref;
+            }
+
             const mount = doc.getElementById("root");
             if (!mount) return;
             rootRef.current = ReactDOM.createRoot(mount);
             rootRef.current.render(
                 <div
                     className="hero-preview-scope"
-                    style={{ width: baseW, height: baseH }}
+                    style={{
+                        width: baseW,
+                        height: baseH,
+                        fontFamily: fontCssFamily,
+                    }}
                 >
                     <BaseComp
                         title={title}
@@ -182,10 +244,26 @@ export default function HeroPreviewModal({
             const iframe = iframeRef.current;
             const doc = iframe?.contentDocument;
             if (!doc || !rootRef.current) return;
+            // Update font link if changed
+            if (fontHref) {
+                const id = "hero-font-link";
+                let link = doc.getElementById(id) as HTMLLinkElement | null;
+                if (!link) {
+                    link = doc.createElement("link");
+                    link.id = id;
+                    link.rel = "stylesheet";
+                    doc.head.appendChild(link);
+                }
+                if (link.href !== fontHref) link.href = fontHref;
+            }
             rootRef.current.render(
                 <div
                     className="hero-preview-scope"
-                    style={{ width: baseW, height: baseH }}
+                    style={{
+                        width: baseW,
+                        height: baseH,
+                        fontFamily: fontCssFamily,
+                    }}
                 >
                     <BaseComp
                         title={title}
@@ -194,7 +272,16 @@ export default function HeroPreviewModal({
                     />
                 </div>
             );
-        }, [title, description, image, BaseComp, baseW, baseH]);
+        }, [
+            title,
+            description,
+            image,
+            BaseComp,
+            baseW,
+            baseH,
+            fontCssFamily,
+            fontHref,
+        ]);
 
         const height = Math.round(baseH * scale);
 
@@ -299,7 +386,12 @@ export default function HeroPreviewModal({
                                             savedTemplate={savedTemplate}
                                             saving={saving}
                                             onSelectTemplate={onSelectTemplate}
-                                            onSave={onSave}
+                                            onSave={() =>
+                                                onSave({
+                                                    template: selectedTemplate,
+                                                    font: selectedFont,
+                                                })
+                                            }
                                             onReset={onReset}
                                             previewData={{
                                                 title: collectionName,
@@ -307,6 +399,9 @@ export default function HeroPreviewModal({
                                                     collectionDescription,
                                                 image: heroImage,
                                             }}
+                                            selectedFont={selectedFont}
+                                            onSelectFont={setSelectedFont}
+                                            savedFont={savedFont}
                                         />
                                     </div>
                                 </motion.div>
@@ -339,6 +434,20 @@ export default function HeroPreviewModal({
                                                                 collectionDescription
                                                             }
                                                             image={heroImage}
+                                                            fontCssFamily={
+                                                                FONT_OPTIONS.find(
+                                                                    (f) =>
+                                                                        f.key ===
+                                                                        selectedFont
+                                                                )?.cssFamily
+                                                            }
+                                                            fontHref={
+                                                                FONT_OPTIONS.find(
+                                                                    (f) =>
+                                                                        f.key ===
+                                                                        selectedFont
+                                                                )?.googleHref
+                                                            }
                                                         />
                                                     </div>
                                                 </div>
@@ -361,6 +470,20 @@ export default function HeroPreviewModal({
                                                             }
                                                             image={heroImage}
                                                             fitBoth
+                                                            fontCssFamily={
+                                                                FONT_OPTIONS.find(
+                                                                    (f) =>
+                                                                        f.key ===
+                                                                        selectedFont
+                                                                )?.cssFamily
+                                                            }
+                                                            fontHref={
+                                                                FONT_OPTIONS.find(
+                                                                    (f) =>
+                                                                        f.key ===
+                                                                        selectedFont
+                                                                )?.googleHref
+                                                            }
                                                         />
                                                     </div>
                                                 </div>
@@ -369,7 +492,7 @@ export default function HeroPreviewModal({
                                             {/* Mobile-friendly stacked previews */}
                                             <div className="md:hidden mt-4 grid grid-cols-2 gap-3 relative">
                                                 <div className="col-span-2">
-                                                    <div className="rounded-lg overflow-hidden border border-gray-200 bg-black">
+                                                    <div className="rounded-lg overflow-hidden border-8 border-black bg-black mr-12">
                                                         <div className="aspect-video relative">
                                                             <div className="absolute inset-0">
                                                                 <IframePreview
@@ -387,6 +510,26 @@ export default function HeroPreviewModal({
                                                                     image={
                                                                         heroImage
                                                                     }
+                                                                    fontCssFamily={
+                                                                        FONT_OPTIONS.find(
+                                                                            (
+                                                                                f
+                                                                            ) =>
+                                                                                f.key ===
+                                                                                selectedFont
+                                                                        )
+                                                                            ?.cssFamily
+                                                                    }
+                                                                    fontHref={
+                                                                        FONT_OPTIONS.find(
+                                                                            (
+                                                                                f
+                                                                            ) =>
+                                                                                f.key ===
+                                                                                selectedFont
+                                                                        )
+                                                                            ?.googleHref
+                                                                    }
                                                                 />
                                                             </div>
                                                         </div>
@@ -394,10 +537,10 @@ export default function HeroPreviewModal({
                                                 </div>
 
                                                 <div
-                                                    className="rounded-xl absolute -top-2 -right-10 overflow-hidden border-8 border-black bg-black"
+                                                    className="rounded-xl absolute -top-2 right-0 overflow-hidden border-4 border-black bg-black"
                                                     style={{
-                                                        width: 120,
-                                                        height: 260,
+                                                        width: 80,
+                                                        height: 160,
                                                     }}
                                                 >
                                                     <IframePreview
@@ -410,6 +553,20 @@ export default function HeroPreviewModal({
                                                         }
                                                         image={heroImage}
                                                         fitBoth
+                                                        fontCssFamily={
+                                                            FONT_OPTIONS.find(
+                                                                (f) =>
+                                                                    f.key ===
+                                                                    selectedFont
+                                                            )?.cssFamily
+                                                        }
+                                                        fontHref={
+                                                            FONT_OPTIONS.find(
+                                                                (f) =>
+                                                                    f.key ===
+                                                                    selectedFont
+                                                            )?.googleHref
+                                                        }
                                                     />
                                                 </div>
                                             </div>

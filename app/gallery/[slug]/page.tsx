@@ -13,6 +13,7 @@ interface Collection {
     description?: string;
     hero_image?: string;
     hero_template?: string;
+    hero_font?: string;
     is_public: boolean;
     has_password: boolean;
 }
@@ -29,6 +30,33 @@ export default function GalleryLandingPage() {
     useEffect(() => {
         fetchCollection();
     }, []);
+
+    // Inject selected Google Font for landing preview as well
+    useEffect(() => {
+        if (!collection?.hero_font) return;
+        const FONT_MAP: Record<string, { href: string }> = {
+            inter: {
+                href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+            },
+            playfair: {
+                href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap",
+            },
+            poppins: {
+                href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap",
+            },
+        };
+        const font = FONT_MAP[collection.hero_font as keyof typeof FONT_MAP];
+        if (!font) return;
+        const id = "gallery-font-link";
+        let link = document.getElementById(id) as HTMLLinkElement | null;
+        if (!link) {
+            link = document.createElement("link");
+            link.id = id;
+            link.rel = "stylesheet";
+            document.head.appendChild(link);
+        }
+        link.href = font.href;
+    }, [collection?.hero_font]);
 
     const fetchCollection = async () => {
         try {
@@ -105,6 +133,14 @@ export default function GalleryLandingPage() {
 
     const template = collection.hero_template || "minimal";
     const HeroTemplate = getGalleryHeroTemplate(template);
+    const fontKey = collection.hero_font || "inter";
+    const FONT_FAMILY: Record<string, string> = {
+        inter: "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+        playfair:
+            "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif",
+        poppins:
+            "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+    };
 
     const renderPasswordPrompt = () => (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
@@ -151,20 +187,22 @@ export default function GalleryLandingPage() {
     // Unified render using existing templates but hiding their titles/buttons
     return (
         <div className="relative h-screen w-full overflow-hidden">
-<div className="absolute inset-0 bg-black/90 w-full h-full z-10" />
+            <div className="absolute inset-0 bg-black/90 w-full h-full z-10" />
             <div className="absolute inset-0">
                 <div className="hero-landing-scope relative h-full w-full">
-                    {HeroTemplate({
-                        data: {
-                            name: collection.name,
-                            description: collection.description,
-                            image: collection.hero_image,
-                        },
-                        elements: {},
-                        options: {
-                            disableAnimations: true,
-                        },
-                    })}
+                    <div style={{ fontFamily: FONT_FAMILY[fontKey] }}>
+                        {HeroTemplate({
+                            data: {
+                                name: collection.name,
+                                description: collection.description,
+                                image: collection.hero_image,
+                            },
+                            elements: {},
+                            options: {
+                                disableAnimations: true,
+                            },
+                        })}
+                    </div>
                 </div>
                 <style jsx global>{`
                     .hero-landing-scope h1,
