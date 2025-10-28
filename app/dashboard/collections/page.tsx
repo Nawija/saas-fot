@@ -85,12 +85,12 @@ export default function CollectionsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-blue-50">
+        <div className="min-h-screen">
             <div className="container mx-auto px-4 py-12 max-w-7xl">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-12">
                     <div>
-                        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
                             Moje galerie
                         </h1>
                         <p className="text-gray-600 text-lg">

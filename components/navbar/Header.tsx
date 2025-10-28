@@ -5,13 +5,12 @@ import Image from "next/image";
 
 export default async function Header() {
     const user = await getUser();
-    const username = user?.name?.split(" ")[0] || user?.email?.split("@")[0];
     return (
-        <header className="bg-white p-4 shadow-sm border-b border-gray-200">
-            <nav className="flex items-center justify-between mx-auto">
+        <header className="bg-white py-3 px-4 lg:px-8">
+            <nav className="flex items-center justify-between mx-auto ">
                 <Link
                     href="/dashboard"
-                    className="text-base lg:hidden font-semibold flex items-center gap-2 text-gray-700"
+                    className="text-base font-semibold flex items-center gap-2 text-gray-700"
                 >
                     <Image
                         src="/logo.svg"
@@ -22,10 +21,11 @@ export default async function Header() {
                     />
                     <span>Seovileo</span>
                 </Link>
-                <p className="hidden lg:block font-semibold text-gray-700">Hello {username}</p>
 
                 {user ? (
                     <div className="flex items-center justify-center text-sm text-gray-500 gap-3">
+                        {/* Slot for menu button - injected by DashboardLayoutClient */}
+                        <div id="dashboard-menu-slot" />
                         <UserDropdown
                             name={user.name}
                             email={user.email}
