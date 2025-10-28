@@ -43,7 +43,7 @@ export default function BillingPage() {
 
     if (!user) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center bg-white rounded-2xl p-12 shadow-lg border border-gray-200">
                     <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <Shield className="w-10 h-10 text-gray-400" />
@@ -70,7 +70,7 @@ export default function BillingPage() {
     );
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen ">
             {/* Hero Header */}
             <div className="relative overflow-hidden bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -283,7 +283,7 @@ export default function BillingPage() {
                 {/* Storage Warning Alert */}
                 {storagePercent >= 90 && (
                     <div className="mb-10">
-                        <div className="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 rounded-xl p-6 shadow-sm">
+                        <div className="bg-linear-to-br from-red-50 to-orange-50 border-2 border-red-200 rounded-xl p-6 shadow-sm">
                             <div className="flex items-start gap-4">
                                 <div className="shrink-0 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
                                     <AlertTriangle className="w-6 h-6 text-red-600" />

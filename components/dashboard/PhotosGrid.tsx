@@ -1,7 +1,8 @@
 // components/dashboard/PhotosGrid.tsx
 "use client";
 
-import { Upload, Trash2 } from "lucide-react";
+import { Upload, Trash2, X } from "lucide-react";
+import MainButton from "../buttons/MainButton";
 
 interface Photo {
     id: number;
@@ -41,13 +42,14 @@ export default function PhotosGrid({ photos, onDeletePhoto }: PhotosGridProps) {
                                 loading="lazy"
                                 decoding="async"
                             />
-                            <div className="absolute inset-0 bg-black/40 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <div className="absolute inset-0 bg-white/50 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-start justify-end opacity-0 group-hover:opacity-100">
                                 <button
                                     onClick={() => onDeletePhoto(photo.id)}
-                                    className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                    className="p-2 text-red-500 hover:text-red-600 transition-colors"
                                 >
-                                    <Trash2 className="w-5 h-5" />
+                                    <X size={22} />
                                 </button>
+                               
                             </div>
                         </div>
                     ))}

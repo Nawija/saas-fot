@@ -13,7 +13,8 @@ import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
 import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
 import CopyLinkButton from "@/components/buttons/CopyLinkButton";
-import { BookImage } from "lucide-react";
+import { BookImage, Eye } from "lucide-react";
+import MainButton from "@/components/buttons/MainButton";
 
 interface Collection {
     id: number;
@@ -367,7 +368,7 @@ export default function CollectionDetailPage({
     );
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen">
             {/* Top Bar */}
             <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -446,12 +447,19 @@ export default function CollectionDetailPage({
                                     </div>
 
                                     {/* Edit Button */}
-                                    <button
+                                    <MainButton
                                         onClick={() => setHeroModalOpen(true)}
-                                        className="w-full bg-gray-900 hover:bg-gray-800 text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-150 text-sm"
-                                    >
-                                        Otwórz edytor
-                                    </button>
+                                        label="Otwórz edytor"
+                                        variant="secondary"
+                                        className="w-full"
+                                    />
+                                    <MainButton
+                                        href={`${origin}/gallery/${collection.slug}`}
+                                        target="_blank"
+                                        icon={<Eye size={15} />}
+                                        label="Zobacz"
+                                        className="w-full"
+                                    />
                                 </div>
                             </div>
                         </div>

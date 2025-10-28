@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 
 interface MainButtonProps {
-    label: string;
+    label?: string;
     href?: string;
     onClick?: () => void;
     type?: "button" | "submit" | "reset";
@@ -14,15 +14,19 @@ interface MainButtonProps {
     icon?: React.ReactNode;
     variant?: "primary" | "secondary" | "danger" | "success";
     className?: string;
+    target?: "_blank" | "_self" | "_parent" | "_top";
 }
 
 const variantStyles: Record<string, string> = {
-    primary: "bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500",
+    primary:
+        "bg-blue-50 hover:bg-blue-100 text-blue-800 hover:text-blue-600 border border-blue-300 hover:border-blue-200",
+    orange:
+        "bg-orange-50 hover:bg-orange-100 text-orange-800 hover:text-orange-600 border border-orange-300 hover:border-orange-200",
     success:
-        "bg-green-600 hover:bg-green-700 text-white focus:ring-green-500",
+        "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 hover:text-emerald-600 border border-emerald-300 hover:border-emerald-200",
     secondary:
-        "bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-400",
-    danger: "bg-red-600 hover:bg-red-700 text-white focus:ring-red-500",
+        "bg-gray-50 hover:bg-gray-100 text-gray-800 hover:text-gray-600 border border-gray-300 hover:border-gray-200",
+    danger: "bg-red-50 hover:bg-red-100 text-red-800 hover:text-red-600 border border-red-300 hover:border-red-200",
 };
 
 const MainButton: React.FC<MainButtonProps> = ({
@@ -36,12 +40,13 @@ const MainButton: React.FC<MainButtonProps> = ({
     icon,
     variant = "primary",
     className = "",
+    target,
 }) => {
     const isDisabled = disabled || loading;
 
     const baseClasses = `
-    inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all
-    focus:outline-none shadow-sm
+    inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all
+    focus:outline-none
     ${variantStyles[variant] || variantStyles.primary}
     ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
     ${className}
@@ -63,13 +68,18 @@ const MainButton: React.FC<MainButtonProps> = ({
     ) : (
         <>
             {icon && <span className="text-lg">{icon}</span>}
-            <span>{label}</span>
+            {label && <span>{label}</span>}
         </>
     );
 
     if (href && !isDisabled) {
+        const linkProps =
+            target === "_blank"
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {};
+
         return (
-            <Link href={href} className={baseClasses}>
+            <Link href={href} className={baseClasses} {...linkProps}>
                 {content}
             </Link>
         );

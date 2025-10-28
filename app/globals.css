@@ -47,6 +47,65 @@ html {
     animation: pulse-slow 3s ease-in-out infinite;
 }
 
+@keyframes confetti-pop {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(
+                calc(-50% + var(--conf-x, 0px)),
+                calc(-50% + var(--conf-y, 0px))
+            )
+            scale(var(--conf-scale, 1)) rotate(var(--conf-rotate, 360deg));
+        opacity: 0;
+    }
+}
+
+@keyframes border-shimmer {
+    0% {
+        --angle: 0deg;
+        opacity: 0;
+    }
+    3% {
+        opacity: 1;
+    }
+
+    100% {
+        --angle: 360deg;
+         opacity: 0;
+    }
+}
+
+@property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.animate-border-shimmer {
+    position: relative;
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+        conic-gradient(
+                from var(--angle),
+                transparent 0deg,
+                transparent 60deg,
+                transparent 100deg,
+                #fb923c 120deg,
+                #fbbf24 180deg,
+                #34d399 240deg,
+                transparent 300deg,
+                transparent 360deg
+            )
+            border-box;
+    animation: border-shimmer 3s;
+    border-radius: 0.75rem;
+}
+
 @theme inline {
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
@@ -159,6 +218,6 @@ html {
         @apply border-border outline-ring/50;
     }
     body {
-        @apply bg-linear-to-br from-gray-50 via-white to-blue-50 text-gray-700;
+        @apply bg-linear-to-br from-gray-100 via-white to-blue-50 text-gray-700;
     }
 }
