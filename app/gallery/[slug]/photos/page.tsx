@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Loading from "@/components/ui/Loading";
+import LoadingGallery from "@/components/ui/LoadingGallery";
 import GalleryHeader from "@/components/gallery/GalleryHeader";
 import GalleryGrid from "@/components/gallery/GalleryGrid";
 import type { Photo, Collection } from "@/types/gallery";
@@ -234,7 +234,7 @@ export default function GalleryPhotosPage() {
     };
 
     if (loading) {
-        return <Loading />;
+        return <LoadingGallery />;
     }
 
     if (!collection) {
