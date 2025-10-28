@@ -361,10 +361,10 @@ export default function NewCollectionPage() {
                                 onClick={() => {
                                     if (userPlan === "free") {
                                         setUpgradeContext({
-                                            title: "Galeria chroniona hasłem",
+                                            title: "Password-protected gallery",
                                             description:
-                                                "Ochrona hasłem jest dostępna od planu Basic. Przejdź na wyższy plan.",
-                                            feature: "Ochrona hasłem",
+                                                "Password protection is available starting from the Basic plan. Please upgrade to use it.",
+                                            feature: "Password protection",
                                         });
                                         setUpgradeDialogOpen(true);
                                         return;

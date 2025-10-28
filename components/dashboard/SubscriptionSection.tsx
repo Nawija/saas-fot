@@ -16,7 +16,7 @@ type Props = {
 function formatDate(dateStr?: string | null) {
     if (!dateStr) return null;
     const d = new Date(dateStr);
-    return d.toLocaleDateString("pl-PL", {
+    return d.toLocaleDateString("en-US", {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -48,13 +48,13 @@ export default function SubscriptionSection({
                 }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Błąd anulowania");
-            toast.success("Subskrypcja anulowana", {
-                description: "Dostęp do końca okresu rozliczeniowego",
+            if (!res.ok) throw new Error(data.error || "Cancellation error");
+            toast.success("Subscription canceled", {
+                description: "Access until end of billing period",
             });
             window.location.reload();
         } catch (e: any) {
-            toast.error("Nie udało się anulować subskrypcji", {
+            toast.error("Failed to cancel subscription", {
                 description: e.message,
             });
         } finally {
@@ -75,13 +75,13 @@ export default function SubscriptionSection({
                 }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Błąd wznawiania");
-            toast.success("Subskrypcja wznowiona", {
-                description: "Od teraz będzie się automatycznie odnawiać",
+            if (!res.ok) throw new Error(data.error || "Resume error");
+            toast.success("Subscription resumed", {
+                description: "It will auto-renew going forward",
             });
             window.location.reload();
         } catch (e: any) {
-            toast.error("Nie udało się wznowić subskrypcji", {
+            toast.error("Failed to resume subscription", {
                 description: e.message,
             });
         } finally {
@@ -93,14 +93,14 @@ export default function SubscriptionSection({
         <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-2 mb-4">
                 <CreditCard className="w-5 h-5 text-gray-700" />
-                <h2 className="text-xl font-semibold">Subskrypcja</h2>
+                <h2 className="text-xl font-semibold">Subscription</h2>
             </div>
 
             <div className="flex items-center justify-between mb-6">
                 <div className="space-y-1">
                     <p className="text-sm text-gray-600">Status</p>
                     <p className="text-base font-semibold capitalize">
-                        {subscription_status || "brak"}
+                        {subscription_status || "none"}
                     </p>
                 </div>
                 <span className="px-4 py-2 bg-white rounded-lg border border-gray-200 text-sm font-medium text-gray-900 capitalize">
@@ -114,7 +114,7 @@ export default function SubscriptionSection({
                     <Calendar className="w-5 h-5 text-blue-600" />
                     <div>
                         <p className="text-sm font-medium text-blue-900">
-                            Odnowienie subskrypcji
+                            Subscription renews on
                         </p>
                         <p className="text-base font-semibold text-blue-700">
                             {formatDate(subscription_ends_at)}
@@ -128,13 +128,13 @@ export default function SubscriptionSection({
                     <AlertCircle className="w-5 h-5 text-orange-600" />
                     <div>
                         <p className="text-sm font-medium text-orange-900">
-                            Dostęp do
+                            Access until
                         </p>
                         <p className="text-base font-semibold text-orange-700">
                             {formatDate(subscription_ends_at)}
                         </p>
                         <p className="text-xs text-orange-600 mt-1">
-                            Po tym terminie plan zostanie zmieniony na darmowy
+                            After this date the plan will switch to Free
                         </p>
                     </div>
                 </div>
@@ -145,9 +145,9 @@ export default function SubscriptionSection({
                     <MainButton
                         onClick={() => setConfirmCancel(true)}
                         loading={loading}
-                        loadingText="Anulowanie..."
+                        loadingText="Cancelling..."
                         variant="danger"
-                        label="Anuluj subskrypcję"
+                        label="Cancel subscription"
                     />
                 </div>
             )}
@@ -158,9 +158,9 @@ export default function SubscriptionSection({
                     <MainButton
                         onClick={handleResume}
                         loading={resuming}
-                        loadingText="Wznawianie..."
+                        loadingText="Resuming..."
                         variant="success"
-                        label="Wznów subskrypcję"
+                        label="Resume subscription"
                     />
                 </div>
             )}
@@ -169,10 +169,10 @@ export default function SubscriptionSection({
                 open={confirmCancel}
                 onOpenChange={setConfirmCancel}
                 onConfirm={handleCancel}
-                title="Anulować subskrypcję?"
-                description="Zachowasz dostęp do końca okresu rozliczeniowego. Możesz w każdej chwili odnowić subskrypcję."
-                confirmLabel="Anuluj subskrypcję"
-                cancelLabel="Zatrzymaj"
+                title="Cancel subscription?"
+                description="You'll keep access until the end of the billing period. You can resume anytime."
+                confirmLabel="Cancel subscription"
+                cancelLabel="Keep"
             />
         </div>
     );

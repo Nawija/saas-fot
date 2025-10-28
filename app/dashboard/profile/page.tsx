@@ -12,13 +12,13 @@ export default async function ProfilePage() {
         redirect("/login");
     }
 
-    const displayName = user.name || user.email?.split("@")[0] || "Użytkownik";
+    const displayName = user.name || user.email?.split("@")[0] || "User";
     const fallback = displayName.charAt(0).toUpperCase();
 
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-4xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold mb-8">Ustawienia profilu</h1>
+                <h1 className="text-3xl font-bold mb-8">Profile settings</h1>
 
                 <div className="bg-white rounded-lg shadow p-6 space-y-8">
                     {/* Avatar Section */}
@@ -45,15 +45,15 @@ export default async function ProfilePage() {
                     {/* Profile Info */}
                     <div>
                         <h2 className="text-xl font-semibold mb-4">
-                            Informacje o profilu
+                            Profile information
                         </h2>
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Nazwa
+                                    Name
                                 </label>
                                 <p className="text-gray-900">
-                                    {user.name || "Nie ustawiono"}
+                                    {user.name || "Not set"}
                                 </p>
                             </div>
                             <div>
@@ -64,11 +64,11 @@ export default async function ProfilePage() {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Metoda logowania
+                                    Sign-in method
                                 </label>
                                 <p className="text-gray-900">
                                     {user.provider === "email"
-                                        ? "Email i hasło"
+                                        ? "Email and password"
                                         : "Google OAuth"}
                                 </p>
                             </div>

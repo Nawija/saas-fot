@@ -63,8 +63,8 @@ const SOURCE: Array<{
     premium?: boolean;
 }> = [
     { key: "minimal", label: "Minimal", tpl: MinimalTemplate },
-    { key: "fullscreen", label: "Pełny ekran", tpl: FullscreenTemplate },
-    { key: "split", label: "Podział", tpl: SplitTemplate, premium: true },
+    { key: "fullscreen", label: "Fullscreen", tpl: FullscreenTemplate },
+    { key: "split", label: "Split", tpl: SplitTemplate, premium: true },
     { key: "overlay", label: "Overlay", tpl: OverlayTemplate, premium: false },
     { key: "gradient", label: "Gradient", tpl: GradientTemplate },
     {
@@ -88,9 +88,9 @@ export const HERO_TEMPLATES: HeroTemplateDefinition[] = SOURCE.map(
     }
 );
 
-// Helper do łatwego pobierania szablonu po kluczu
+// Helper to easily get a template by key
 export function getTemplateByKey(key: string): HeroTemplateDefinition {
     return (
-        HERO_TEMPLATES.find((t) => t.key === key) || HERO_TEMPLATES[0] // fallback na minimal
+        HERO_TEMPLATES.find((t) => t.key === key) || HERO_TEMPLATES[0] // fallback to minimal
     );
 }

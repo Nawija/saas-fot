@@ -87,7 +87,7 @@ export default function CollectionDetailPage({
     const [userPlan, setUserPlan] = useState<string>("free");
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
     const [upgradeContext, setUpgradeContext] = useState({
-        title: "Funkcja dostępna w wyższych planach",
+        title: "Feature available on higher plans",
         description: "",
         feature: "",
     });
@@ -144,7 +144,7 @@ export default function CollectionDetailPage({
             if (res.ok) {
                 const data = await res.json();
                 setCollection(data);
-                // ustaw podgląd na zapisany szablon po załadowaniu
+                // set preview to saved template after loading
                 if (data?.hero_template) {
                     setSelectedTemplate(data.hero_template);
                 }
@@ -155,7 +155,7 @@ export default function CollectionDetailPage({
                 router.push("/dashboard/collections");
             }
 
-            // Pobierz plan użytkownika
+            // Fetch user's plan
             const userRes = await fetch("/api/user/me");
             if (userRes.ok) {
                 const userData = await userRes.json();
@@ -182,30 +182,30 @@ export default function CollectionDetailPage({
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
 
-                // Jeśli to błąd wymagający upgrade'u planu
+                // If this is an error requiring a plan upgrade
                 if (res.status === 403 && err?.upgradeRequired) {
                     setUpgradeContext({
-                        title: err?.error || "Szablon niedostępny",
+                        title: err?.error || "Template unavailable",
                         description:
                             err?.message ||
-                            "Ten szablon wymaga subskrypcji Basic, Pro lub Unlimited.",
-                        feature: "Szablony Premium",
+                            "This template requires a Basic, Pro, or Unlimited subscription.",
+                        feature: "Premium templates",
                     });
                     setUpgradeDialogOpen(true);
                     return;
                 }
 
-                throw new Error(err?.error || "Błąd zapisu szablonu");
+                throw new Error(err?.error || "Failed to save template");
             }
 
             const result = await res.json();
             setCollection(result.collection);
             setSelectedTemplate(result.collection.hero_template || tpl);
             setSelectedFont(result.collection.hero_font || font);
-            toast.success("Zapisano wygląd hero i czcionkę");
+            toast.success("Saved hero design and font");
             setHeroModalOpen(false);
         } catch (e: any) {
-            toast.error(e?.message || "Nie udało się zapisać");
+            toast.error(e?.message || "Failed to save");
         } finally {
             setSaving(false);
         }
@@ -261,10 +261,10 @@ export default function CollectionDetailPage({
                 ) {
                     if (!quotaErrorRedirected) {
                         quotaErrorRedirected = true;
-                        toast.error("Brak miejsca", {
+                        toast.error("Out of space", {
                             description:
                                 errorData.message ||
-                                "Przekroczono limit storage. Przekierowuję do zakupu rozszerzenia...",
+                                "Storage limit exceeded. Redirecting to upgrade...",
                         });
                         router.push("/dashboard/billing");
                     }
@@ -302,10 +302,10 @@ export default function CollectionDetailPage({
                 ) {
                     if (!quotaErrorRedirected) {
                         quotaErrorRedirected = true;
-                        toast.error("Brak miejsca", {
+                        toast.error("Out of space", {
                             description:
                                 errorData.message ||
-                                "Przekroczono limit storage. Przekierowuję do zakupu rozszerzenia...",
+                                "Storage limit exceeded. Redirecting to upgrade...",
                         });
                         router.push("/dashboard/billing");
                     }
@@ -347,10 +347,10 @@ export default function CollectionDetailPage({
             await fetchPhotos();
             await fetchCollection();
 
-            toast.success(`Dodano ${uploaded} z ${totalFiles} zdjęć`);
+            toast.success(`Uploaded ${uploaded} of ${totalFiles} photos`);
         } catch (error) {
             console.error("Upload error:", error);
-            toast.error("Błąd podczas uploadu zdjęć");
+            toast.error("Error uploading photos");
         } finally {
             setUploading(false);
             setUploadProgress(0);
@@ -367,12 +367,12 @@ export default function CollectionDetailPage({
             if (res.ok) {
                 setPhotos((prev) => prev.filter((p) => p.id !== photoId));
                 await fetchCollection();
-                toast.success("Zdjęcie usunięte");
+                toast.success("Photo deleted");
             } else {
-                toast.error("Nie udało się usunąć zdjęcia");
+                toast.error("Failed to delete photo");
             }
         } catch (error) {
-            toast.error("Błąd podczas usuwania");
+            toast.error("Error during deletion");
         }
     }
 
@@ -396,9 +396,9 @@ export default function CollectionDetailPage({
             const failedCount = results.filter((r) => !r.ok).length;
 
             if (failedCount > 0) {
-                toast.error(`Nie udało się usunąć ${failedCount} zdjęć`);
+                toast.error(`Failed to delete ${failedCount} photos`);
             } else {
-                toast.success("Wszystkie zdjęcia zostały usunięte");
+                toast.success("All photos have been deleted");
             }
 
             // Odśwież listę
@@ -406,7 +406,7 @@ export default function CollectionDetailPage({
             await fetchCollection();
         } catch (error) {
             console.error("Error deleting all photos:", error);
-            toast.error("Błąd podczas usuwania zdjęć");
+            toast.error("Error deleting photos");
         }
     }
 
@@ -414,7 +414,7 @@ export default function CollectionDetailPage({
         if (!collectionId || photos.length === 0) return;
 
         try {
-            toast.info("Przygotowuję pobieranie zdjęć...");
+            toast.info("Preparing your download...");
 
             // Pobierz ZIP z API
             const response = await fetch(
@@ -436,10 +436,10 @@ export default function CollectionDetailPage({
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
 
-            toast.success("Pobieranie rozpoczęte!");
+            toast.success("Download started!");
         } catch (error) {
             console.error("Error downloading photos:", error);
-            toast.error("Błąd podczas pobierania zdjęć");
+            toast.error("Error downloading photos");
         }
     }
 
@@ -463,11 +463,11 @@ export default function CollectionDetailPage({
 
             const result = await res.json();
             setCollection(result.collection);
-            toast.success("Ustawienia zaktualizowane");
+            toast.success("Settings updated");
             setSettingsModalOpen(false);
         } catch (error) {
             console.error("Error updating settings:", error);
-            toast.error("Błąd podczas zapisywania ustawień");
+            toast.error("Error saving settings");
         } finally {
             setSavingSettings(false);
         }
@@ -503,10 +503,10 @@ export default function CollectionDetailPage({
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <h2 className="text-base font-semibold text-gray-900">
-                                    Wygląd powitalny
+                                    Hero appearance
                                 </h2>
                                 <p className="text-sm text-gray-600 mt-1">
-                                    Szablon strony galerii
+                                    Gallery page template
                                 </p>
                             </div>
 
@@ -555,7 +555,7 @@ export default function CollectionDetailPage({
                                     <div className="bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-200">
                                         <div className="flex items-center justify-between">
                                             <span className="text-xs font-medium text-gray-600">
-                                                Aktywny szablon
+                                                Active template
                                             </span>
                                             <span className="text-sm font-semibold text-gray-900">
                                                 {currentTemplate?.label ||
@@ -567,7 +567,7 @@ export default function CollectionDetailPage({
                                     {/* Edit Button */}
                                     <MainButton
                                         onClick={() => setHeroModalOpen(true)}
-                                        label="Otwórz edytor"
+                                        label="Open editor"
                                         variant="secondary"
                                         className="w-full"
                                     />
@@ -575,7 +575,7 @@ export default function CollectionDetailPage({
                                         href={`${origin}/gallery/${collection.slug}`}
                                         target="_blank"
                                         icon={<Eye size={15} />}
-                                        label="Zobacz"
+                                        label="View"
                                         className="w-full"
                                     />
                                 </div>
@@ -586,13 +586,13 @@ export default function CollectionDetailPage({
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <h2 className="text-base font-semibold text-gray-900">
-                                    Statystyki
+                                    Stats
                                 </h2>
                             </div>
                             <div className="p-5 space-y-3">
                                 <div className="flex items-center justify-between py-2">
                                     <span className="text-sm text-gray-600">
-                                        Liczba zdjęć
+                                        Number of photos
                                     </span>
                                     <span className="text-sm font-semibold text-gray-900">
                                         {photos.length}
@@ -600,7 +600,7 @@ export default function CollectionDetailPage({
                                 </div>
                                 <div className="flex items-center justify-between py-2 border-t border-gray-100">
                                     <span className="text-sm text-gray-600">
-                                        Rozmiar
+                                        Size
                                     </span>
                                     <span className="text-sm font-semibold text-gray-900">
                                         {formatFileSize(
@@ -613,12 +613,12 @@ export default function CollectionDetailPage({
                                 </div>
                                 <div className="flex items-center justify-between py-2 border-t border-gray-100">
                                     <span className="text-sm text-gray-600">
-                                        Data utworzenia
+                                        Created on
                                     </span>
                                     <span className="text-sm font-semibold text-gray-900">
                                         {new Date(
                                             collection.created_at
-                                        ).toLocaleDateString("pl-PL")}
+                                        ).toLocaleDateString("en-US")}
                                     </span>
                                 </div>
                             </div>
@@ -628,14 +628,14 @@ export default function CollectionDetailPage({
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <h2 className="text-base font-semibold">
-                                    Zarządzaj kolekcją
+                                    Manage collection
                                 </h2>
                             </div>
                             <div className="p-5 space-y-3">
                                 <MainButton
                                     onClick={handleDownloadAllPhotos}
                                     icon={<Download size={16} />}
-                                    label="Pobierz jako ZIP"
+                                    label="Download as ZIP"
                                     variant="secondary"
                                     className="w-full"
                                     disabled={photos.length === 0}
@@ -649,7 +649,7 @@ export default function CollectionDetailPage({
                                             <Lock size={16} />
                                         )
                                     }
-                                    label="Ustawienia kolekcji"
+                                    label="Collection settings"
                                     variant="secondary"
                                     className="w-full"
                                 />
@@ -664,7 +664,7 @@ export default function CollectionDetailPage({
                             <CopyLinkButton
                                 url={`${origin}/gallery/${collection.slug}`}
                                 showUrl={true}
-                                label="Kopiuj"
+                                label="Copy"
                                 variant="default"
                             />
                         </div>
@@ -672,11 +672,11 @@ export default function CollectionDetailPage({
                         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <h2 className="text-lg font-semibold text-gray-800 tracking-tight">
-                                    Dodaj zdjęcia
+                                    Add photos
                                 </h2>
 
                                 <p className="text-sm text-gray-600 mt-1">
-                                    Przeciągnij pliki lub kliknij aby wybrać
+                                    Drag files here or click to select
                                 </p>
                             </div>
                             <div className="p-5">
@@ -693,7 +693,7 @@ export default function CollectionDetailPage({
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-base font-semibold text-gray-900">
-                                        Galeria zdjęć ({photos.length})
+                                        Photo gallery ({photos.length})
                                     </h2>
                                     {photos.length > 0 && (
                                         <MainButton
@@ -701,7 +701,7 @@ export default function CollectionDetailPage({
                                                 setConfirmDeleteAllOpen(true)
                                             }
                                             icon={<Trash2 size={15} />}
-                                            label="Usuń wszystkie"
+                                            label="Delete all"
                                             variant="danger"
                                             className="text-xs md:text-sm"
                                         />
@@ -724,10 +724,10 @@ export default function CollectionDetailPage({
             <ConfirmDialog
                 open={confirmOpen}
                 onOpenChange={setConfirmOpen}
-                title="Na pewno chcesz usunąć to zdjęcie?"
-                description="Tej operacji nie można cofnąć."
-                confirmLabel="Usuń zdjęcie"
-                cancelLabel="Anuluj"
+                title="Are you sure you want to delete this photo?"
+                description="This action cannot be undone."
+                confirmLabel="Delete photo"
+                cancelLabel="Cancel"
                 onConfirm={async () => {
                     if (pendingPhotoId != null) {
                         await performDeletePhoto(pendingPhotoId);
@@ -739,12 +739,12 @@ export default function CollectionDetailPage({
             <ConfirmDialog
                 open={confirmDeleteAllOpen}
                 onOpenChange={setConfirmDeleteAllOpen}
-                title="Usunąć wszystkie zdjęcia?"
-                description={`Ta operacja usunie ${photos.length} ${
-                    photos.length === 1 ? "zdjęcie" : "zdjęć"
-                } z tej kolekcji. Nie można tego cofnąć.`}
-                confirmLabel="Usuń wszystkie"
-                cancelLabel="Anuluj"
+                title="Delete all photos?"
+                description={`This will delete ${photos.length} ${
+                    photos.length === 1 ? "photo" : "photos"
+                } from this collection. This action cannot be undone.`}
+                confirmLabel="Delete all"
+                cancelLabel="Cancel"
                 onConfirm={async () => {
                     await performDeleteAllPhotos();
                     setConfirmDeleteAllOpen(false);
@@ -783,10 +783,10 @@ export default function CollectionDetailPage({
                 onUpgradeRequired={() => {
                     setSettingsModalOpen(false);
                     setUpgradeContext({
-                        title: "Galeria chroniona hasłem",
+                        title: "Password-protected gallery",
                         description:
-                            "Ochrona hasłem jest dostępna od planu Basic. Przejdź na wyższy plan.",
-                        feature: "Ochrona hasłem",
+                            "Password protection is available starting from the Basic plan. Please upgrade to use it.",
+                        feature: "Password protection",
                     });
                     setUpgradeDialogOpen(true);
                 }}

@@ -26,84 +26,84 @@ export default async function DashboardPage() {
     const features = [
         {
             icon: Images,
-            title: "Nieograniczone galerie",
+            title: "Unlimited galleries",
             description:
-                "Twórz piękne galerie zdjęć dla swoich klientów, rodziny lub wydarzeń.",
+                "Create beautiful photo galleries for clients, family, or events.",
         },
         {
             icon: Palette,
-            title: "7 stylów hero",
+            title: "7 hero styles",
             description:
-                "Wybierz spośród gotowych szablonów - od minimalistycznych po kinematograficzne.",
+                "Choose from ready-made templates — from minimal to cinematic.",
         },
         {
             icon: Share2,
-            title: "Łatwe udostępnianie",
+            title: "Easy sharing",
             description:
-                "Jeden link do galerii - wysyłaj klientom bez komplikacji.",
+                "One link to the gallery — share with clients without hassle.",
         },
         {
             icon: Lock,
-            title: "Ochrona hasłem",
+            title: "Password protection",
             description:
-                "Zabezpiecz prywatne galerie hasłem dostępnym tylko dla wybranych.",
+                "Protect private galleries with a password only for selected viewers.",
         },
         {
             icon: Heart,
-            title: "System polubień",
+            title: "Likes system",
             description:
-                "Goście mogą oznaczać ulubione zdjęcia bez rejestracji.",
+                "Guests can mark favorite photos without registration.",
         },
         {
             icon: Download,
-            title: "Pobieranie ZIP",
+            title: "ZIP download",
             description:
-                "Klienci pobierają wybrane zdjęcia lub całą galerię jednym kliknięciem.",
+                "Clients can download selected photos or the entire gallery in one click.",
         },
         {
             icon: Smartphone,
             title: "Responsive design",
             description:
-                "Galerie wyglądają świetnie na telefonach, tabletach i desktopach.",
+                "Galleries look great on phones, tablets, and desktops.",
         },
         {
             icon: Zap,
-            title: "Szybkie ładowanie",
+            title: "Fast loading",
             description:
-                "Optymalizacja obrazów i CDN zapewniają błyskawiczne wyświetlanie.",
+                "Image optimization and CDN ensure blazing-fast delivery.",
         },
     ];
 
     const plans = [
         {
             name: "Basic",
-            price: "19 zł",
+            price: "$19",
             features: [
                 "10 GB storage",
-                "Wszystkie szablony hero",
-                "Ochrona hasłem",
-                "Nieograniczone galerie",
+                "All hero templates",
+                "Password protection",
+                "Unlimited galleries",
             ],
         },
         {
             name: "Pro",
-            price: "39 zł",
+            price: "$39",
             features: [
                 "50 GB storage",
-                "Priorytetowy support",
-                "Własna domena (wkrótce)",
-                "Zaawansowane statystyki",
+                "Priority support",
+                "Custom domain (soon)",
+                "Advanced analytics",
             ],
             popular: true,
         },
         {
             name: "Unlimited",
-            price: "99 zł",
+            price: "$99",
             features: [
                 "200 GB storage",
-                "White-label (bez loga)",
+                "White-label (no logo)",
                 "API access",
-                "Dedykowany account manager",
+                "Dedicated account manager",
             ],
         },
     ];
@@ -115,26 +115,26 @@ export default async function DashboardPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div className="text-center">
                         <h1 className="text-4xl sm:text-5xl font-semibold mb-4">
-                            Witaj 👋 <br />
+                            Welcome 👋 <br />
                             <span>{user.name ? `${user.name}` : ""}!</span>
                         </h1>
                         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                            Profesjonalna platforma do tworzenia i udostępniania
-                            galerii zdjęć. Idealne dla fotografów, event
-                            managerów i twórców treści.
+                            A professional platform for creating and sharing
+                            photo galleries. Perfect for photographers, event
+                            managers, and content creators.
                         </p>
                         <div className="flex flex-col w-3/4 mx-auto sm:flex-row gap-4 justify-center">
                             <MainButton
                                 href="/dashboard/collections"
                                 icon={<Images className="w-5 h-5 mr-2" />}
-                                label="Utwórz galerię"
+                                label="Create gallery"
                             />
 
                             <MainButton
                                 href="/dashboard/billing"
                                 variant="secondary"
                                 icon={<Crown className="w-5 h-5 mr-2" />}
-                                label="Plan Premium"
+                                label="Premium plan"
                             />
                         </div>
                     </div>
@@ -145,11 +145,11 @@ export default async function DashboardPage() {
                 {/* Features Grid */}
                 <div className="mb-16">
                     <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">
-                        Wszystko, czego potrzebujesz
+                        Everything you need
                     </h2>
                     <p className="text-gray-600 text-center mb-10">
-                        Funkcje, które sprawiają, że udostępnianie zdjęć jest
-                        proste i profesjonalne
+                        Features that make sharing photos simple and
+                        professional
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {features.map((feature, index) => {
@@ -177,7 +177,7 @@ export default async function DashboardPage() {
                 {/* Quick Start */}
                 <div className="my-16 bg-white rounded-xl p-8 border border-gray-200">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-                        Szybki start w 3 krokach
+                        Quick start in 3 steps
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="text-center">
@@ -185,10 +185,10 @@ export default async function DashboardPage() {
                                 1
                             </div>
                             <h3 className="font-semibold text-gray-900 mb-2">
-                                Utwórz galerię
+                                Create a gallery
                             </h3>
                             <p className="text-gray-600 text-sm">
-                                Kliknij "Galerie" i dodaj nową kolekcję zdjęć
+                                Click "Galleries" and add a new photo collection
                             </p>
                         </div>
                         <div className="text-center">
@@ -196,10 +196,10 @@ export default async function DashboardPage() {
                                 2
                             </div>
                             <h3 className="font-semibold text-gray-900 mb-2">
-                                Wybierz styl
+                                Pick a style
                             </h3>
                             <p className="text-gray-600 text-sm">
-                                Dostosuj wygląd hero i wybierz czcionkę
+                                Customize the hero and choose a font
                             </p>
                         </div>
                         <div className="text-center">
@@ -207,10 +207,10 @@ export default async function DashboardPage() {
                                 3
                             </div>
                             <h3 className="font-semibold text-gray-900 mb-2">
-                                Udostępnij
+                                Share
                             </h3>
                             <p className="text-gray-600 text-sm">
-                                Skopiuj link i wyślij swoim klientom
+                                Copy the link and send it to your clients
                             </p>
                         </div>
                     </div>
@@ -219,18 +219,17 @@ export default async function DashboardPage() {
                 {/* Pricing Section */}
                 <div className="mb-16">
                     <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">
-                        Plany dopasowane do Twoich potrzeb
+                        Plans to fit your needs
                     </h2>
                     <p className="text-gray-600 text-center mb-10">
-                        Zacznij za darmo lub wybierz plan Premium dla większych
-                        możliwości
+                        Start for free or choose Premium for more power
                     </p>
                     <div className="py-12">
                         <PricingCards />
                     </div>
                     <p className="text-center text-sm text-gray-600">
-                        Plan Free: 2 GB storage • Wszystkie podstawowe funkcje •
-                        Bez karty kredytowej
+                        Free plan: 2 GB storage • All basic features • No credit
+                        card required
                     </p>
                 </div>
 
@@ -241,21 +240,21 @@ export default async function DashboardPage() {
                             <Coffee className="w-8 h-8 text-orange-800" />
                         </div>
                         <h2 className="text-2xl font-bold text-orange-800 mb-3">
-                            Wesprzyj rozwój projektu ❤️
+                            Support the project ❤️
                         </h2>
                         <p className="text-gray-700 mb-6 leading-relaxed">
-                            Seovileo to niezależny projekt tworzony z pasją.
-                            Jeśli podoba Ci się nasza platforma i chcesz pomóc w
-                            rozwoju nowych funkcji (niestandardowe domeny, białe
-                            etykiety, integracje), rozważ subskrypcję Premium.
-                            Każde wsparcie ma ogromne znaczenie i pozwala nam
-                            tworzyć jeszcze lepsze narzędzia dla Ciebie.
+                            Seovileo is an independent project built with
+                            passion. If you like the platform and want to help
+                            us develop new features (custom domains,
+                            white-label, integrations), consider subscribing to
+                            Premium. Every bit of support helps us build even
+                            better tools for you.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <MainButton
                                 href="/dashboard/billing"
                                 icon={<Crown className="w-5 h-5" />}
-                                label="Subskrybuj"
+                                label="Subscribe"
                                 variant="success"
                             />
                             <MainButton

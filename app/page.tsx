@@ -84,7 +84,7 @@ export default function Home() {
                         <div className="mt-8 flex items-center justify-center gap-3">
                             <MainButton
                                 label="Sign up"
-                                href="/register"
+                                href="/login"
                                 variant="primary"
                             />
                             <MainButton
@@ -154,7 +154,7 @@ export default function Home() {
                     </div>
 
                     <div className="text-center mt-10">
-                        <MainButton label="Try for free" href="/register" />
+                        <MainButton label="Try for free" href="/login" />
                     </div>
                 </div>
             </section>
@@ -212,7 +212,7 @@ export default function Home() {
                             />
                             <MainButton
                                 label="Sign up"
-                                href="/register"
+                                href="/login"
                                 variant="secondary"
                             />
                         </div>
@@ -249,7 +249,7 @@ export default function Home() {
                     </div>
 
                     <div className="text-center mt-10">
-                        <MainButton label="Sign up" href="/register" />
+                        <MainButton label="Sign up" href="/login" />
                     </div>
                 </div>
             </section>
@@ -266,7 +266,7 @@ export default function Home() {
                             minute.
                         </p>
                         <div className="mt-6 flex items-center justify-center gap-3">
-                            <MainButton label="Sign up" href="/register" />
+                            <MainButton label="Sign up" href="/login" />
                             <MainButton
                                 label="See plans"
                                 href="/dashboard/billing#plans"

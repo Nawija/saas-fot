@@ -18,15 +18,15 @@ export default function ChangePasswordPage() {
 
     async function fetchUserEmail() {
         try {
-            const res = await fetch("/api/user/me"); // endpoint zwracający dane zalogowanego użytkownika
+            const res = await fetch("/api/user/me"); // endpoint returning the logged-in user's data
             const data = await res.json();
             if (res.ok) setEmail(data.email);
         } catch {
-            setError("Nie udało się pobrać danych użytkownika.");
+            setError("Failed to load user data.");
         }
     }
 
-    // uruchamiane przy wejściu na stronę
+    // run on first render
     if (email === null) fetchUserEmail();
 
     async function handleSendCode() {
@@ -58,7 +58,7 @@ export default function ChangePasswordPage() {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
-            setSuccess("Hasło zostało zmienione pomyślnie!");
+            setSuccess("Password changed successfully!");
 
             await fetch("/api/auth/logout", { method: "POST" });
 
@@ -77,7 +77,7 @@ export default function ChangePasswordPage() {
         <div className="min-h-screen flex items-center justify-center">
             <div className="w-full max-w-md bg-white shadow-md rounded-2xl p-8">
                 <h1 className="text-2xl font-semibold text-center mb-6">
-                    Zmień hasło
+                    Change password
                 </h1>
 
                 {error && (
@@ -94,46 +94,46 @@ export default function ChangePasswordPage() {
                 {!confirmed ? (
                     <div className="space-y-4 text-center">
                         <p>
-                            Twój adres e-mail: <b>{email || "Ładowanie..."}</b>
+                            Your email address: <b>{email || "Loading..."}</b>
                         </p>
                         <button
                             onClick={() => setConfirmed(true)}
                             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
                         >
-                            Chcę zmienić hasło
+                            I want to change my password
                         </button>
                     </div>
                 ) : !showCodeStep ? (
                     <div className="space-y-4 text-center">
-                        <p>Czy na pewno chcesz zmienić swoje hasło?</p>
+                        <p>Are you sure you want to change your password?</p>
                         <div className="flex gap-2 justify-center">
                             <button
                                 onClick={handleSendCode}
                                 disabled={loading}
                                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
                             >
-                                {loading ? "Wysyłanie..." : "Tak, wyślij kod"}
+                                {loading ? "Sending..." : "Yes, send the code"}
                             </button>
                             <button
                                 onClick={() => setConfirmed(false)}
                                 className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition"
                             >
-                                Anuluj
+                                Cancel
                             </button>
                         </div>
                     </div>
                 ) : (
                     <form onSubmit={handleChangePassword} className="space-y-4">
                         <p className="text-center text-gray-600">
-                            Kod wysłano na <b>{email}</b>.
+                            The code has been sent to <b>{email}</b>.
                         </p>
                         <div className="text-center text-sm text-gray-500 mb-2">
-                            Kod wygaśnie za: <CountdownTimer minutes={5} />
+                            Code expires in: <CountdownTimer minutes={5} />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium mb-1">
-                                Kod weryfikacyjny
+                                Verification code
                             </label>
                             <input
                                 type="text"
@@ -146,7 +146,7 @@ export default function ChangePasswordPage() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1">
-                                Nowe hasło
+                                New password
                             </label>
                             <input
                                 type="password"
@@ -158,7 +158,7 @@ export default function ChangePasswordPage() {
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1">
-                                Powtórz nowe hasło
+                                Repeat new password
                             </label>
                             <input
                                 type="password"
@@ -175,7 +175,7 @@ export default function ChangePasswordPage() {
                             disabled={loading}
                             className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
                         >
-                            {loading ? "Zapisywanie..." : "Zmień hasło"}
+                            {loading ? "Saving..." : "Change password"}
                         </button>
                     </form>
                 )}

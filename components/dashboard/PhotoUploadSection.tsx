@@ -44,7 +44,7 @@ export default function PhotoUploadSection({
                     {uploading ? (
                         <div>
                             <div className="text-gray-900 font-medium mb-2">
-                                Uploaduję... {uploadProgress}%
+                                Uploading... {uploadProgress}%
                             </div>
                             <div className="w-full max-w-xs mx-auto bg-gray-200 rounded-full h-2">
                                 <div
@@ -58,10 +58,10 @@ export default function PhotoUploadSection({
                     ) : (
                         <div>
                             <div className="text-gray-900 font-medium mb-2">
-                                Kliknij aby dodać zdjęcia
+                                Click to add photos
                             </div>
                             <div className="text-sm text-gray-600">
-                                Możesz wybrać wiele zdjęć na raz
+                                You can select multiple photos at once
                             </div>
                         </div>
                     )}

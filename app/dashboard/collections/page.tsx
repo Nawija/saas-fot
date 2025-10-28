@@ -63,22 +63,22 @@ export default function CollectionsPage() {
             const data = await res.json();
             if (data.ok) {
                 toast.success(
-                    `Usunięto galerię — zwolniono ${
+                    `Gallery deleted — freed ${
                         Math.round((data.freedSpace / 1024 / 1024) * 10) / 10
                     } MB`,
-                    { description: `Usunięto ${data.deletedFiles} plików` }
+                    { description: `Deleted ${data.deletedFiles} files` }
                 );
                 setCollections((prev) =>
                     prev.filter((c) => c.id !== collectionId)
                 );
             } else {
-                toast.error("Błąd usuwania", {
-                    description: data.error || "Nie udało się usunąć",
+                toast.error("Delete error", {
+                    description: data.error || "Failed to delete",
                 });
             }
         } catch (error) {
             console.error("Delete error:", error);
-            toast.error("Wystąpił błąd podczas usuwania");
+            toast.error("An error occurred while deleting");
         }
     };
 
@@ -93,18 +93,18 @@ export default function CollectionsPage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-12">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold  mb-3">
-                            Moje galerie
+                            My galleries
                         </h1>
                         <p className="text-gray-600 text-lg">
-                            Zarządzaj swoimi kolekcjami zdjęć i udostępniaj je
-                            klientom
+                            Manage your photo collections and share them with
+                            clients
                         </p>
                     </div>
 
                     <MainButton
                         href="/dashboard/collections/new"
                         className="mt-6 md:mt-0"
-                        label=" Nowa galeria"
+                        label="New gallery"
                         icon={<Plus className="w-5 h-5" />}
                     />
                 </div>
@@ -116,17 +116,17 @@ export default function CollectionsPage() {
                             <ImageIcon className="w-12 h-12 text-gray-400" />
                         </div>
                         <h2 className="text-2xl font-bold  mb-3">
-                            Nie masz jeszcze żadnych galerii
+                            You don't have any galleries yet
                         </h2>
                         <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                            Utwórz swoją pierwszą galerię i zacznij dzielić się
-                            pięknymi zdjęciami ze swoimi klientami
+                            Create your first gallery and start sharing
+                            beautiful photos with your clients
                         </p>
 
                         <MainButton
                             href="/dashboard/collections/new"
                             className="mt-6 md:mt-0"
-                            label="Utwórz pierwszą galerię"
+                            label="Create your first gallery"
                             icon={<Plus className="w-5 h-5" />}
                         />
                     </div>
@@ -177,7 +177,7 @@ export default function CollectionsPage() {
                                             <ImageIcon className="w-4 h-4" />
                                             <span>
                                                 {collection.photo_count || 0}{" "}
-                                                zdjęć
+                                                photos
                                             </span>
                                         </div>
                                         <span
@@ -190,12 +190,12 @@ export default function CollectionsPage() {
                                             {collection.is_public ? (
                                                 <span className="flex items-center gap-1">
                                                     <Globe className="w-3 h-3" />{" "}
-                                                    Publiczna
+                                                    Public
                                                 </span>
                                             ) : (
                                                 <span className="flex items-center gap-1">
                                                     <Lock className="w-3 h-3" />{" "}
-                                                    Chroniona
+                                                    Protected
                                                 </span>
                                             )}
                                         </span>
@@ -209,7 +209,7 @@ export default function CollectionsPage() {
                                             icon={
                                                 <ExternalLink className="w-4 h-4" />
                                             }
-                                            label="Zobacz"
+                                            label="View"
                                             className="text-sm w-full"
                                         />
 
@@ -245,13 +245,13 @@ export default function CollectionsPage() {
                 open={confirmOpen}
                 onOpenChange={setConfirmOpen}
                 title={
-                    pending ? `Usunąć galerię "${pending.name}"?` : "Usunąć?"
+                    pending ? `Delete gallery "${pending.name}"?` : "Delete?"
                 }
                 description={
-                    "Usunięte zostaną: galeria, wszystkie zdjęcia i pliki z Cloudflare R2. Tej operacji nie można cofnąć."
+                    "This will delete: the gallery, all photos and files from Cloudflare R2. This action cannot be undone."
                 }
-                confirmLabel="Usuń galerię"
-                cancelLabel="Anuluj"
+                confirmLabel="Delete gallery"
+                cancelLabel="Cancel"
                 onConfirm={async () => {
                     if (pending) {
                         await performDelete(pending.id);

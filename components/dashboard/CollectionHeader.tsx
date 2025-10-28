@@ -41,7 +41,7 @@ export default function PremiumCollectionHeader({ collection, photos }: Props) {
                 >
                     <ArrowLeft className="w-4 h-4" />
                     <span className="hidden sm:inline text-sm font-medium">
-                        Powrót
+                        Back
                     </span>
                 </button>
                 <div className="h-6 w-px bg-gray-300 hidden sm:block" />
@@ -76,12 +76,12 @@ export default function PremiumCollectionHeader({ collection, photos }: Props) {
                     {collection.is_public ? (
                         <>
                             <Globe className="w-3.5 h-3.5" />
-                            <span className="inline">Publiczna</span>
+                            <span className="inline">Public</span>
                         </>
                     ) : (
                         <>
                             <Lock className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Chroniona</span>
+                            <span className="hidden sm:inline">Protected</span>
                         </>
                     )}
                 </div>

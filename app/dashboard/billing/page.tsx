@@ -127,7 +127,7 @@ export default function BillingPage() {
                                         {currentPlan.price > 0 ? (
                                             <p className="text-gray-700">
                                                 <span className="text-xl font-semibold">
-                                                    {currentPlan.price} zł
+                                                    ${currentPlan.price}
                                                 </span>
                                                 <span className="text-sm text-gray-600">
                                                     /month

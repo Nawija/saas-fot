@@ -160,7 +160,7 @@ export default function HeroTemplateSelector({
             {/* Typography selector */}
             <div className="mb-8">
                 <label className="block text-xs font-medium text-gray-700 mb-2">
-                    Czcionka hero
+                    Hero font
                 </label>
                 <div className="flex flex-wrap gap-2">
                     {FONT_OPTIONS.map((f) => {
@@ -235,12 +235,12 @@ export default function HeroTemplateSelector({
                                 <div className="flex items-center gap-2">
                                     {isSaved && (
                                         <span className="absolute top-1 right-1 px-2 py-1 bg-green-100 rounded-3xl flex items-center gap-1 text-green-600 text-[10px] font-medium">
-                                            <Check size={11} /> Zapisany
+                                            <Check size={11} /> Saved
                                         </span>
                                     )}
                                     {isPreview && !isSaved && (
                                         <span className="absolute top-1 right-1 px-2 py-1 bg-blue-100 rounded-3xl flex items-center gap-1 text-blue-600 text-[10px] font-medium">
-                                            <Check size={11} /> Podgląd
+                                            <Check size={11} /> Preview
                                         </span>
                                     )}
                                 </div>
@@ -263,10 +263,10 @@ export default function HeroTemplateSelector({
                         </svg>
                         <div className="text-xs text-yellow-800">
                             <span className="font-semibold">
-                                Szablon premium
+                                Premium template
                             </span>
                             <p className="mt-0.5">
-                                Dostępne dla użytkowników z aktywną subskrypcją
+                                Available for users with an active subscription
                                 (Basic, Pro, Unlimited)
                             </p>
                         </div>
@@ -289,7 +289,7 @@ export default function HeroTemplateSelector({
                                 : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
                         }`}
                     >
-                        {saving ? "Zapisywanie..." : "Zapisz wygląd"}
+                        {saving ? "Saving..." : "Save design"}
                     </button>
                     <button
                         disabled={saving}

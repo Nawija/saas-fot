@@ -319,7 +319,7 @@ export default function HeroPreviewModal({
                     className="fixed inset-0 z-50 w-screen h-screen"
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Kreator wyglądu hero"
+                    aria-label="Hero design editor"
                 >
                     {/* Backdrop */}
                     <motion.div
@@ -352,7 +352,7 @@ export default function HeroPreviewModal({
                                 className="flex items-center justify-between px-6 sm:px-8 py-4 border-b border-gray-200 bg-white/70"
                             >
                                 <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-                                    Edytor wyglądu hero
+                                    Hero design editor
                                 </h2>
 
                                 <motion.button
@@ -360,7 +360,7 @@ export default function HeroPreviewModal({
                                     whileTap={{ scale: 0.95 }}
                                     onClick={onClose}
                                     className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-150"
-                                    aria-label="Zamknij edytor (Esc)"
+                                    aria-label="Close editor (Esc)"
                                 >
                                     <X className="w-5 h-5" />
                                 </motion.button>

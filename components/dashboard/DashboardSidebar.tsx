@@ -8,12 +8,12 @@ import LogoutButton from "../buttons/LogoutButton";
 
 const menuItems = [
     {
-        label: "Galerie",
+        label: "Galleries",
         href: "/dashboard/collections",
         icon: Images,
     },
     {
-        label: "Rozliczenia",
+        label: "Billing",
         href: "/dashboard/billing",
         icon: CreditCard,
     },

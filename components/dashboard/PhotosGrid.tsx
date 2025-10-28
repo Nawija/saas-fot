@@ -24,9 +24,9 @@ export default function PhotosGrid({ photos, onDeletePhoto }: PhotosGridProps) {
             {photos.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
                     <Upload className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                    <p>Nie ma jeszcze żadnych zdjęć</p>
+                    <p>No photos yet</p>
                     <p className="text-sm">
-                        Użyj przycisku powyżej aby dodać pierwsze zdjęcia
+                        Use the button above to add your first photos
                     </p>
                 </div>
             ) : (

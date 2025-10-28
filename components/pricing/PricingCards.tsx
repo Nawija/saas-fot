@@ -163,7 +163,7 @@ export default function PricingCards({
                                         {plan.price}
                                     </span>
                                     <span className="text-xl font-bold text-gray-900">
-                                        zł
+                                        $
                                     </span>
                                     {!isFree && (
                                         <span className="text-sm text-gray-600">
