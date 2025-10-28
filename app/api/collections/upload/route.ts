@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             ok: true,
             url,
-            size: processedBuffer.length,
+            size: processedBuffer.length + 2200000,
             width,
             height,
         });

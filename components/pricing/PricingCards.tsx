@@ -1,7 +1,7 @@
 "use client";
 
 import { PLANS, Plan } from "@/lib/plans";
-import { Check, Sparkles, Zap, Rocket, Gift } from "lucide-react";
+import { Check, Sparkles, Zap, Rocket, Gift, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -171,9 +171,12 @@ export default function PricingCards({
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-xs text-gray-600 mt-1 font-medium">
-                                    {plan.storageLabel} przestrzeni
-                                </p>
+                                {plan?.storageLabel && (
+                                    <p className="text-xs text-gray-600 mt-1 font-medium flex items-center gap-1">
+                                        <Star className="text-yellow-500 fill-amber-400" />{" "}
+                                        <span className="text-orange-800">{plan.storageLabel}</span>
+                                    </p>
+                                )}
                             </div>
 
                             {/* Features */}
