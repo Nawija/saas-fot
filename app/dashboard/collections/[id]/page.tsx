@@ -149,7 +149,7 @@ export default function CollectionDetailPage({
             }
 
             // Pobierz plan użytkownika
-            const userRes = await fetch("/api/user");
+            const userRes = await fetch("/api/user/me");
             if (userRes.ok) {
                 const userData = await userRes.json();
                 setUserPlan(userData.user?.subscription_plan || "free");

@@ -8,6 +8,7 @@ import {
     HeroTemplateDefinition,
     HeroTemplateProps,
 } from "./hero-templates/types";
+import MainButton from "../buttons/MainButton";
 
 interface HeroTemplateSelectorProps {
     templates: HeroTemplateDefinition[];

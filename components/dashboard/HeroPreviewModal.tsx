@@ -379,7 +379,7 @@ export default function HeroPreviewModal({
                                     }}
                                     className="lg:col-span-4 order-2 lg:order-1 overflow-y-auto"
                                 >
-                                    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm lg:h-[86vh] pb-12">
+                                    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm lg:h-[86vh] lg:pb-24 pb-40">
                                         <HeroTemplateSelector
                                             templates={templates}
                                             selectedTemplate={selectedTemplate}

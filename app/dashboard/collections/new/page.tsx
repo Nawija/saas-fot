@@ -23,14 +23,16 @@ export default function NewCollectionPage() {
 
     useEffect(() => {
         // Pobierz plan użytkownika
-        fetch("/api/user")
-            .then((res) => res.json())
+        fetch("/api/user/me")
+            .then((res) => (res.ok ? res.json() : Promise.reject(res)))
             .then((data) => {
                 if (data.user?.subscription_plan) {
                     setUserPlan(data.user.subscription_plan);
                 }
             })
-            .catch(console.error);
+            .catch(() => {
+                // zostaw domyślnie "free" jeśli nie udało się pobrać
+            });
     }, []);
 
     const generateSlug = (name: string) => {

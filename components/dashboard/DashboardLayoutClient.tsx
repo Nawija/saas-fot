@@ -37,7 +37,7 @@ export default function DashboardLayoutClient({
                     isOpen={sidebarOpen}
                     onClose={() => setSidebarOpen(false)}
                 />
-                <div className="flex-1 overflow-y-auto border border-gray-200">
+                <div className="flex-1 overflow-x-hidden h-full w-full border pb-24 border-gray-200">
                     <main>{children}</main>
                 </div>
             </div>
