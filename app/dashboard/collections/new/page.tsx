@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Lock, Globe } from "lucide-react";
 import { toast } from "sonner";
+import MainButton from "@/components/buttons/MainButton";
 
 export default function NewCollectionPage() {
     const router = useRouter();
@@ -365,13 +366,12 @@ export default function NewCollectionPage() {
 
                     {/* Submit */}
                     <div className="flex items-center gap-4">
-                        <button
-                            type="submit"
+                        <MainButton
                             disabled={loading}
-                            className="flex-1 px-6 py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                        >
-                            {loading ? "Tworzenie..." : "Utwórz galerię"}
-                        </button>
+                            loading={loading}
+                            loadingText="Tworzenie..."
+                            label="Utwórz galerię"
+                        />
                         <Link
                             href="/dashboard/collections"
                             className="px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors"

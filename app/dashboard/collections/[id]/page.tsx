@@ -12,8 +12,18 @@ import PhotoUploadSection from "@/components/dashboard/PhotoUploadSection";
 import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
 import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
+import CollectionSettingsModal from "@/components/dashboard/CollectionSettingsModal";
 import CopyLinkButton from "@/components/buttons/CopyLinkButton";
-import { BookImage, Eye, Trash2 } from "lucide-react";
+import {
+    BookImage,
+    Eye,
+    Trash2,
+    Download,
+    Share2,
+    Settings,
+    Globe,
+    Lock,
+} from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 
 interface Collection {
@@ -70,6 +80,8 @@ export default function CollectionDetailPage({
     const [pendingPhotoId, setPendingPhotoId] = useState<number | null>(null);
     const [confirmDeleteAllOpen, setConfirmDeleteAllOpen] = useState(false);
     const [heroModalOpen, setHeroModalOpen] = useState(false);
+    const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+    const [savingSettings, setSavingSettings] = useState(false);
     const [origin, setOrigin] = useState("");
 
     useEffect(() => {
@@ -385,6 +397,69 @@ export default function CollectionDetailPage({
         }
     }
 
+    async function handleDownloadAllPhotos() {
+        if (!collectionId || photos.length === 0) return;
+
+        try {
+            toast.info("Przygotowuję pobieranie zdjęć...");
+
+            // Pobierz ZIP z API
+            const response = await fetch(
+                `/api/collections/${collectionId}/download-zip`
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to download");
+            }
+
+            // Pobierz blob i utwórz link do pobrania
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${collection?.slug || "photos"}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            toast.success("Pobieranie rozpoczęte!");
+        } catch (error) {
+            console.error("Error downloading photos:", error);
+            toast.error("Błąd podczas pobierania zdjęć");
+        }
+    }
+
+    async function handleSaveSettings(isPublic: boolean, password?: string) {
+        if (!collectionId) return;
+
+        try {
+            setSavingSettings(true);
+            const res = await fetch(`/api/collections/${collectionId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    is_public: isPublic,
+                    password_plain: isPublic ? null : password,
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to update settings");
+            }
+
+            const result = await res.json();
+            setCollection(result.collection);
+            toast.success("Ustawienia zaktualizowane");
+            setSettingsModalOpen(false);
+        } catch (error) {
+            console.error("Error updating settings:", error);
+            toast.error("Błąd podczas zapisywania ustawień");
+        } finally {
+            setSavingSettings(false);
+        }
+    }
+
     if (loading) {
         return <Loading />;
     }
@@ -535,6 +610,42 @@ export default function CollectionDetailPage({
                                 </div>
                             </div>
                         </div>
+
+                        {/* Actions Card */}
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="border-b border-gray-200 px-5 py-4">
+                                <h2 className="text-base font-semibold">
+                                    Zarządzaj kolekcją
+                                </h2>
+                            </div>
+                            <div className="p-5 space-y-3">
+                                <MainButton
+                                    onClick={handleDownloadAllPhotos}
+                                    icon={<Download size={16} />}
+                                    label="Pobierz jako ZIP"
+                                    variant="secondary"
+                                    className="w-full"
+                                    disabled={photos.length === 0}
+                                />
+                                <MainButton
+                                    onClick={() => setSettingsModalOpen(true)}
+                                    icon={
+                                        collection.is_public ? (
+                                            <Globe size={16} />
+                                        ) : (
+                                            <Lock size={16} />
+                                        )
+                                    }
+                                    label={
+                                        collection.is_public
+                                            ? "Publiczna"
+                                            : "Chroniona"
+                                    }
+                                    variant="secondary"
+                                    className="w-full"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Right Content - Upload & Gallery */}
@@ -650,6 +761,15 @@ export default function CollectionDetailPage({
                 collectionDescription={collection.description}
                 heroImage={collection.hero_image}
                 selectedFont={selectedFont}
+            />
+
+            <CollectionSettingsModal
+                open={settingsModalOpen}
+                onClose={() => setSettingsModalOpen(false)}
+                isPublic={collection.is_public}
+                passwordPlain={collection.password_plain}
+                onSave={handleSaveSettings}
+                saving={savingSettings}
             />
         </div>
     );

@@ -114,14 +114,15 @@ export default async function DashboardPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div className="text-center">
                         <h1 className="text-4xl sm:text-5xl font-semibold mb-4">
-                            Witaj{user.name ? `, ${user.name}` : ""}! 👋
+                            Witaj 👋 <br />
+                            <span>{user.name ? `${user.name}` : ""}!</span>
                         </h1>
                         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
                             Profesjonalna platforma do tworzenia i udostępniania
                             galerii zdjęć. Idealne dla fotografów, event
                             managerów i twórców treści.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <div className="flex flex-col w-3/4 mx-auto sm:flex-row gap-4 justify-center">
                             <MainButton
                                 href="/dashboard/collections"
                                 icon={<Images className="w-5 h-5 mr-2" />}
@@ -179,7 +180,7 @@ export default async function DashboardPage() {
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="text-center">
-                            <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                            <div className="w-12 h-12 bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                                 1
                             </div>
                             <h3 className="font-semibold text-gray-900 mb-2">
@@ -190,7 +191,7 @@ export default async function DashboardPage() {
                             </p>
                         </div>
                         <div className="text-center">
-                            <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                            <div className="w-12 h-12 bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                                 2
                             </div>
                             <h3 className="font-semibold text-gray-900 mb-2">
@@ -201,7 +202,7 @@ export default async function DashboardPage() {
                             </p>
                         </div>
                         <div className="text-center">
-                            <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                            <div className="w-12 h-12 bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                                 3
                             </div>
                             <h3 className="font-semibold text-gray-900 mb-2">
@@ -229,13 +230,13 @@ export default async function DashboardPage() {
                                 key={index}
                                 className={`relative bg-white rounded-xl p-8 border-2 transition-all duration-200 ${
                                     plan.popular
-                                        ? "border-blue-500 shadow-lg scale-105"
+                                        ? "border-blue-200 shadow-lg scale-105"
                                         : "border-gray-200 hover:border-blue-300 hover:shadow-md"
                                 }`}
                             >
                                 {plan.popular && (
                                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                                        <span className="bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded-full">
+                                        <span className="bg-blue-200 text-blue-800 text-sm font-semibold px-4 py-1 rounded-full">
                                             Najpopularniejszy
                                         </span>
                                     </div>
@@ -274,16 +275,12 @@ export default async function DashboardPage() {
                                         </li>
                                     ))}
                                 </ul>
-                                <Link
+
+                                <MainButton
                                     href="/dashboard/billing"
-                                    className={`block text-center px-6 py-3 rounded-lg font-semibold transition-colors duration-200 ${
-                                        plan.popular
-                                            ? "bg-blue-600 text-white hover:bg-blue-700"
-                                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                                    }`}
-                                >
-                                    Wybierz plan
-                                </Link>
+                                    label="Wybierz plan"
+                                    className="w-full"
+                                />
                             </div>
                         ))}
                     </div>
@@ -296,7 +293,7 @@ export default async function DashboardPage() {
                 {/* Support Section */}
                 <div className="bg-linear-to-tr from-orange-50 to-amber-50 rounded-2xl p-8 border border-orange-300">
                     <div className="max-w-3xl mx-auto text-center">
-                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
+                        <div className="w-16 h-16 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Coffee className="w-8 h-8 text-orange-800" />
                         </div>
                         <h2 className="text-2xl font-bold text-orange-800 mb-3">
@@ -311,22 +308,19 @@ export default async function DashboardPage() {
                             tworzyć jeszcze lepsze narzędzia dla Ciebie.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Link
+                            <MainButton
                                 href="/dashboard/billing"
-                                className="inline-flex items-center justify-center px-6 py-3 bg-orange-700 text-white font-semibold rounded-lg hover:bg-orange-800 transition-colors duration-200"
-                            >
-                                <Crown className="w-5 h-5 mr-2" />
-                                Subskrybuj
-                            </Link>
-                            <a
+                                icon={<Crown className="w-5 h-5" />}
+                                label="Subskrybuj"
+                                variant="success"
+                            />
+                            <MainButton
                                 href="https://www.buymeacoffee.com/seovileo"
                                 target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center justify-center px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:border-orange-700 hover:text-orange-800 transition-all duration-200"
-                            >
-                                <Coffee className="w-5 h-5 mr-2" />
-                                Buy me a coffee
-                            </a>
+                                icon={<Coffee className="w-5 h-5" />}
+                                label="Buy me a coffee"
+                                variant="secondary"
+                            />
                         </div>
                     </div>
                 </div>

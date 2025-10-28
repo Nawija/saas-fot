@@ -142,6 +142,7 @@ export async function PATCH(
             name,
             description,
             password,
+            password_plain,
             is_public,
             hero_template,
             hero_font,
@@ -241,6 +242,24 @@ export async function PATCH(
             const hash = await bcrypt.hash(password, 10);
             updates.push(`password_hash = $${paramCount++}`);
             values.push(hash);
+        }
+        if (password_plain !== undefined) {
+            // Gdy ustawiamy password_plain, również zhashuj i zapisz w password_hash
+            if (password_plain === null || password_plain === "") {
+                // Jeśli usuwamy hasło (publiczna galeria)
+                updates.push(`password_plain = $${paramCount++}`);
+                values.push(null);
+                updates.push(`password_hash = $${paramCount++}`);
+                values.push(null);
+            } else {
+                // Zapisz zwykłe hasło i zhashowaną wersję
+                const bcrypt = require("bcrypt");
+                const hash = await bcrypt.hash(password_plain, 10);
+                updates.push(`password_plain = $${paramCount++}`);
+                values.push(password_plain);
+                updates.push(`password_hash = $${paramCount++}`);
+                values.push(hash);
+            }
         }
 
         updates.push(`updated_at = NOW()`);
