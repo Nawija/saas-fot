@@ -28,9 +28,9 @@ export const PLANS: Record<SubscriptionPlan, Plan> = {
         storageLabel: "",
         maxCollections: 3, // Limit 3 galerii
         features: [
-            "2 GB przestrzeni (1000-2000 zdjęć)",
+            "2 GB przestrzeni (1000+ zdjęć)",
             "Do 3 galerii",
-            "Zdjecia do 1200px",
+            "Zdjecia do 1300px",
             "Publiczne linki do galerii",
             "Watermark na zdjęciach",
             "Automatyczny konwert WebP",

@@ -4,6 +4,8 @@ import { createErrorResponse } from "@/lib/utils/apiHelpers";
 import { uploadToR2, R2Paths } from "@/lib/r2";
 import { query } from "@/lib/db";
 import sharp from "sharp";
+import path from "path";
+import { promises as fs } from "fs";
 export async function POST(req: NextRequest) {
     try {
         const user = await getUser();
@@ -38,10 +40,10 @@ export async function POST(req: NextRequest) {
             return createErrorResponse("Plik musi być obrazem", 400);
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
-        let processedBuffer: Buffer;
-        let contentType = "image/webp";
-        let key: string;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    let processedBuffer: Buffer;
+    let contentType = "image/webp";
+    let key: string;
 
         if (type === "hero") {
             // Hero image - 1920x1080
@@ -56,41 +58,64 @@ export async function POST(req: NextRequest) {
             key = R2Paths.collectionHero(user.id, parseInt(collectionId));
         } else {
             // Regular photo - 1300px szerokości (optymalne dla web)
-            let image = sharp(buffer).resize(1300, null, {
+            const targetMaxWidth = 1300;
+            const inputMeta = await sharp(buffer).metadata();
+            const inW = inputMeta.width || targetMaxWidth;
+            const inH = inputMeta.height || Math.round(targetMaxWidth * 0.75);
+            const targetW = Math.min(inW, targetMaxWidth);
+            const scale = targetW / inW;
+            const targetH = Math.max(1, Math.round(inH * scale));
+
+            let composed = sharp(buffer).resize(targetMaxWidth, null, {
                 fit: "inside",
                 withoutEnlargement: true,
             });
 
-            // Dla planu FREE dodaj watermark
+            // Dla planu FREE dodaj watermark z pliku public/watermark.svg
             if (userPlan === "free") {
-                // Pobierz wymiary obrazu PRZED przetworzeniem
-                const metadata = await image.metadata();
-                const imgWidth = metadata.width || 1300;
-                const imgHeight = metadata.height || 800;
+                const watermarkPath = path.join(process.cwd(), "public", "watermark.svg");
+                const svgBuffer = await fs.readFile(watermarkPath);
 
-                // Stwórz watermark SVG jako buffer
-                const watermarkSvg = `
-                <svg width="140" height="45" viewBox="0 0 140 45">
-                  <rect width="140" height="45" rx="4" fill="white" fill-opacity="0.9"/>
-                  <text x="70" y="28" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1f2937" text-anchor="middle">
-                    Seovileo
-                  </text>
-                </svg>
-                `;
-                const watermarkBuffer = Buffer.from(watermarkSvg);
+                // Skala watermarku ~16% szerokości, z bezpiecznymi limitami
+                const overlayW = Math.max(60, Math.min(Math.floor(targetW * 0.4), Math.round(targetW * 0.16)));
+                const wmPng = await sharp(svgBuffer).resize({ width: overlayW }).png().toBuffer();
+                const wmMeta = await sharp(wmPng).metadata();
+                const wmW = wmMeta.width || overlayW;
+                const wmH = wmMeta.height || Math.round(overlayW * 0.3);
 
-                // Watermark w prawym dolnym rogu z marginesem 15px
-                // Używamy top/left licząc od końca (dół/prawo)
-                image = image.composite([
-                    {
-                        input: watermarkBuffer,
-                        top: imgHeight - 45 - 15, // wysokość watermarku (45px) + margines (15px) od dołu
-                        left: imgWidth - 140 - 15, // szerokość watermarku (140px) + margines (15px) od prawej
-                    },
+                // Tło pod watermark (dla widoczności na jasnym tle)
+                let edge = Math.max(8, Math.min(32, Math.round(targetW * 0.015))); // od krawędzi zdjęcia
+                let pad = Math.max(6, Math.min(18, Math.round(targetW * 0.01))); // wewnętrzny padding tła
+                let bgW = wmW + pad * 2;
+                let bgH = wmH + pad * 2;
+
+                // SVG tła z zaokrągleniami i przezroczystą czernią
+                const bgSvg = Buffer.from(
+                    `<svg width="${bgW}" height="${bgH}" viewBox="0 0 ${bgW} ${bgH}" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="0" width="${bgW}" height="${bgH}" fill-opacity="0" />
+                    </svg>`
+                );
+
+                // Pozycja w prawym-dolnym rogu z marginesem
+                let top = targetH - bgH - edge;
+                let left = targetW - bgW - edge;
+                if (top < 0 || left < 0) {
+                    // Dla bardzo małych zdjęć – zredukuj padding i sklej do krawędzi
+                    edge = Math.max(4, edge);
+                    pad = Math.max(4, pad);
+                    bgW = wmW + pad * 2;
+                    bgH = wmH + pad * 2;
+                    top = Math.max(0, targetH - bgH - edge);
+                    left = Math.max(0, targetW - bgW - edge);
+                }
+
+                composed = composed.composite([
+                    { input: bgSvg, top, left },
+                    { input: wmPng, top: top + pad, left: left + pad },
                 ]);
             }
 
-            processedBuffer = await image.webp({ quality: 85 }).toBuffer();
+            processedBuffer = await composed.webp({ quality: 85 }).toBuffer();
 
             // Użyj ID zdjęcia lub timestamp
             const fileExt = "webp";
