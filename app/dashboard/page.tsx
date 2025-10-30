@@ -1,6 +1,5 @@
 import { getUser } from "@/lib/auth/getUser";
 import UnauthenticatedView from "@/components/dashboard/UnauthenticatedView";
-import Link from "next/link";
 import {
     Images,
     Palette,
@@ -74,51 +73,17 @@ export default async function DashboardPage() {
         },
     ];
 
-    const plans = [
-        {
-            name: "Basic",
-            price: "$19",
-            features: [
-                "10 GB storage",
-                "All hero templates",
-                "Password protection",
-                "Unlimited galleries",
-            ],
-        },
-        {
-            name: "Pro",
-            price: "$39",
-            features: [
-                "50 GB storage",
-                "Priority support",
-                "Custom domain (soon)",
-                "Advanced analytics",
-            ],
-            popular: true,
-        },
-        {
-            name: "Unlimited",
-            price: "$99",
-            features: [
-                "200 GB storage",
-                "White-label (no logo)",
-                "API access",
-                "Dedicated account manager",
-            ],
-        },
-    ];
-
     return (
         <div className="min-h-screen bg-linear-to-r from-blue-50 via-pink-50 to-indigo-50">
             {/* Hero Section */}
             <div className="relative overflow-hidden bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div className="text-center">
-                        <h1 className="text-4xl sm:text-5xl font-semibold mb-4">
-                            Welcome 👋 <br />
-                            <span>{user.name ? `${user.name}` : ""}!</span>
+                        <h1 className="text-4xl sm:text-5xl font-semibold mb-12">
+                            Welcome 👋
+                           
                         </h1>
-                        <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                        <p className="text-base text-gray-600 mb-8 max-w-3xl mx-auto">
                             A professional platform for creating and sharing
                             photo galleries. Perfect for photographers, event
                             managers, and content creators.
