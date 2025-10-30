@@ -39,12 +39,12 @@ export default function PhotosGrid({ photos, onDeletePhoto }: PhotosGridProps) {
                             <Image
                                 src={photo.file_path}
                                 alt={photo.file_name}
-                                height={110}
-                                width={110}
+                                height={200}
+                                width={200}
                                 className="w-full h-full object-cover"
                                 decoding="async"
                             />
-                            <div className="absolute inset-0 lg:bg-white/50 lg:bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-start justify-end lg:opacity-0 group-hover:opacity-100">
+                            <div className="absolute inset-0 lg:bg-linear-to-t lg:from-white/60 lg:bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-start justify-end lg:opacity-0 group-hover:opacity-100">
                                 <button
                                     onClick={() => onDeletePhoto(photo.id)}
                                     className="p-1 m-1 text-red-500 hover:text-red-600 rounded-full bg-white transition-colors"

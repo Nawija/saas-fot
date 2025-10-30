@@ -46,7 +46,7 @@ export default function PremiumCollectionHeader({ collection, photos }: Props) {
                 </button>
                 <div className="h-6 w-px bg-gray-300 hidden sm:block" />
                 <div>
-                    <h1 className="text-lg sm:text-xl font-bold text-gray-900 line-clamp-1">
+                    <h1 className="text-sm md:text-base font-bold text-gray-900 line-clamp-1">
                         {collection.name}
                     </h1>
                 </div>

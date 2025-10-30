@@ -489,7 +489,7 @@ export default function CollectionDetailPage({
         <div className="min-h-screen">
             {/* Top Bar */}
             <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
                     <CollectionHeader collection={collection} photos={photos} />
                 </div>
             </div>
@@ -515,6 +515,7 @@ export default function CollectionDetailPage({
                                     {/* Template Preview */}
                                     {currentTemplate && (
                                         <div className="relative bg-gray-900 rounded-xl overflow-hidden border border-gray-200">
+                                            <div className="absolute top-0 right-0 z-10 bg-white w-full h-full" />
                                             <div
                                                 className="w-full overflow-hidden"
                                                 style={{
@@ -582,7 +583,41 @@ export default function CollectionDetailPage({
                             </div>
                         </div>
 
-                        {/* Stats Card */}
+                       
+
+                        {/* Actions Card */}
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div className="border-b border-gray-200 px-5 py-4">
+                                <h2 className="text-base font-semibold">
+                                    Manage collection
+                                </h2>
+                            </div>
+                            <div className="p-5 space-y-3">
+                                <MainButton
+                                    onClick={handleDownloadAllPhotos}
+                                    icon={<Download size={16} />}
+                                    label="Download as ZIP"
+                                    variant="secondary"
+                                    className="w-full"
+                                    disabled={photos.length === 0}
+                                />
+                                <MainButton
+                                    onClick={() => setSettingsModalOpen(true)}
+                                    icon={
+                                        collection.is_public ? (
+                                            <Globe size={16} />
+                                        ) : (
+                                            <Lock size={16} />
+                                        )
+                                    }
+                                    label="Collection settings"
+                                    variant="secondary"
+                                    className="w-full"
+                                />
+                            </div>
+                        </div>
+
+                         {/* Stats Card */}
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <h2 className="text-base font-semibold text-gray-900">
@@ -621,38 +656,6 @@ export default function CollectionDetailPage({
                                         ).toLocaleDateString("en-US")}
                                     </span>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Actions Card */}
-                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                            <div className="border-b border-gray-200 px-5 py-4">
-                                <h2 className="text-base font-semibold">
-                                    Manage collection
-                                </h2>
-                            </div>
-                            <div className="p-5 space-y-3">
-                                <MainButton
-                                    onClick={handleDownloadAllPhotos}
-                                    icon={<Download size={16} />}
-                                    label="Download as ZIP"
-                                    variant="secondary"
-                                    className="w-full"
-                                    disabled={photos.length === 0}
-                                />
-                                <MainButton
-                                    onClick={() => setSettingsModalOpen(true)}
-                                    icon={
-                                        collection.is_public ? (
-                                            <Globe size={16} />
-                                        ) : (
-                                            <Lock size={16} />
-                                        )
-                                    }
-                                    label="Collection settings"
-                                    variant="secondary"
-                                    className="w-full"
-                                />
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 // components/dashboard/PhotoUploadSection.tsx
 "use client";
 
-import { Upload } from "lucide-react";
+import { Loader, Upload } from "lucide-react";
 import Loading from "../ui/Loading";
 
 interface PhotoUploadSectionProps {
@@ -36,7 +36,7 @@ export default function PhotoUploadSection({
                 >
                     <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center">
                         {uploading ? (
-                            <Loading />
+                            <Loader size={33} className="text-blue-400 animate-spin" />
                         ) : (
                             <Upload className="w-12 h-12 text-blue-400" />
                         )}

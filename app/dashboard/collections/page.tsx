@@ -147,11 +147,11 @@ export default function CollectionsPage() {
                                                 <Image
                                                     src={collection.hero_image}
                                                     alt={collection.name}
-                                                    height={200}
-                                                    width={200}
+                                                    height={350}
+                                                    width={350}
                                                     className="w-full h-full object-cover transition-transform duration-300"
                                                 />
-                                                <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                                <div className="absolute inset-0 bg-linear-to-t from-white/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                             </>
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">
