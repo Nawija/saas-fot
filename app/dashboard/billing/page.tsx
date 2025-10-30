@@ -89,7 +89,7 @@ export default function BillingPage() {
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30">
             {/* Hero Header */}
-            <div className="relative overflow-hidden bg-linear-to-br from-indigo-100 via-purple-100 to-pink-100">
+            <div className="relative overflow-hidden bg-linear-to-br from-indigo-100 via-purple-50 to-pink-50">
                 <div className="absolute inset-0 bg-grid-white/[0.05] bg-size-[20px_20px]"></div>
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                     <div className="text-center">
@@ -109,9 +109,9 @@ export default function BillingPage() {
                 </div>
             </div>
 
-            <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 {/* Current Plan Card */}
-                <div className="mb-6 sm:mb-8">
+                <div className="mb-6 sm:mb-8 max-w-5xl mx-auto">
                     <div className="bg-white rounded-xl shadow-sm border border-purple-100 overflow-hidden">
                         {/* Plan Header */}
                         <div className="bg-linear-to-br from-purple-50/50 via-pink-50/50 to-blue-50/50 p-4 sm:p-6">

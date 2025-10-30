@@ -515,7 +515,7 @@ export default function CollectionDetailPage({
                                     {/* Template Preview */}
                                     {currentTemplate && (
                                         <div className="relative bg-gray-900 rounded-xl overflow-hidden border border-gray-200">
-                                            <div className="absolute top-0 right-0 z-10 bg-white w-full h-full" />
+                                            <div className="absolute top-0 right-0 z-10 bg-white/5 w-full h-full" />
                                             <div
                                                 className="w-full overflow-hidden"
                                                 style={{
@@ -597,7 +597,7 @@ export default function CollectionDetailPage({
                                     onClick={handleDownloadAllPhotos}
                                     icon={<Download size={16} />}
                                     label="Download as ZIP"
-                                    variant="secondary"
+                                    variant="orange"
                                     className="w-full"
                                     disabled={photos.length === 0}
                                 />
@@ -611,7 +611,7 @@ export default function CollectionDetailPage({
                                         )
                                     }
                                     label="Collection settings"
-                                    variant="secondary"
+                                    variant="success"
                                     className="w-full"
                                 />
                             </div>
