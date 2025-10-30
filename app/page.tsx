@@ -1,4 +1,5 @@
 import MainButton from "@/components/buttons/MainButton";
+import Logo from "@/components/navbar/Logo";
 import {
     Camera,
     Lock,
@@ -65,6 +66,17 @@ export default function Home() {
 
     return (
         <main>
+            {/* TOP NAV ONLY ON HOMEPAGE */}
+            <nav className="border-b border-gray-200 bg-gray-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+                    <Logo href="/" />
+                    <MainButton
+                        label="Login"
+                        href="/login"
+                        variant="orange"
+                    />
+                </div>
+            </nav>
             {/* HERO */}
             <section className="relative overflow-hidden border-b border-gray-200 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

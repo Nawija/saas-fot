@@ -44,7 +44,7 @@ const MainButton: React.FC<MainButtonProps> = ({
     const isDisabled = disabled || loading;
 
     const baseClasses = `
-    inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all
+    inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg font-medium transition-all
     focus:outline-none
     ${variantStyles[variant] || variantStyles.primary}
     ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
