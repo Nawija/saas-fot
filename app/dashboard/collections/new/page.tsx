@@ -197,7 +197,7 @@ export default function NewCollectionPage() {
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-blue-50">
+        <div className="min-h-screen">
             <div className="container mx-auto px-4 py-12 max-w-4xl">
                 {/* Header */}
                 <Link
