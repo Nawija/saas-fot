@@ -628,7 +628,7 @@ export default function CollectionDetailPage({
             <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     {/* Left Sidebar - Hero Template & Stats */}
-                    <div className="lg:col-span-4 xl:col-span-3 space-y-6 sticky top-16 self-start overscroll-y-auto max-h-[calc(100vh-4rem)]">
+                    <div className="lg:col-span-4 xl:col-span-3 space-y-6 sticky top-16 self-start overflow-y-scroll h-[80vh] pb-20 pr-3">
                         {/* Hero Template Card */}
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
