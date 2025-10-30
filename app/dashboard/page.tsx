@@ -120,12 +120,12 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30">
             {/* Hero Header */}
-            <div className="relative overflow-hidden bg-linear-to-br from-orange-100 via-yellow-50 to-red-50 border-b border-gray-200">
+            <div className="relative overflow-hidden bg-linear-to-br from-indigo-100 via-purple-50 to-pink-50 border-b border-gray-200">
                 <div className="absolute inset-0 bg-grid-white/[0.05] bg-size-[20px_20px]"></div>
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                     <div className="text-center">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full mb-4">
-                            <Gem className="w-4 h-4 text-gray-800" />
+                            <Gem className="w-4 h-4 text-sky-500" />
                             <span className="text-xs font-semibold text-gray-800">
                                 Dashboard
                             </span>
@@ -144,15 +144,15 @@ export default function DashboardPage() {
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 {/* Quick Actions Card */}
                 <div className="mb-6 sm:mb-8 max-w-5xl mx-auto">
-                    <div className="bg-white rounded-xl shadow-sm border border-orange-100 overflow-hidden">
-                        <div className="bg-linear-to-br from-orange-50/50 via-yellow-50/50 to-red-50/50 p-4 sm:p-6">
+                    <div className="bg-white rounded-xl shadow-sm border border-purple-100 overflow-hidden">
+                        <div className="bg-linear-to-br from-purple-50/50 via-pink-50/50 to-blue-50/50 p-4 sm:p-6">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm shrink-0">
-                                        <Sparkles className="w-6 h-6 text-orange-500" />
+                                        <Sparkles className="w-6 h-6 text-purple-500" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-medium text-orange-600 mb-1">
+                                        <p className="text-xs font-medium text-purple-600 mb-1">
                                             Quick Start
                                         </p>
                                         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">
@@ -192,10 +192,10 @@ export default function DashboardPage() {
                             </div>
                         </div>
 
-                        <div className="p-4 sm:p-5 border-t border-orange-100 bg-linear-to-br from-teal-50/30 to-emerald-50/30">
+                        <div className="p-4 sm:p-5 border-t border-orange-100 bg-linear-to-br from-orange-50 to-orange-50/30">
                             <div className="flex items-start gap-3">
                                 <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm shrink-0">
-                                    <Sparkles className="w-5 h-5 text-teal-500" />
+                                    <Sparkles className="w-5 h-5 text-orange-500" />
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="text-sm font-bold text-gray-800 mb-1">
@@ -229,10 +229,10 @@ export default function DashboardPage() {
                             return (
                                 <div
                                     key={index}
-                                    className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 hover:border-yellow-200 hover:shadow-md transition-all"
+                                    className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 hover:border-purple-200 hover:shadow-md transition-all"
                                 >
-                                    <div className="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center mb-3 shadow-sm">
-                                        <Icon className="w-5 h-5 text-yellow-500" />
+                                    <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center mb-3 shadow-sm">
+                                        <Icon className="w-5 h-5 text-purple-500" />
                                     </div>
                                     <h3 className="text-base font-bold text-gray-800 mb-1.5">
                                         {feature.title}
@@ -248,10 +248,10 @@ export default function DashboardPage() {
 
                 {/* Premium Benefits Section */}
                 <div className="mb-6 sm:mb-8">
-                    <div className="bg-linear-to-br from-emerald-50/50 via-green-50/50 to-teal-50/50 rounded-xl p-5 sm:p-6 border border-emerald-100 overflow-hidden">
+                    <div className="bg-linear-to-br from-sky-50/50 via-blue-50/50 to-indigo-50/50 rounded-xl p-5 sm:p-6 border border-sky-100 overflow-hidden">
                         <div className="text-center mb-5 sm:mb-6">
                             <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-3 shadow-sm">
-                                <Crown className="w-6 h-6 text-emerald-500" />
+                                <Crown className="w-6 h-6 text-sky-500" />
                             </div>
                             <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                                 Unlock Premium Benefits
@@ -309,10 +309,10 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Support Section */}
-                <div className="bg-linear-to-br from-orange-50/80 via-amber-50/80 to-yellow-50/80 rounded-xl p-5 sm:p-6 border border-orange-200">
+                <div className="bg-linear-to-br from-indigo-50/80 via-purple-50/80 to-pink-50/80 rounded-xl p-5 sm:p-6 border border-purple-200">
                     <div className="max-w-2xl mx-auto text-center">
                         <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-3 shadow-sm">
-                            <Coffee className="w-6 h-6 text-orange-600" />
+                            <Coffee className="w-6 h-6 text-purple-600" />
                         </div>
                         <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                             Love Seovileo? Support Us! ❤️
@@ -364,13 +364,13 @@ function QuickActionCard({
     return (
         <a
             href={href}
-            className="block bg-linear-to-br from-gray-50 to-orange-50/30 rounded-lg p-4 border border-gray-200 hover:border-orange-300 hover:shadow-sm transition-all group"
+            className="block bg-linear-to-br from-gray-50 to-teal-50/30 rounded-lg p-4 border border-gray-200 hover:border-teal-300 hover:shadow-sm transition-all group"
         >
             <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 rounded-full bg-orange-400 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-full bg-teal-200 text-teal-700 border border-teal-300 font-bold text-xs flex items-center justify-center shrink-0">
                     {number}
                 </div>
-                <div className="w-8 h-8 rounded-lg bg-white text-orange-500 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+                <div className="w-8 h-8 rounded-lg bg-white text-teal-500 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
                     {icon}
                 </div>
             </div>
@@ -392,9 +392,9 @@ function PremiumBenefit({
     description: string;
 }) {
     return (
-        <div className="bg-white rounded-lg p-3 sm:p-4 border border-emerald-100 hover:shadow-sm transition-shadow">
+        <div className="bg-white rounded-lg p-3 sm:p-4 border border-teal-200 hover:shadow-sm transition-shadow">
             <div className="flex items-start gap-2 sm:gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center shrink-0">
                     {icon}
                 </div>
                 <div className="flex-1 min-w-0">
