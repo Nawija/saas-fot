@@ -11,6 +11,12 @@ import {
     Zap,
     Crown,
     Coffee,
+    CheckCircle2,
+    ArrowRight,
+    Upload,
+    Link2,
+    Shield,
+    Sparkles,
 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 import PricingCards from "@/components/pricing/PricingCards";
@@ -74,63 +80,115 @@ export default async function DashboardPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-linear-to-r from-blue-50 via-pink-50 to-indigo-50">
-            {/* Hero Section */}
-            <div className="relative overflow-hidden bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="min-h-screen bg-white">
+            {/* Hero Section - Clean and welcoming */}
+            <div className="relative overflow-hidden bg-linear-to-br from-blue-50 via-white to-indigo-50 border-b border-gray-100">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
                     <div className="text-center">
-                        <h1 className="text-4xl sm:text-5xl font-semibold mb-12">
-                            Welcome 👋
-                           
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 text-blue-600 mb-6">
+                            <Images className="w-8 h-8" />
+                        </div>
+                        <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-4">
+                            Welcome to Your Dashboard
                         </h1>
-                        <p className="text-base text-gray-600 mb-8 max-w-3xl mx-auto">
-                            A professional platform for creating and sharing
-                            photo galleries. Perfect for photographers, event
-                            managers, and content creators.
+                        <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                            Create stunning photo galleries in minutes and share
+                            them with your clients professionally
                         </p>
-                        <div className="flex flex-col w-3/4 mx-auto sm:flex-row gap-4 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <MainButton
                                 href="/dashboard/collections"
-                                icon={<Images className="w-5 h-5 mr-2" />}
-                                label="Create gallery"
+                                label="Create Your First Gallery"
+                                variant="primary"
+                                className="text-lg px-8 py-3"
                             />
-
                             <MainButton
                                 href="/dashboard/billing"
+                                label="Explore Premium"
                                 variant="secondary"
-                                icon={<Crown className="w-5 h-5 mr-2" />}
-                                label="Premium plan"
+                                className="text-lg px-8 py-3"
                             />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* Features Grid */}
-                <div className="mb-16">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">
-                        Everything you need
-                    </h2>
-                    <p className="text-gray-600 text-center mb-10">
-                        Features that make sharing photos simple and
-                        professional
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <main className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+                {/* How to Use Section */}
+                <div className="mb-20">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                            How to use Seovileo
+                        </h2>
+                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                            From upload to share — simple steps to deliver your
+                            photos professionally
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-8 mb-12">
+                        <HowToCard
+                            number="1"
+                            icon={<Upload className="w-6 h-6" />}
+                            title="Create & Upload"
+                            description="Go to Collections, create a new gallery, and upload your photos. We handle optimization automatically."
+                        />
+                        <HowToCard
+                            number="2"
+                            icon={<Palette className="w-6 h-6" />}
+                            title="Customize Style"
+                            description="Choose a hero template, adjust colors, and set privacy options like password protection."
+                        />
+                        <HowToCard
+                            number="3"
+                            icon={<Link2 className="w-6 h-6" />}
+                            title="Share Link"
+                            description="Copy the gallery link and send it to your clients. They can view and download photos instantly."
+                        />
+                    </div>
+                    <div className="bg-blue-50 rounded-2xl p-6 sm:p-8 border border-blue-100">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <div className="shrink-0">
+                                <Sparkles className="w-8 h-8 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                    Pro Tip: Use Collections to organize
+                                </h3>
+                                <p className="text-gray-600 leading-relaxed">
+                                    Create separate collections for different
+                                    clients or events. Each collection can have
+                                    its own style and privacy settings.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Features Grid - Simplified */}
+                <div className="mb-20">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                            What you can do
+                        </h2>
+                        <p className="text-lg text-gray-600">
+                            Powerful features to manage and share your photos
+                        </p>
+                    </div>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {features.map((feature, index) => {
                             const Icon = feature.icon;
                             return (
                                 <div
                                     key={index}
-                                    className="bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200"
+                                    className="bg-gray-50 rounded-xl p-6 hover:bg-white hover:shadow-md border border-gray-100 hover:border-blue-200 transition-all"
                                 >
-                                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
+                                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
                                         <Icon className="w-6 h-6 text-blue-600" />
                                     </div>
                                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
                                         {feature.title}
                                     </h3>
-                                    <p className="text-gray-600 text-sm">
+                                    <p className="text-gray-600 text-sm leading-relaxed">
                                         {feature.description}
                                     </p>
                                 </div>
@@ -139,100 +197,164 @@ export default async function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Quick Start */}
-                <div className="my-16 bg-white rounded-xl p-8 border border-gray-200">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-                        Quick start in 3 steps
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="text-center">
-                            <div className="w-12 h-12 bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                                1
+                {/* Premium Benefits Section */}
+                <div className="mb-20">
+                    <div className="bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl p-8 sm:p-12 border border-indigo-100">
+                        <div className="text-center mb-10">
+                            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-indigo-100 text-indigo-600 mb-4">
+                                <Crown className="w-7 h-7" />
                             </div>
-                            <h3 className="font-semibold text-gray-900 mb-2">
-                                Create a gallery
-                            </h3>
-                            <p className="text-gray-600 text-sm">
-                                Click "Galleries" and add a new photo collection
+                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                                Unlock Premium Benefits
+                            </h2>
+                            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                                Get more storage, advanced features, and
+                                priority support
                             </p>
                         </div>
-                        <div className="text-center">
-                            <div className="w-12 h-12 bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                                2
-                            </div>
-                            <h3 className="font-semibold text-gray-900 mb-2">
-                                Pick a style
-                            </h3>
-                            <p className="text-gray-600 text-sm">
-                                Customize the hero and choose a font
-                            </p>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            <PremiumBenefit
+                                icon={<Shield className="w-5 h-5" />}
+                                title="Password Protection"
+                                description="Secure your galleries with passwords for private clients"
+                            />
+                            <PremiumBenefit
+                                icon={<Images className="w-5 h-5" />}
+                                title="Unlimited Galleries"
+                                description="Create as many collections as you need without limits"
+                            />
+                            <PremiumBenefit
+                                icon={<Zap className="w-5 h-5" />}
+                                title="No Watermarks"
+                                description="Professional galleries without Seovileo branding"
+                            />
+                            <PremiumBenefit
+                                icon={<Download className="w-5 h-5" />}
+                                title="Full Resolution"
+                                description="Clients download photos in original quality"
+                            />
+                            <PremiumBenefit
+                                icon={<Palette className="w-5 h-5" />}
+                                title="All Hero Templates"
+                                description="Access to all 7 premium hero styles"
+                            />
+                            <PremiumBenefit
+                                icon={<Heart className="w-5 h-5" />}
+                                title="Priority Support"
+                                description="Get help faster with dedicated support"
+                            />
                         </div>
                         <div className="text-center">
-                            <div className="w-12 h-12 bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                                3
-                            </div>
-                            <h3 className="font-semibold text-gray-900 mb-2">
-                                Share
-                            </h3>
-                            <p className="text-gray-600 text-sm">
-                                Copy the link and send it to your clients
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Pricing Section */}
-                <div className="mb-16">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">
-                        Plans to fit your needs
-                    </h2>
-                    <p className="text-gray-600 text-center mb-10">
-                        Start for free or choose Premium for more power
-                    </p>
-                    <div className="py-12">
-                        <PricingCards />
-                    </div>
-                    <p className="text-center text-sm text-gray-600">
-                        Free plan: 2 GB storage • All basic features • No credit
-                        card required
-                    </p>
-                </div>
-
-                {/* Support Section */}
-                <div className="bg-linear-to-tr from-orange-50 to-amber-50 rounded-2xl p-8 border border-orange-300">
-                    <div className="max-w-3xl mx-auto text-center">
-                        <div className="w-16 h-16 bg-orange-100 border border-orange-300 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Coffee className="w-8 h-8 text-orange-800" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-orange-800 mb-3">
-                            Support the project ❤️
-                        </h2>
-                        <p className="text-gray-700 mb-6 leading-relaxed">
-                            Seovileo is an independent project built with
-                            passion. If you like the platform and want to help
-                            us develop new features (custom domains,
-                            white-label, integrations), consider subscribing to
-                            Premium. Every bit of support helps us build even
-                            better tools for you.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <MainButton
                                 href="/dashboard/billing"
-                                icon={<Crown className="w-5 h-5" />}
-                                label="Subscribe"
-                                variant="success"
+                                label="View Premium Plans"
+                                variant="primary"
+                                className="text-lg px-8 py-3"
+                            />
+                            <p className="text-sm text-gray-600 mt-4">
+                                Start with a free 7-day trial • Cancel anytime
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Support Section - Redesigned */}
+                <div className="bg-linear-to-br from-orange-50 via-amber-50 to-yellow-50 rounded-2xl p-8 sm:p-12 border border-orange-200 shadow-sm">
+                    <div className="max-w-3xl mx-auto text-center">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-sm mb-6">
+                            <Coffee className="w-8 h-8 text-orange-600" />
+                        </div>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                            Love Seovileo? Support Us! ❤️
+                        </h2>
+                        <p className="text-lg text-gray-700 mb-8 leading-relaxed max-w-2xl mx-auto">
+                            Seovileo is built by a small team passionate about
+                            helping photographers. Your support helps us add new
+                            features like custom domains, white-label options,
+                            and integrations. Every subscription matters!
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+                            <MainButton
+                                href="/dashboard/billing"
+                                label="Upgrade to Premium"
+                                variant="primary"
+                                className="text-lg px-8 py-3"
                             />
                             <MainButton
                                 href="https://www.buymeacoffee.com/seovileo"
                                 target="_blank"
-                                icon={<Coffee className="w-5 h-5" />}
-                                label="Buy me a coffee"
+                                label="Buy us a coffee"
                                 variant="secondary"
+                                className="text-lg px-8 py-3"
                             />
                         </div>
+                        <p className="text-sm text-gray-600">
+                            Can't upgrade? Share Seovileo with other
+                            photographers — that helps too! 🙏
+                        </p>
                     </div>
                 </div>
             </main>
+        </div>
+    );
+}
+
+// Helper Components
+function HowToCard({
+    number,
+    icon,
+    title,
+    description,
+}: {
+    number: string;
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+}) {
+    return (
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-200 hover:shadow-md transition-all">
+            <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-lg flex items-center justify-center shrink-0">
+                    {number}
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                    {icon}
+                </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {title}
+            </h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+                {description}
+            </p>
+        </div>
+    );
+}
+
+function PremiumBenefit({
+    icon,
+    title,
+    description,
+}: {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+}) {
+    return (
+        <div className="bg-white rounded-xl p-5 border border-indigo-100 hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                    {icon}
+                </div>
+                <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-1">
+                        {title}
+                    </h4>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                        {description}
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }

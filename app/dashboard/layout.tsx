@@ -9,7 +9,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-    title: "Dashboard - SEOVILEO",
+    title: "Dashboard - Seovileo",
     description: "Manage your photo galleries",
 };
 
