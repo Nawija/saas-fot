@@ -20,6 +20,7 @@ export default function PhotoUploadSection({
 }: PhotoUploadSectionProps) {
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const dropZoneRef = useRef<HTMLDivElement>(null);
 
     const handleDragEnter = (e: React.DragEvent) => {
         e.preventDefault();
@@ -30,7 +31,14 @@ export default function PhotoUploadSection({
     const handleDragLeave = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsDragging(false);
+
+        // Only set isDragging to false if we're leaving the drop zone entirely
+        if (
+            dropZoneRef.current &&
+            !dropZoneRef.current.contains(e.relatedTarget as Node)
+        ) {
+            setIsDragging(false);
+        }
     };
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -80,6 +88,7 @@ export default function PhotoUploadSection({
                 id="photo-upload"
             />
             <div
+                ref={dropZoneRef}
                 onClick={handleClick}
                 onDragEnter={handleDragEnter}
                 onDragOver={handleDragOver}
