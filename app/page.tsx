@@ -11,6 +11,7 @@ import {
     Star,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
@@ -66,8 +67,8 @@ export default function Home() {
     };
 
     return (
-        <main className="bg-white">
-            <nav className="border-b border-gray-100">
+        <>
+            <nav className=" absolute w-full top-0 z-10">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                     <Logo href="/" />
                     <MainButton
@@ -78,12 +79,22 @@ export default function Home() {
                 </div>
             </nav>
 
-            <section className="pt-20 pb-16 px-4 sm:px-6">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
+            <section className="pt-20 pb-16 px-4 sm:px-6 relative">
+                <div className="absolute left-0 top-0 object-cover h-full w-full -z-10">
+                    <Image
+                        src="/heroLandingPage.png"
+                        alt="Hero Image"
+                        fill
+                        quality={40}
+                        className="object-cover opacity-40"
+                    />
+                    <div className="absolute left-0 top-0 h-full w-full bg-linear-to-b from-transparent to-gray-50" />
+                </div>
+                <div className="max-w-4xl mx-auto text-center z-20">
+                    <h1 className="text-3xl sm:text-6xl font-bold text-gray-800 tracking-tight leading-tight">
                         Share beautiful photo galleries with your clients
                     </h1>
-                    <p className="text-xl text-gray-600 mt-6 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-lg text-gray-800 mt-6 max-w-2xl mx-auto leading-relaxed">
                         Upload photos, share a link. Password protection,
                         automatic optimization, and one-click downloads all
                         included.
@@ -92,11 +103,10 @@ export default function Home() {
                         <MainButton
                             label="Start for free"
                             href="/login"
-                            variant="primary"
                             className="text-lg px-8 py-3"
                         />
                     </div>
-                    <p className="text-sm text-gray-500 mt-4">
+                    <p className="text-sm text-green-700 font-semibold animate-pulse mt-4">
                         Free plan available No credit card required
                     </p>
                 </div>
@@ -105,7 +115,7 @@ export default function Home() {
             <section className="py-20 px-4 sm:px-6 bg-gray-50">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
                             Everything you need
                         </h2>
                         <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
@@ -140,7 +150,7 @@ export default function Home() {
             <section className="py-20 px-4 sm:px-6 bg-white">
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
                             How it works
                         </h2>
                         <p className="text-lg text-gray-600 mt-4">
@@ -169,7 +179,7 @@ export default function Home() {
 
             <section className="py-20 px-4 sm:px-6 bg-blue-50">
                 <div className="max-w-3xl mx-auto text-center">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
                         Start free, upgrade when ready
                     </h2>
                     <p className="text-lg text-gray-600 mt-4">
@@ -197,7 +207,7 @@ export default function Home() {
             <section className="py-20 px-4 sm:px-6 bg-linear-to-br from-gray-50 to-blue-50">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
                             Why photographers love us
                         </h2>
                         <p className="text-lg text-gray-600 mt-4">
@@ -243,7 +253,7 @@ export default function Home() {
             <section className="py-20 px-4 sm:px-6 bg-white">
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
                             Trusted by professionals
                         </h2>
                         <p className="text-lg text-gray-600 mt-4">
@@ -270,7 +280,7 @@ export default function Home() {
 
             <section className="py-20 px-4 sm:px-6 bg-gray-50">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 text-center mb-12">
                         FAQ
                     </h2>
                     <div className="space-y-6">
@@ -312,18 +322,18 @@ export default function Home() {
             </section>
 
             {/* FOOTER */}
-            <footer className="bg-gray-950 text-gray-400 py-12 px-4 sm:px-6 border-t border-gray-800">
+            <footer className="bg-stone-200 text-slate-900 py-16 px-4 sm:px-6">
                 <div className="max-w-6xl mx-auto">
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-                        <div>
-                            <h3 className="text-white font-semibold mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 text-center gap-12 lg:gap-8 mb-12">
+                        <div className="space-y-4">
+                            <h3 className="text-gray-800 font-semibold text-lg mb-4">
                                 Product
                             </h3>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                                 <li>
                                     <a
                                         href="/dashboard"
-                                        className="hover:text-white transition-colors"
+                                        className="hover:text-orange-800 transition-colors text-sm"
                                     >
                                         Dashboard
                                     </a>
@@ -331,7 +341,7 @@ export default function Home() {
                                 <li>
                                     <a
                                         href="/dashboard/billing#plans"
-                                        className="hover:text-white transition-colors"
+                                        className="hover:text-orange-800 transition-colors text-sm"
                                     >
                                         Pricing
                                     </a>
@@ -339,22 +349,22 @@ export default function Home() {
                                 <li>
                                     <a
                                         href="#funkcje"
-                                        className="hover:text-white transition-colors"
+                                        className="hover:text-orange-800 transition-colors text-sm"
                                     >
                                         Features
                                     </a>
                                 </li>
                             </ul>
                         </div>
-                        <div>
-                            <h3 className="text-white font-semibold mb-4">
+                        <div className="space-y-4">
+                            <h3 className="text-gray-800 font-semibold text-lg mb-4">
                                 Company
                             </h3>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                                 <li>
                                     <a
                                         href="#"
-                                        className="hover:text-white transition-colors"
+                                        className="hover:text-orange-800 transition-colors text-sm"
                                     >
                                         About
                                     </a>
@@ -362,7 +372,7 @@ export default function Home() {
                                 <li>
                                     <a
                                         href="#"
-                                        className="hover:text-white transition-colors"
+                                        className="hover:text-orange-800 transition-colors text-sm"
                                     >
                                         Contact
                                     </a>
@@ -370,22 +380,22 @@ export default function Home() {
                                 <li>
                                     <a
                                         href="#faq"
-                                        className="hover:text-white transition-colors"
+                                        className="hover:text-orange-800 transition-colors text-sm"
                                     >
                                         FAQ
                                     </a>
                                 </li>
                             </ul>
                         </div>
-                        <div>
-                            <h3 className="text-white font-semibold mb-4">
+                        <div className="space-y-4">
+                            <h3 className="text-gray-800 font-semibold text-lg mb-4">
                                 Resources
                             </h3>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                                 <li>
                                     <a
                                         href="#jak-to-dziala"
-                                        className="hover:text-white transition-colors"
+                                        className="hover:text-orange-800 transition-colors text-sm"
                                     >
                                         How it works
                                     </a>
@@ -393,7 +403,7 @@ export default function Home() {
                                 <li>
                                     <a
                                         href="#"
-                                        className="hover:text-white transition-colors"
+                                        className="hover:text-orange-800 transition-colors text-sm"
                                     >
                                         Help Center
                                     </a>
@@ -401,48 +411,48 @@ export default function Home() {
                                 <li>
                                     <a
                                         href="#"
-                                        className="hover:text-white transition-colors"
+                                        className="hover:text-orange-800 transition-colors text-sm"
                                     >
                                         Terms
                                     </a>
                                 </li>
                             </ul>
                         </div>
-                        <div>
-                            <h3 className="text-white font-semibold mb-4">
+                        <div className="space-y-4">
+                            <h3 className="text-gray-800 font-semibold text-lg mb-4">
                                 Get Started
                             </h3>
-                            <p className="text-sm mb-4">
+                            <p className="text-sm leading-relaxed mb-4">
                                 Start sharing beautiful galleries today
                             </p>
                             <MainButton
                                 label="Sign up free"
                                 href="/login"
-                                variant="primary"
-                                className="w-full"
+                                variant="orange"
+                                className="w-full sm:w-auto"
                             />
                         </div>
                     </div>
-                    <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <p className="text-sm">
+                    <div className="border-t border-slate-700 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
+                        <p className="text-slate-400">
                             © 2025 Seovileo. All rights reserved.
                         </p>
-                        <div className="flex gap-6">
+                        <div className="flex gap-6 text-sm">
                             <a
                                 href="#"
-                                className="hover:text-white transition-colors"
+                                className="hover:text-orange-800 transition-colors"
                             >
                                 Privacy
                             </a>
                             <a
                                 href="#"
-                                className="hover:text-white transition-colors"
+                                className="hover:text-orange-800 transition-colors"
                             >
                                 Terms
                             </a>
                             <a
                                 href="#"
-                                className="hover:text-white transition-colors"
+                                className="hover:text-orange-800 transition-colors"
                             >
                                 Cookies
                             </a>
@@ -455,7 +465,7 @@ export default function Home() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-        </main>
+        </>
     );
 }
 
@@ -473,7 +483,7 @@ function FeatureCard({
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 mb-4">
                 {icon}
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
                 {title}
             </h3>
             <p className="text-gray-600 leading-relaxed">{desc}</p>
@@ -495,7 +505,7 @@ function StepCard({
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-xl mb-4">
                 {number}
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
                 {title}
             </h3>
             <p className="text-gray-600 leading-relaxed">{desc}</p>
@@ -517,7 +527,7 @@ function BenefitCard({
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-600 mb-4">
                 {icon}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 {title}
             </h3>
             <p className="text-gray-600 leading-relaxed">{desc}</p>
@@ -539,7 +549,7 @@ function StatCard({ number, label }: { number: string; label: string }) {
 function FaqItem({ q, a }: { q: string; a: string }) {
     return (
         <div className="border-b border-gray-200 pb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{q}</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{q}</h3>
             <p className="text-gray-600 leading-relaxed">{a}</p>
         </div>
     );
