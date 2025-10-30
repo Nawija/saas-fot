@@ -79,19 +79,19 @@ export default function Home() {
                 </div>
             </nav>
 
-            <section className="pt-20 pb-16 px-4 sm:px-6 relative">
+            <section className="pt-48 pb-16 px-4 sm:px-6 relative">
                 <div className="absolute left-0 top-0 object-cover h-full w-full -z-10">
                     <Image
                         src="/heroLandingPage.png"
                         alt="Hero Image"
                         fill
                         quality={40}
-                        className="object-cover opacity-40"
+                        className="object-cover opacity-50"
                     />
                     <div className="absolute left-0 top-0 h-full w-full bg-linear-to-b from-transparent to-gray-50" />
                 </div>
                 <div className="max-w-4xl mx-auto text-center z-20">
-                    <h1 className="text-3xl sm:text-6xl font-bold text-gray-800 tracking-tight leading-tight">
+                    <h1 className="text-3xl sm:text-6xl font-bold text-gray-800 tracking-tight leading-tight px-5">
                         Share beautiful photo galleries with your clients
                     </h1>
                     <p className="text-lg text-gray-800 mt-6 max-w-2xl mx-auto leading-relaxed">

@@ -6,7 +6,6 @@ import { PLANS, formatBytes } from "@/lib/plans";
 import PricingCards from "@/components/pricing/PricingCards";
 import Loading from "@/components/ui/Loading";
 import {
-    Sparkles,
     TrendingUp,
     Shield,
     Crown,
@@ -14,7 +13,6 @@ import {
     CheckCircle2,
     AlertTriangle,
     CreditCard,
-    Zap,
     ArrowRight,
 } from "lucide-react";
 
@@ -89,7 +87,7 @@ export default function BillingPage() {
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30">
             {/* Hero Header */}
-            <div className="relative overflow-hidden bg-linear-to-br from-indigo-100 via-purple-50 to-pink-50">
+            <div className="relative overflow-hidden bg-linear-to-br from-indigo-100 via-purple-50 to-pink-50 border-b border-gray-200">
                 <div className="absolute inset-0 bg-grid-white/[0.05] bg-size-[20px_20px]"></div>
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                     <div className="text-center">

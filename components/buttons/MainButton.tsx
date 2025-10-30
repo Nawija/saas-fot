@@ -12,7 +12,14 @@ interface MainButtonProps {
     loading?: boolean;
     loadingText?: string;
     icon?: React.ReactNode;
-    variant?: "primary" | "secondary" | "danger" | "success" | "orange";
+    variant?:
+        | "primary"
+        | "secondary"
+        | "danger"
+        | "success"
+        | "orange"
+        | "purple"
+        | "teal";
     className?: string;
     target?: "_blank" | "_self" | "_parent" | "_top";
 }
@@ -21,6 +28,8 @@ const variantStyles: Record<string, string> = {
     primary:
         "bg-blue-50 hover:bg-blue-100 text-blue-800 hover:text-blue-600 border border-blue-300 hover:border-blue-200",
     orange: "bg-orange-50 hover:bg-orange-100 text-orange-800 hover:text-orange-600 border border-orange-300 hover:border-orange-200",
+    purple: "bg-purple-50 hover:bg-purple-100 text-purple-800 hover:text-purple-600 border border-purple-300 hover:border-purple-200",
+    teal: "bg-teal-50 hover:bg-teal-100 text-teal-800 hover:text-teal-600 border border-teal-300 hover:border-teal-200",
     success:
         "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 hover:text-emerald-600 border border-emerald-300 hover:border-emerald-200",
     secondary:

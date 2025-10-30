@@ -11,15 +11,14 @@ import {
     Zap,
     Crown,
     Coffee,
-    CheckCircle2,
-    ArrowRight,
     Upload,
     Link2,
     Shield,
     Sparkles,
+    Gem,
 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
-import PricingCards from "@/components/pricing/PricingCards";
+import Image from "next/image";
 
 export default async function DashboardPage() {
     const user = await getUser();
@@ -80,33 +79,32 @@ export default async function DashboardPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen">
             {/* Hero Section - Clean and welcoming */}
-            <div className="relative overflow-hidden bg-linear-to-br from-blue-50 via-white to-indigo-50 border-b border-gray-100">
+            <div className="relative overflow-hidden bg-linear-to-br from-orange-100 via-yellow-50 to-red-50 border-b border-gray-200">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
                     <div className="text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 text-blue-600 mb-6">
-                            <Images className="w-8 h-8" />
+                        <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm shrink-0 mb-6 mx-auto">
+                            <Gem className="w-6 h-6 text-yellow-500" />
                         </div>
-                        <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-4">
+                        <h1 className="text-3xl sm:text-5xl font-bold text-gray-800 mb-4">
                             Welcome to Your Dashboard
                         </h1>
                         <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
                             Create stunning photo galleries in minutes and share
                             them with your clients professionally
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center px-6">
                             <MainButton
                                 href="/dashboard/collections"
-                                label="Create Your First Gallery"
-                                variant="primary"
-                                className="text-lg px-8 py-3"
+                                label="Create Gallery"
+                                variant="orange"
+
                             />
                             <MainButton
                                 href="/dashboard/billing"
                                 label="Explore Premium"
                                 variant="secondary"
-                                className="text-lg px-8 py-3"
                             />
                         </div>
                     </div>
@@ -117,7 +115,7 @@ export default async function DashboardPage() {
                 {/* How to Use Section */}
                 <div className="mb-20">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
                             How to use Seovileo
                         </h2>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -145,13 +143,13 @@ export default async function DashboardPage() {
                             description="Copy the gallery link and send it to your clients. They can view and download photos instantly."
                         />
                     </div>
-                    <div className="bg-blue-50 rounded-2xl p-6 sm:p-8 border border-blue-100">
+                    <div className="bg-teal-50 rounded-2xl p-6 sm:p-8 border border-teal-100">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                             <div className="shrink-0">
-                                <Sparkles className="w-8 h-8 text-blue-600" />
+                                <Sparkles className="w-8 h-8 text-teal-600" />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2">
                                     Pro Tip: Use Collections to organize
                                 </h3>
                                 <p className="text-gray-600 leading-relaxed">
@@ -167,7 +165,7 @@ export default async function DashboardPage() {
                 {/* Features Grid - Simplified */}
                 <div className="mb-20">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
                             What you can do
                         </h2>
                         <p className="text-lg text-gray-600">
@@ -180,12 +178,12 @@ export default async function DashboardPage() {
                             return (
                                 <div
                                     key={index}
-                                    className="bg-gray-50 rounded-xl p-6 hover:bg-white hover:shadow-md border border-gray-100 hover:border-blue-200 transition-all"
+                                    className="bg-gray-50 rounded-xl p-6 hover:bg-white hover:shadow-md border border-gray-100 hover:border-yellow-200 transition-all"
                                 >
-                                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                                        <Icon className="w-6 h-6 text-blue-600" />
+                                    <div className="w-12 h-12 bg-white shadow rounded-xl flex items-center justify-center mb-4">
+                                        <Icon className="w-6 h-6 text-yellow-500" />
                                     </div>
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
                                         {feature.title}
                                     </h3>
                                     <p className="text-gray-600 text-sm leading-relaxed">
@@ -199,12 +197,12 @@ export default async function DashboardPage() {
 
                 {/* Premium Benefits Section */}
                 <div className="mb-20">
-                    <div className="bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl p-8 sm:p-12 border border-indigo-100">
+                    <div className="bg-linear-to-tr from-emerald-50 via-green-50 to-teal-50 rounded-2xl p-8 sm:p-12 border border-indigo-100">
                         <div className="text-center mb-10">
-                            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-indigo-100 text-indigo-600 mb-4">
+                            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-teal-100 text-teal-600 mb-4">
                                 <Crown className="w-7 h-7" />
                             </div>
-                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
                                 Unlock Premium Benefits
                             </h2>
                             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -264,7 +262,7 @@ export default async function DashboardPage() {
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-sm mb-6">
                             <Coffee className="w-8 h-8 text-orange-600" />
                         </div>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
                             Love Seovileo? Support Us! ❤️
                         </h2>
                         <p className="text-lg text-gray-700 mb-8 leading-relaxed max-w-2xl mx-auto">
@@ -312,16 +310,16 @@ function HowToCard({
     description: string;
 }) {
     return (
-        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-200 hover:shadow-md transition-all">
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:border-indigo-200 hover:shadow-md transition-all">
             <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-lg flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-full bg-rose-400/80 text-white font-bold text-lg flex items-center justify-center shrink-0">
                     {number}
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-orange-50 text-teal-500 flex items-center justify-center shrink-0">
                     {icon}
                 </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 {title}
             </h3>
             <p className="text-gray-600 text-sm leading-relaxed">
@@ -341,13 +339,13 @@ function PremiumBenefit({
     description: string;
 }) {
     return (
-        <div className="bg-white rounded-xl p-5 border border-indigo-100 hover:shadow-md transition-shadow">
+        <div className="bg-white rounded-xl p-5 border border-emerald-100 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                     {icon}
                 </div>
                 <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">
+                    <h4 className="font-semibold text-gray-800 mb-1">
                         {title}
                     </h4>
                     <p className="text-sm text-gray-600 leading-relaxed">
