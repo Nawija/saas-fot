@@ -142,11 +142,11 @@ export default function GalleryLandingPage() {
 
     // Renderowanie formularza hasła
     const renderPasswordPrompt = () => (
-        <div className="w-full max-w-md mx-auto px-4">
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+        <div className="w-full max-w-md mx-auto px-3">
+            <div className="bg-white/10 backdrop-blur-xl border-2 border-white/20 overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
                 <div className="p-10 md:p-12" style={{ fontFamily }}>
                     <div className="flex justify-center mb-8">
-                        <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                        <div className="w-14 h-14 bg-white/20 flex items-center justify-center border-2 border-white/20">
                             <Lock
                                 className="w-6 h-6 text-white"
                                 strokeWidth={1.5}
@@ -159,13 +159,13 @@ export default function GalleryLandingPage() {
                     <p className="text-white/70 text-center mb-8 text-sm">
                         Wprowadź hasło, aby uzyskać dostęp
                     </p>
-                    <form onSubmit={handlePasswordSubmit} className="space-y-5">
+                    <form onSubmit={handlePasswordSubmit} className="space-y-3">
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Hasło"
-                            className="w-full px-5 py-3.5 bg-white/10 border border-white/30 rounded-2xl text-white placeholder-white/50 text-center focus:outline-none focus:bg-white/15 focus:border-white/50 transition-all duration-200"
+                            className="w-full px-5 py-3 bg-white/10 border-2 border-white/30 text-white placeholder-white/50 text-center focus:outline-none focus:bg-white/15 focus:border-white transition-all duration-200"
                             autoFocus
                         />
                         {error && (
@@ -175,9 +175,12 @@ export default function GalleryLandingPage() {
                         )}
                         <button
                             type="submit"
-                            className="w-full px-6 py-3.5 bg-white text-black font-medium rounded-2xl hover:bg-white/95 active:scale-[0.98] transition-all duration-200 shadow-lg"
+                            className="group relative w-full px-4 py-3 bg-white text-black font-semibold overflow-hidden hover:bg-neutral-100 active:scale-[0.99] transition-all duration-200"
                         >
-                            Wejdź do galerii
+                            <span className="relative z-10">
+                                Wejdź do galerii
+                            </span>
+                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                         </button>
                     </form>
                 </div>
@@ -188,13 +191,13 @@ export default function GalleryLandingPage() {
     // Renderowanie przycisku "Zobacz"
     const renderViewButton = () => (
         <div className="w-full max-w-2xl mx-auto text-center px-4">
-            <div className="space-y-8" style={{ fontFamily }}>
+            <div className="space-y-12" style={{ fontFamily }}>
                 <div className="space-y-4">
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white leading-tight tracking-tight">
                         {collection.name}
                     </h1>
                     {collection.description && (
-                        <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-xl mx-auto">
+                        <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
                             {collection.description}
                         </p>
                     )}
@@ -202,10 +205,13 @@ export default function GalleryLandingPage() {
                 <div>
                     <button
                         onClick={handleViewGallery}
-                        className="inline-flex items-center justify-center gap-2.5 bg-white text-black px-10 py-4 rounded-full font-medium text-base hover:bg-white/95 hover:scale-105 active:scale-95 transition-all duration-200 shadow-xl"
+                        className="group relative inline-flex items-center justify-center gap-3 border border-white/90 text-white/90 hover:text-neutral-900 px-8 w-max py-3 font-semibold text-base overflow-hidden hover:bg-neutral-100 active:scale-[0.99] transition-all duration-300"
                     >
-                        <Eye size={20} strokeWidth={2} />
-                        <span>Zobacz galerię</span>
+                        <span className="relative z-10 flex items-center gap-3 text-sm lg:text-base">
+                            <Eye size={22} strokeWidth={2} />
+                            <span>Zobacz galerię</span>
+                        </span>
+                        <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
                     </button>
                 </div>
             </div>
@@ -219,7 +225,7 @@ export default function GalleryLandingPage() {
         if (!hasHeroImage) {
             // Bez hero image - elegancki gradient
             return {
-                background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+                background: "black",
             };
         }
 
@@ -237,16 +243,7 @@ export default function GalleryLandingPage() {
             style={getBackgroundStyle()}
         >
             {/* Premium overlay */}
-            <div className="absolute inset-0 bg-black/50" />
-
-            {/* Subtelna tekstura */}
-            <div
-                className="absolute inset-0 opacity-[0.02]"
-                style={{
-                    backgroundImage:
-                        'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.4"/%3E%3C/svg%3E")',
-                }}
-            />
+            <div className="absolute inset-0 bg-black/60" />
 
             {/* Zawartość */}
             <div className="relative z-10 w-full py-12">
