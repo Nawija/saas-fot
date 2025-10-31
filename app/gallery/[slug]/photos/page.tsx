@@ -15,9 +15,12 @@ function getPhotoIndexFromHash(photos: Photo[]): number | null {
     if (typeof window === "undefined") return null;
     const hash = window.location.hash;
     if (!hash.startsWith("#photo-")) return null;
-    const id = hash.replace("#photo-", "");
-    const idx = photos.findIndex((p) => String(p.id) === id);
-    return idx >= 0 ? idx : null;
+    const numStr = hash.replace("#photo-", "");
+    const n = parseInt(numStr, 10);
+    if (Number.isNaN(n)) return null;
+    const idx = n - 1; // convert 1-based to 0-based
+    if (idx < 0 || idx >= photos.length) return null;
+    return idx;
 }
 
 export default function GalleryPhotosPage() {
@@ -205,13 +208,16 @@ export default function GalleryPhotosPage() {
         // guard to prevent repeated triggers while a page is already requested
         const triggeredRef = { value: false } as { value: boolean };
 
-        const pswp = (lightbox as any).pswp;
+        const lbAny = lightbox as any;
+        const pswp = lbAny.pswp;
 
         const tryGetIndex = () => {
-            if (!pswp) return null;
-            return typeof pswp.getCurrentIndex === "function"
-                ? pswp.getCurrentIndex()
-                : pswp.currIndex ?? null;
+            // try pswp instance first, then lightbox
+            const inst = pswp ?? lbAny.instance ?? lbAny.pswp;
+            if (!inst) return null;
+            return typeof inst.getCurrentIndex === "function"
+                ? inst.getCurrentIndex()
+                : inst.currIndex ?? null;
         };
 
         const onIndexChange = () => {
@@ -229,6 +235,34 @@ export default function GalleryPhotosPage() {
                     setPage((p) => p + 1);
                     setTimeout(() => (triggeredRef.value = false), 1500);
                 }
+                try {
+                    // update URL hash to reflect currently visible photo index (1-based)
+                    if (typeof window !== "undefined" && "history" in window) {
+                        const newUrl =
+                            window.location.pathname +
+                            window.location.search +
+                            `#photo-${idx + 1}`;
+                        window.history.replaceState(null, "", newUrl);
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            } catch (e) {
+                // ignore
+            }
+        };
+
+        // Attach handlers to both the underlying pswp instance (if present)
+        // and the PhotoSwipeLightbox wrapper — some navigation events come from one or the other
+        const closeHandler = () => {
+            try {
+                if (typeof window !== "undefined" && "history" in window) {
+                    window.history.replaceState(
+                        null,
+                        "",
+                        window.location.pathname + window.location.search
+                    );
+                }
             } catch (e) {
                 // ignore
             }
@@ -237,8 +271,53 @@ export default function GalleryPhotosPage() {
         if (pswp && typeof pswp.on === "function") {
             pswp.on("change", onIndexChange);
             pswp.on("indexChange", onIndexChange);
+            pswp.on("close", closeHandler);
         }
+
+        if (lbAny && typeof lbAny.on === "function") {
+            lbAny.on("change", onIndexChange);
+            lbAny.on("indexChange", onIndexChange);
+            lbAny.on("close", closeHandler);
+        }
+
+        // keep the click fallback
         orderContainer.addEventListener("click", onIndexChange);
+
+        // Polling fallback: some navigation methods may not emit change events we can catch reliably.
+        // Start a short interval to check current index while the lightbox is active.
+        let lastIdx: number | null = null;
+        const pollInterval =
+            typeof window !== "undefined"
+                ? window.setInterval(() => {
+                      try {
+                          const idx = tryGetIndex();
+                          if (idx == null) return;
+                          if (idx !== lastIdx) {
+                              lastIdx = idx;
+                              try {
+                                  if (
+                                      typeof window !== "undefined" &&
+                                      "history" in window
+                                  ) {
+                                      const newUrl =
+                                          window.location.pathname +
+                                          window.location.search +
+                                          `#photo-${idx + 1}`;
+                                      window.history.replaceState(
+                                          null,
+                                          "",
+                                          newUrl
+                                      );
+                                  }
+                              } catch (e) {
+                                  // ignore
+                              }
+                          }
+                      } catch (e) {
+                          // ignore
+                      }
+                  }, 250)
+                : null;
 
         // if we had a previous open index, reopen at same index in the new instance
         if (previousIndex != null) {
@@ -262,10 +341,25 @@ export default function GalleryPhotosPage() {
 
         return () => {
             if (pswp && typeof pswp.off === "function") {
-                pswp.off("change", onIndexChange);
-                pswp.off("indexChange", onIndexChange);
+                try {
+                    pswp.off("change", onIndexChange);
+                    pswp.off("indexChange", onIndexChange);
+                    pswp.off("close", closeHandler);
+                } catch (e) {
+                    // ignore
+                }
+            }
+            if (lbAny && typeof lbAny.off === "function") {
+                try {
+                    lbAny.off("change", onIndexChange);
+                    lbAny.off("indexChange", onIndexChange);
+                    lbAny.off("close", closeHandler);
+                } catch (e) {}
             }
             orderContainer.removeEventListener("click", onIndexChange);
+            try {
+                if (pollInterval) window.clearInterval(pollInterval);
+            } catch (e) {}
             try {
                 lightbox.destroy();
             } catch (e) {}
@@ -310,6 +404,18 @@ export default function GalleryPhotosPage() {
         const link = links?.[idx] as HTMLAnchorElement | undefined;
         if (link) {
             link.click();
+            try {
+                // Update URL to current photo index (1-based) without adding history entries
+                if (typeof window !== "undefined" && "history" in window) {
+                    const newUrl =
+                        window.location.pathname +
+                        window.location.search +
+                        `#photo-${idx + 1}`;
+                    window.history.replaceState(null, "", newUrl);
+                }
+            } catch (e) {
+                // ignore
+            }
             const visible = galleryRef.current?.querySelector(
                 `a[data-photo-id="${id}"]`
             );
