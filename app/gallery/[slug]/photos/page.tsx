@@ -259,18 +259,6 @@ export default function GalleryPhotosPage() {
         // retry timer used to wait until the thumbnail is rendered in the gallery after closing
         let scrollRetryTimer: number | null = null;
         const closeHandler = () => {
-            try {
-                if (typeof window !== "undefined" && "history" in window) {
-                    window.history.replaceState(
-                        null,
-                        "",
-                        window.location.pathname + window.location.search
-                    );
-                }
-            } catch (e) {
-                // ignore
-            }
-
             // After closing, attempt to scroll the gallery to the thumbnail that was being shown
             try {
                 const idx = tryGetIndex();
