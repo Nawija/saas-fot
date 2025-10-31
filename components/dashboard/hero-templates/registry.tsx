@@ -65,7 +65,7 @@ const SOURCE: Array<{
     { key: "minimal", label: "Minimal", tpl: MinimalTemplate },
     { key: "fullscreen", label: "Fullscreen", tpl: FullscreenTemplate },
     { key: "split", label: "Split", tpl: SplitTemplate, premium: true },
-    { key: "overlay", label: "Overlay", tpl: OverlayTemplate, premium: false },
+    { key: "overlay", label: "Overlay", tpl: OverlayTemplate },
     { key: "gradient", label: "Gradient", tpl: GradientTemplate },
     {
         key: "cinematic",

@@ -228,6 +228,21 @@ html {
     }
 }
 
+.section-gradient {
+    @apply relative isolate overflow-hidden;
+}
+
+.section-gradient::before {
+    content: "";
+    @apply absolute inset-0 -z-10 bg-gradient-to-br from-indigo-50 via-white to-pink-50;
+}
+
+.section-gradient::after {
+    content: "";
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[800px]
+    bg-gradient-to-tr from-blue-200 via-pink-100 to-teal-200 blur-3xl opacity-40 -z-10;
+}
+
 /* scrollbar visible only on hover */
 .scrollbar-on-hover {
     /* Firefox */

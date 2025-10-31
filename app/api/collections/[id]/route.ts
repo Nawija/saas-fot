@@ -174,7 +174,6 @@ export async function PATCH(
 
         const premiumTemplates = new Set([
             "split",
-            "overlay",
             "cards",
             "cinematic",
             "editorial",
