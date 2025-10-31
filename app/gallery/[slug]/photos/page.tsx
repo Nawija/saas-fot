@@ -169,6 +169,8 @@ export default function GalleryPhotosPage() {
 
     // PhotoSwipe using hidden left-to-right anchors
     const lightboxRef = useRef<PhotoSwipeLightbox | null>(null);
+    // store last visible index seen in the lightbox so we can scroll to it on close
+    const lastVisibleIndexRef = useRef<number | null>(null);
 
     useEffect(() => {
         const orderContainer = document.getElementById("pswp-order");
@@ -225,6 +227,8 @@ export default function GalleryPhotosPage() {
         const onIndexChange = () => {
             try {
                 const idx = tryGetIndex();
+                // remember last visible index so close uses the final viewed photo
+                if (idx != null) lastVisibleIndexRef.current = idx;
                 if (idx == null) return;
                 const currentLoaded = displayedPhotos.length;
                 if (
@@ -261,7 +265,8 @@ export default function GalleryPhotosPage() {
         const closeHandler = () => {
             // After closing, attempt to scroll the gallery to the thumbnail that was being shown
             try {
-                const idx = tryGetIndex();
+                // prefer the last visible index we recorded while navigating; fallback to reading from instance
+                const idx = lastVisibleIndexRef.current ?? tryGetIndex();
                 if (idx == null) return;
                 const allCols = distributePhotosIntoColumns(
                     allPhotos,
@@ -353,6 +358,7 @@ export default function GalleryPhotosPage() {
                           if (idx == null) return;
                           if (idx !== lastIdx) {
                               lastIdx = idx;
+                              lastVisibleIndexRef.current = idx;
                               try {
                                   if (
                                       typeof window !== "undefined" &&
@@ -540,8 +546,7 @@ export default function GalleryPhotosPage() {
                             columns.map((col, colIndex) => (
                                 <div
                                     key={colIndex}
-                                    className="flex-1 space-y-1"
-                                    id={`photo-${colIndex}`}
+                                    className="flex-1 space-y-1" 
                                 >
                                     {col.map((photo: Photo) => (
                                         <a
