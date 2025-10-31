@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import LoadingGallery from "@/components/ui/LoadingGallery";
 import type { Photo, Collection } from "@/types/gallery";
@@ -10,7 +10,7 @@ import Image from "next/image";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 
-// Helper to get photo index from hash
+// Helper to get index from hash
 function getPhotoIndexFromHash(photos: Photo[]): number | null {
     if (typeof window === "undefined") return null;
     const hash = window.location.hash;
@@ -24,17 +24,72 @@ export default function GalleryPhotosPage() {
     const params = useParams();
     const router = useRouter();
     const [collection, setCollection] = useState<Collection | null>(null);
-    const [photos, setPhotos] = useState<Photo[]>([]);
+    const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
+    const [displayedPhotos, setDisplayedPhotos] = useState<Photo[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
     const galleryRef = useRef<HTMLDivElement>(null);
+    const PHOTOS_PER_PAGE = 20;
 
+    // Fetch gallery
     useEffect(() => {
         fetchGallery();
     }, []);
 
+    const fetchGallery = async () => {
+        try {
+            const token = sessionStorage.getItem(`gallery_${params.slug}`);
+            const { ok, collection, photos, status } = await apiGetPhotos(
+                String(params.slug),
+                token ?? undefined
+            );
+            if (ok && collection && photos) {
+                // Sort photos chronologically (by filename or ID)
+                const sorted = [...photos].sort((a, b) =>
+                    a.file_path.localeCompare(b.file_path, undefined, {
+                        numeric: true,
+                    })
+                );
+                setCollection(collection);
+                setAllPhotos(sorted);
+                setDisplayedPhotos(sorted.slice(0, PHOTOS_PER_PAGE));
+            } else if (status === 401) {
+                router.push(`/gallery/${params.slug}`);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Infinite scroll
+    const handleScroll = useCallback(() => {
+        if (!galleryRef.current) return;
+        const { scrollTop, scrollHeight, clientHeight } =
+            document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
+            // Load next batch
+            setPage((prev) => prev + 1);
+        }
+    }, []);
+
+    useEffect(() => {
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [handleScroll]);
+
+    // Load more photos when page increases
+    useEffect(() => {
+        if (page === 1) return;
+        const start = (page - 1) * PHOTOS_PER_PAGE;
+        const newPhotos = allPhotos.slice(0, start + PHOTOS_PER_PAGE);
+        setDisplayedPhotos(newPhotos);
+    }, [page, allPhotos]);
+
     // Initialize PhotoSwipe
     useEffect(() => {
-        if (photos.length === 0) return;
+        if (displayedPhotos.length === 0) return;
 
         let lightbox: PhotoSwipeLightbox | null = new PhotoSwipeLightbox({
             gallery: "#gallery",
@@ -45,33 +100,19 @@ export default function GalleryPhotosPage() {
             loop: true,
             closeTitle: "Zamknij (Esc)",
             zoomTitle: "Zoom",
-            arrowPrevTitle: "Poprzednie (strzałka w lewo)",
-            arrowNextTitle: "Następne (strzałka w prawo)",
+            arrowPrevTitle: "Poprzednie (←)",
+            arrowNextTitle: "Następne (→)",
             errorMsg: "Nie można załadować zdjęcia",
         });
 
-        // On slide change, update hash and scroll grid to photo
         lightbox.on("change", () => {
             const idx = lightbox?.pswp?.currIndex ?? 0;
-            const photo = photos[idx];
+            const photo = displayedPhotos[idx];
             if (photo) {
                 window.location.hash = `photo-${photo.id}`;
-                // Scroll to the photo in the grid
-                if (galleryRef.current) {
-                    const links =
-                        galleryRef.current.querySelectorAll("a[data-photo-id]");
-                    const link = links[idx] as HTMLElement | undefined;
-                    if (link) {
-                        link.scrollIntoView({
-                            behavior: "smooth",
-                            block: "center",
-                        });
-                    }
-                }
             }
         });
 
-        // On close, clear hash
         lightbox.on("close", () => {
             if (window.location.hash.startsWith("#photo-")) {
                 history.replaceState(
@@ -84,8 +125,7 @@ export default function GalleryPhotosPage() {
 
         lightbox.init();
 
-        // If hash present, programmatically click the correct <a> to open PhotoSwipe and scroll to it
-        const idxFromHash = getPhotoIndexFromHash(photos);
+        const idxFromHash = getPhotoIndexFromHash(displayedPhotos);
         if (idxFromHash !== null && galleryRef.current) {
             const links =
                 galleryRef.current.querySelectorAll("a[data-photo-id]");
@@ -101,48 +141,28 @@ export default function GalleryPhotosPage() {
             }
         }
 
-        // Listen for hashchange (user pastes or navigates)
-        const onHashChange = () => {
-            const idx = getPhotoIndexFromHash(photos);
-            if (idx !== null && galleryRef.current) {
-                const links =
-                    galleryRef.current.querySelectorAll("a[data-photo-id]");
-                const link = links[idx] as HTMLAnchorElement | undefined;
-                if (link) link.click();
-            }
-        };
-        window.addEventListener("hashchange", onHashChange);
-
         return () => {
             lightbox?.destroy();
             lightbox = null;
-            window.removeEventListener("hashchange", onHashChange);
         };
-    }, [photos]);
+    }, [displayedPhotos]);
 
-    const fetchGallery = async () => {
-        try {
-            const token = sessionStorage.getItem(`gallery_${params.slug}`);
-            const { ok, collection, photos, status } = await apiGetPhotos(
-                String(params.slug),
-                token ?? undefined
-            );
-            if (ok && collection && photos) {
-                setCollection(collection);
-                setPhotos(photos);
-            } else if (status === 401) {
-                router.push(`/gallery/${params.slug}`);
+    // Masonry reorder to go row-by-row visually
+    const reorderForColumns = (photos: Photo[], columns = 3) => {
+        const reordered: Photo[] = [];
+        const rows = Math.ceil(photos.length / columns);
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < columns; col++) {
+                const index = col * rows + row;
+                if (photos[index]) reordered.push(photos[index]);
             }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setLoading(false);
         }
+        return reordered;
     };
 
-    if (loading) {
-        return <LoadingGallery />;
-    }
+    const photosToRender = reorderForColumns(displayedPhotos, 3);
+
+    if (loading) return <LoadingGallery />;
 
     if (!collection) {
         return (
@@ -162,30 +182,27 @@ export default function GalleryPhotosPage() {
 
     return (
         <>
-            {/* Hero Section */}
             <GalleryHero collection={collection} />
 
-            {/* Gallery Grid */}
             <div className="min-h-screen bg-neutral-950 py-12 px-2">
-                {/* Header */}
                 <div className="mb-8">
                     <h2 className="text-2xl md:text-3xl font-medium text-white mb-2">
                         {collection.name}
                     </h2>
                     <p className="text-white/60">
-                        {photos.length}{" "}
-                        {photos.length === 1 ? "zdjęcie" : "zdjęć"}
+                        {allPhotos.length}{" "}
+                        {allPhotos.length === 1 ? "zdjęcie" : "zdjęć"}
                     </p>
                 </div>
 
-                {/* Premium Masonry Grid with PhotoSwipe */}
+                {/* Masonry Layout */}
                 <div id="s" className="scroll-m-2">
                     <div
                         id="gallery"
                         ref={galleryRef}
-                        className="columns-1 sm:columns-2 lg:columns-3 gap-0"
+                        className="columns-1 sm:columns-2 lg:columns-3 gap-1"
                     >
-                        {photos.map((photo, index) => (
+                        {photosToRender.map((photo, index) => (
                             <a
                                 key={photo.id}
                                 href={photo.file_path}
@@ -193,10 +210,8 @@ export default function GalleryPhotosPage() {
                                 data-pswp-width={photo.width}
                                 data-pswp-height={photo.height}
                                 data-photo-id={photo.id}
-                                className="mb-0 block w-full group cursor-pointer p-1 overflow-hidden bg-neutral-900"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                }}
+                                className="mb-1 block w-full group cursor-pointer overflow-hidden bg-neutral-900"
+                                onClick={(e) => e.preventDefault()}
                             >
                                 <div
                                     className="relative w-full"
@@ -211,12 +226,18 @@ export default function GalleryPhotosPage() {
                                         className="object-cover"
                                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                     />
-                                    {/* Hover Overlay */}
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
                                 </div>
                             </a>
                         ))}
                     </div>
+
+                    {/* Loading indicator */}
+                    {displayedPhotos.length < allPhotos.length && (
+                        <div className="text-center text-white py-6">
+                            Ładowanie kolejnych zdjęć...
+                        </div>
+                    )}
                 </div>
             </div>
         </>
