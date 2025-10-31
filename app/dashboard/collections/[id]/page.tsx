@@ -648,9 +648,6 @@ export default function CollectionDetailPage({
                                             <div className="absolute top-0 right-0 z-10 bg-white/5 w-full h-full" />
                                             <div
                                                 className="w-full overflow-hidden aspect-video"
-                                                // style={{
-                                                //     height: "170px",
-                                                // }}
                                             >
                                                 <div
                                                     className="origin-top-left"
