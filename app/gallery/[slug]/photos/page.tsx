@@ -101,7 +101,8 @@ export default function GalleryPhotosPage() {
                         {collection.name}
                     </h2>
                     <p className="text-white/60">
-                        {photos.length} {photos.length === 1 ? "zdjęcie" : "zdjęć"}
+                        {photos.length}{" "}
+                        {photos.length === 1 ? "zdjęcie" : "zdjęć"}
                     </p>
                 </div>
 
