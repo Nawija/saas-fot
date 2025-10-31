@@ -1,1 +1,0 @@
-* nie usówaw gigabajtów z hero image z neon data baze ale wszystkie image usuwaja sie z R2 

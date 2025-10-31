@@ -42,29 +42,8 @@ export async function POST(req: NextRequest) {
         const { buffer: processedBuffer, contentType } =
             await processAvatarImage(buffer);
 
-        // Oblicz różnicę rozmiaru (nowy avatar - stary avatar)
-        let oldAvatarSize = 0;
-        if (user.avatar) {
-            // Dla uproszczenia przyjmujemy że avatar zawsze ma ~50KB
-            oldAvatarSize = 50000;
-        }
-        const sizeDiff = processedBuffer.length - oldAvatarSize;
-
-        // Sprawdź czy użytkownik ma wystarczająco miejsca (tylko jeśli zwiększamy rozmiar)
-        if (sizeDiff > 0) {
-            const hasSpace = await canUploadFile(user.id, sizeDiff);
-            if (!hasSpace) {
-                return NextResponse.json(
-                    {
-                        error: "Brak miejsca",
-                        message:
-                            "Przekroczono limit storage. Zakup większy plan.",
-                        upgradeRequired: true,
-                    },
-                    { status: 413 }
-                );
-            }
-        }
+        // Avatar nie jest liczony do storage_used (tak jak hero_image)
+        // Tylko zdjęcia w galeriach zajmują miejsce w limicie
 
         // Usuń stary avatar jeśli istnieje
         if (user.avatar) {
@@ -85,12 +64,6 @@ export async function POST(req: NextRequest) {
             avatarUrl,
             user.id,
         ]);
-
-        // Zaktualizuj storage_used (używamy wcześniej obliczonego sizeDiff)
-        await query(
-            "UPDATE users SET storage_used = storage_used + $1 WHERE id = $2",
-            [sizeDiff, user.id]
-        );
 
         return NextResponse.json({
             ok: true,
