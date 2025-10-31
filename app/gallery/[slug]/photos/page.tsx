@@ -10,6 +10,16 @@ import Image from "next/image";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 
+// Helper to get photo index from hash
+function getPhotoIndexFromHash(photos: Photo[]): number | null {
+    if (typeof window === "undefined") return null;
+    const hash = window.location.hash;
+    if (!hash.startsWith("#photo-")) return null;
+    const id = hash.replace("#photo-", "");
+    const idx = photos.findIndex((p) => String(p.id) === id);
+    return idx >= 0 ? idx : null;
+}
+
 export default function GalleryPhotosPage() {
     const params = useParams();
     const router = useRouter();
@@ -40,11 +50,73 @@ export default function GalleryPhotosPage() {
             errorMsg: "Nie można załadować zdjęcia",
         });
 
+        // On slide change, update hash and scroll grid to photo
+        lightbox.on("change", () => {
+            const idx = lightbox?.pswp?.currIndex ?? 0;
+            const photo = photos[idx];
+            if (photo) {
+                window.location.hash = `photo-${photo.id}`;
+                // Scroll to the photo in the grid
+                if (galleryRef.current) {
+                    const links =
+                        galleryRef.current.querySelectorAll("a[data-photo-id]");
+                    const link = links[idx] as HTMLElement | undefined;
+                    if (link) {
+                        link.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                        });
+                    }
+                }
+            }
+        });
+
+        // On close, clear hash
+        lightbox.on("close", () => {
+            if (window.location.hash.startsWith("#photo-")) {
+                history.replaceState(
+                    null,
+                    "",
+                    window.location.pathname + window.location.search
+                );
+            }
+        });
+
         lightbox.init();
+
+        // If hash present, programmatically click the correct <a> to open PhotoSwipe and scroll to it
+        const idxFromHash = getPhotoIndexFromHash(photos);
+        if (idxFromHash !== null && galleryRef.current) {
+            const links =
+                galleryRef.current.querySelectorAll("a[data-photo-id]");
+            const link = links[idxFromHash] as HTMLAnchorElement | undefined;
+            if (link) {
+                setTimeout(() => {
+                    link.click();
+                    link.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                }, 100);
+            }
+        }
+
+        // Listen for hashchange (user pastes or navigates)
+        const onHashChange = () => {
+            const idx = getPhotoIndexFromHash(photos);
+            if (idx !== null && galleryRef.current) {
+                const links =
+                    galleryRef.current.querySelectorAll("a[data-photo-id]");
+                const link = links[idx] as HTMLAnchorElement | undefined;
+                if (link) link.click();
+            }
+        };
+        window.addEventListener("hashchange", onHashChange);
 
         return () => {
             lightbox?.destroy();
             lightbox = null;
+            window.removeEventListener("hashchange", onHashChange);
         };
     }, [photos]);
 
@@ -94,9 +166,9 @@ export default function GalleryPhotosPage() {
             <GalleryHero collection={collection} />
 
             {/* Gallery Grid */}
-            <div className="min-h-screen bg-neutral-950 py-12 px-4 md:px-8">
+            <div className="min-h-screen bg-neutral-950 py-12 px-2">
                 {/* Header */}
-                <div className="max-w-7xl mx-auto mb-8">
+                <div className="mb-8">
                     <h2 className="text-2xl md:text-3xl font-medium text-white mb-2">
                         {collection.name}
                     </h2>
@@ -107,7 +179,7 @@ export default function GalleryPhotosPage() {
                 </div>
 
                 {/* Premium Masonry Grid with PhotoSwipe */}
-                <div className="max-w-7xl mx-auto">
+                <div id="s" className="scroll-m-2">
                     <div
                         id="gallery"
                         ref={galleryRef}
@@ -117,13 +189,16 @@ export default function GalleryPhotosPage() {
                             <a
                                 key={photo.id}
                                 href={photo.file_path}
+                                data-pswp-src={photo.file_path}
                                 data-pswp-width={photo.width}
                                 data-pswp-height={photo.height}
-                                target="_blank"
-                                rel="noreferrer"
+                                data-photo-id={photo.id}
                                 className="relative group cursor-pointer overflow-hidden bg-neutral-900 block"
                                 style={{
                                     aspectRatio: `${photo.width} / ${photo.height}`,
+                                }}
+                                onClick={(e) => {
+                                    e.preventDefault();
                                 }}
                             >
                                 <Image
