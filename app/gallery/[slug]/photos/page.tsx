@@ -28,8 +28,68 @@ export default function GalleryPhotosPage() {
     const [displayedPhotos, setDisplayedPhotos] = useState<Photo[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const galleryRef = useRef<HTMLDivElement>(null);
     const PHOTOS_PER_PAGE = 20;
+
+    // Masonry columns: distribute photos into N columns and append new photos
+    const [columnsCount, setColumnsCount] = useState<number>(3);
+    const [columns, setColumns] = useState<Photo[][]>([]);
+    const [columnsHeights, setColumnsHeights] = useState<number[]>([]); // approximate heights by aspect ratio
+
+    // helper to create empty columns
+    const createEmptyColumns = (n: number) =>
+        Array.from({ length: n }, () => [] as Photo[]);
+
+    // distribute a full list into columns (used for initial render or when columnsCount changes)
+    const distributePhotosIntoColumns = (photos: Photo[], n: number) => {
+        const cols = createEmptyColumns(n);
+        const heights = new Array(n).fill(0);
+        photos.forEach((p) => {
+            const aspect = (p.height || 1) / (p.width || 1);
+            // put into shortest column
+            let minIdx = 0;
+            for (let i = 1; i < n; i++)
+                if (heights[i] < heights[minIdx]) minIdx = i;
+            cols[minIdx].push(p);
+            heights[minIdx] += aspect;
+        });
+        return { cols, heights };
+    };
+
+    // append a batch of photos to existing columns (keeps previous items in place)
+    const appendPhotosToColumns = (nextBatch: Photo[]) => {
+        if (!nextBatch || nextBatch.length === 0) return;
+        setColumns((prevCols) => {
+            const n = Math.max(columnsCount, 1);
+            const cols =
+                prevCols.length === n
+                    ? prevCols.map((c) => [...c])
+                    : createEmptyColumns(n);
+            const heights = cols.map((c, i) => {
+                // compute current height estimate if we don't have it
+                return (
+                    columnsHeights[i] ??
+                    cols[i].reduce(
+                        (s, p) => s + (p.height || 1) / (p.width || 1),
+                        0
+                    )
+                );
+            });
+
+            nextBatch.forEach((p) => {
+                const aspect = (p.height || 1) / (p.width || 1);
+                let minIdx = 0;
+                for (let i = 1; i < n; i++)
+                    if (heights[i] < heights[minIdx]) minIdx = i;
+                cols[minIdx].push(p);
+                heights[minIdx] += aspect;
+            });
+
+            setColumnsHeights(heights);
+            return cols;
+        });
+    };
 
     // Fetch gallery
     useEffect(() => {
@@ -43,8 +103,9 @@ export default function GalleryPhotosPage() {
                 String(params.slug),
                 token ?? undefined
             );
+
             if (ok && collection && photos) {
-                // Sort photos chronologically (by filename or ID)
+                // Sort photos chronologicznie (np. 1.jpg, 2.jpg, itd.)
                 const sorted = [...photos].sort((a, b) =>
                     a.file_path.localeCompare(b.file_path, undefined, {
                         numeric: true,
@@ -52,7 +113,15 @@ export default function GalleryPhotosPage() {
                 );
                 setCollection(collection);
                 setAllPhotos(sorted);
-                setDisplayedPhotos(sorted.slice(0, PHOTOS_PER_PAGE));
+                const initial = sorted.slice(0, PHOTOS_PER_PAGE);
+                setDisplayedPhotos(initial);
+                // distribute initial photos into columns (if columnsCount already set)
+                const { cols, heights } = distributePhotosIntoColumns(
+                    initial,
+                    columnsCount
+                );
+                setColumns(cols);
+                setColumnsHeights(heights);
             } else if (status === 401) {
                 router.push(`/gallery/${params.slug}`);
             }
@@ -65,31 +134,42 @@ export default function GalleryPhotosPage() {
 
     // Infinite scroll
     const handleScroll = useCallback(() => {
-        if (!galleryRef.current) return;
+        if (isLoadingMore) return;
         const { scrollTop, scrollHeight, clientHeight } =
             document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 100) {
-            // Load next batch
+
+        // Ładuj nowe zdjęcia, gdy zbliżamy się do końca strony
+        if (scrollTop + clientHeight >= scrollHeight - 300) {
+            setIsLoadingMore(true);
             setPage((prev) => prev + 1);
         }
-    }, []);
+    }, [isLoadingMore]);
 
     useEffect(() => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, [handleScroll]);
 
-    // Load more photos when page increases
+    // Doładowywanie kolejnych zdjęć (DOKŁADANIE bez przeskakiwania)
     useEffect(() => {
         if (page === 1) return;
         const start = (page - 1) * PHOTOS_PER_PAGE;
-        const newPhotos = allPhotos.slice(0, start + PHOTOS_PER_PAGE);
-        setDisplayedPhotos(newPhotos);
+        const nextBatch = allPhotos.slice(start, start + PHOTOS_PER_PAGE);
+        if (nextBatch.length > 0) {
+            setDisplayedPhotos((prev) => {
+                const updated = [...prev, ...nextBatch];
+                return updated;
+            });
+            // append to columns so we don't recompute entire ordering
+            appendPhotosToColumns(nextBatch);
+        }
+        setIsLoadingMore(false);
     }, [page, allPhotos]);
 
-    // Initialize PhotoSwipe
+    // PhotoSwipe
     useEffect(() => {
-        if (displayedPhotos.length === 0) return;
+        // initialize PhotoSwipe on DOM anchors (columns determine DOM order)
+        if (!galleryRef.current) return;
 
         let lightbox: PhotoSwipeLightbox | null = new PhotoSwipeLightbox({
             gallery: "#gallery",
@@ -98,34 +178,13 @@ export default function GalleryPhotosPage() {
             bgOpacity: 0.95,
             spacing: 0.1,
             loop: true,
-            closeTitle: "Zamknij (Esc)",
-            zoomTitle: "Zoom",
-            arrowPrevTitle: "Poprzednie (←)",
-            arrowNextTitle: "Następne (→)",
-            errorMsg: "Nie można załadować zdjęcia",
-        });
-
-        lightbox.on("change", () => {
-            const idx = lightbox?.pswp?.currIndex ?? 0;
-            const photo = displayedPhotos[idx];
-            if (photo) {
-                window.location.hash = `photo-${photo.id}`;
-            }
-        });
-
-        lightbox.on("close", () => {
-            if (window.location.hash.startsWith("#photo-")) {
-                history.replaceState(
-                    null,
-                    "",
-                    window.location.pathname + window.location.search
-                );
-            }
         });
 
         lightbox.init();
 
-        const idxFromHash = getPhotoIndexFromHash(displayedPhotos);
+        // compute DOM order (flattened columns)
+        const flat = columns.flat();
+        const idxFromHash = getPhotoIndexFromHash(flat);
         if (idxFromHash !== null && galleryRef.current) {
             const links =
                 galleryRef.current.querySelectorAll("a[data-photo-id]");
@@ -145,22 +204,31 @@ export default function GalleryPhotosPage() {
             lightbox?.destroy();
             lightbox = null;
         };
-    }, [displayedPhotos]);
+    }, [columns]);
 
-    // Masonry reorder to go row-by-row visually
-    const reorderForColumns = (photos: Photo[], columns = 3) => {
-        const reordered: Photo[] = [];
-        const rows = Math.ceil(photos.length / columns);
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < columns; col++) {
-                const index = col * rows + row;
-                if (photos[index]) reordered.push(photos[index]);
-            }
-        }
-        return reordered;
-    };
+    // responsive: update columnsCount on resize
+    useEffect(() => {
+        const updateCols = () => {
+            const w = typeof window !== "undefined" ? window.innerWidth : 1200;
+            if (w < 640) setColumnsCount(1);
+            else if (w < 1024) setColumnsCount(2);
+            else setColumnsCount(3);
+        };
+        updateCols();
+        window.addEventListener("resize", updateCols);
+        return () => window.removeEventListener("resize", updateCols);
+    }, []);
 
-    const photosToRender = reorderForColumns(displayedPhotos, 3);
+    // when columnsCount changes, redistribute all displayed photos into new columns
+    useEffect(() => {
+        if (displayedPhotos.length === 0) return;
+        const { cols, heights } = distributePhotosIntoColumns(
+            displayedPhotos,
+            columnsCount
+        );
+        setColumns(cols);
+        setColumnsHeights(heights);
+    }, [columnsCount]);
 
     if (loading) return <LoadingGallery />;
 
@@ -195,46 +263,55 @@ export default function GalleryPhotosPage() {
                     </p>
                 </div>
 
-                {/* Masonry Layout */}
                 <div id="s" className="scroll-m-2">
-                    <div
-                        id="gallery"
-                        ref={galleryRef}
-                        className="columns-1 sm:columns-2 lg:columns-3 gap-1"
-                    >
-                        {photosToRender.map((photo, index) => (
-                            <a
-                                key={photo.id}
-                                href={photo.file_path}
-                                data-pswp-src={photo.file_path}
-                                data-pswp-width={photo.width}
-                                data-pswp-height={photo.height}
-                                data-photo-id={photo.id}
-                                className="mb-1 block w-full group cursor-pointer overflow-hidden bg-neutral-900"
-                                onClick={(e) => e.preventDefault()}
-                            >
+                    <div id="gallery" ref={galleryRef} className="flex gap-1">
+                        {columns.length === 0 ? (
+                            <div className="w-full text-center text-white/60 py-6">
+                                Brak zdjęć
+                            </div>
+                        ) : (
+                            columns.map((col, colIndex) => (
                                 <div
-                                    className="relative w-full"
-                                    style={{
-                                        aspectRatio: `${photo.width} / ${photo.height}`,
-                                    }}
+                                    key={colIndex}
+                                    className="flex-1 space-y-1"
                                 >
-                                    <Image
-                                        src={photo.file_path}
-                                        alt={`Photo ${index + 1}`}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                    />
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                                    {col.map((photo: Photo) => (
+                                        <a
+                                            key={photo.id}
+                                            href={photo.file_path}
+                                            data-pswp-src={photo.file_path}
+                                            data-pswp-width={photo.width}
+                                            data-pswp-height={photo.height}
+                                            data-photo-id={photo.id}
+                                            className="mb-1 block w-full group cursor-pointer overflow-hidden bg-neutral-900"
+                                            onClick={(e) => e.preventDefault()}
+                                        >
+                                            <div
+                                                className="relative w-full"
+                                                style={{
+                                                    aspectRatio: `${photo.width} / ${photo.height}`,
+                                                }}
+                                            >
+                                                <Image
+                                                    src={photo.file_path}
+                                                    alt={`Photo ${photo.id}`}
+                                                    fill
+                                                    loading="lazy"
+                                                    className="object-cover transition-opacity duration-500 opacity-100"
+                                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                                />
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                                            </div>
+                                        </a>
+                                    ))}
                                 </div>
-                            </a>
-                        ))}
+                            ))
+                        )}
                     </div>
 
-                    {/* Loading indicator */}
+                    {/* Loader */}
                     {displayedPhotos.length < allPhotos.length && (
-                        <div className="text-center text-white py-6">
+                        <div className="text-center text-white/70 py-6">
                             Ładowanie kolejnych zdjęć...
                         </div>
                     )}
