@@ -79,36 +79,62 @@ export default function Home() {
                 </div>
             </nav>
 
-            <section className="pt-48 pb-16 px-4 sm:px-6 relative">
-                <div className="absolute left-0 top-0 object-cover h-full w-full -z-10">
-                    <Image
-                        src="/heroLandingPage.png"
-                        alt="Hero Image"
-                        fill
-                        quality={40}
-                        className="object-cover opacity-50"
-                    />
-                    <div className="absolute left-0 top-0 h-full w-full bg-linear-to-b from-transparent to-gray-50" />
-                </div>
-                <div className="max-w-4xl mx-auto text-center z-20">
-                    <h1 className="text-3xl sm:text-6xl font-bold text-gray-800 tracking-tight leading-tight px-5">
-                        Share beautiful photo galleries with your clients
+            <section className="relative isolate overflow-hidden pt-48 pb-32 px-4 sm:px-6">
+                {/* Tło gradientowe + blur */}
+                <div className="absolute inset-0 -z-10 bg-linear-to-br from-indigo-100 via-white to-pink-50" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[800px] bg-linear-to-tr from-teal-300 via-pink-100 to-blue-300 blur-3xl opacity-40" />
+
+                {/* Główna treść */}
+                <div className="max-w-6xl mx-auto text-center relative z-10">
+                    <h1 className="text-4xl sm:text-6xl px-4 max-w-4xl mx-auto font-bold tracking-tight text-gray-900 leading-tight">
+                        Share{" "}
+                        <span className="text-transparent bg-clip-text bg-linear-to-r from-sky-400 via-indigo-500 to-pink-500">
+                            beautiful photo galleries
+                        </span>{" "}
+                        with your clients
                     </h1>
-                    <p className="text-lg text-gray-800 mt-6 max-w-2xl mx-auto leading-relaxed">
-                        Upload photos, share a link. Password protection,
-                        automatic optimization, and one-click downloads all
-                        included.
+
+                    <p className="mt-6 text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
+                        Deliver your photos with style — password-protected,
+                        WebP optimized, and ready for instant downloads.
+                        Designed for professionals.
                     </p>
-                    <div className="mt-10">
+
+                    <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
                         <MainButton
                             label="Start for free"
                             href="/login"
-                            className="text-lg px-8 py-3"
+                            variant="purple"
+                            className="text-lg px-8 py-2"
+                        />
+                        <a
+                            href="/dashboard/billing#plans"
+                            className="text-indigo-700 font-medium hover:text-indigo-900 transition-colors"
+                        >
+                            View pricing →
+                        </a>
+                    </div>
+
+                    <p className="text-sm text-green-700 font-semibold animate-pulse mt-6">
+                        Free plan available — no credit card required
+                    </p>
+                </div>
+
+                {/* Obrazek hero (mockup galerii) */}
+                <div className="mt-20 max-w-5xl mx-auto relative">
+                    <div className="rounded-2xl border border-gray-200 shadow-xl overflow-hidden bg-white">
+                        <Image
+                            src="/hero.png"
+                            alt="Seovileo gallery preview"
+                            width={1600}
+                            height={900}
+                            className="w-full object-cover"
+                            priority
                         />
                     </div>
-                    <p className="text-sm text-green-700 font-semibold animate-pulse mt-4">
-                        Free plan available No credit card required
-                    </p>
+
+                    {/* Subtelne efekty */}
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-linear-to-t from-gray-50 via-white/50 to-transparent blur-2xl opacity-70" />
                 </div>
             </section>
 
