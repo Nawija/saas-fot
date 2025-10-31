@@ -1,12 +1,12 @@
-// components/gallery/hero/templates/FullScreen.tsx
+// components/gallery/hero/templates/Minimal.tsx
 "use client";
 
 import Image from "next/image";
 import { GalleryHeroTemplate } from "../types";
 import { ArrowBigDown } from "lucide-react";
-import Link from "next/link";
 
-export const FullscreenTemplate: GalleryHeroTemplate = ({ data, elements }) => {
+export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
+    const Scroll = elements.ScrollIndicator;
     return (
         <div className="relative h-screen w-full bg-neutral-950 overflow-hidden">
             {/* Background Image */}
@@ -65,6 +65,13 @@ export const FullscreenTemplate: GalleryHeroTemplate = ({ data, elements }) => {
             {/* Content */}
             <div className="absolute inset-0 flex items-center justify-center z-20 px-6 md:px-12 lg:px-16">
                 <div className="text-center max-w-4xl w-full">
+                    {/* Small Badge */}
+                    <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 bg-white/10 border border-white/20 backdrop-blur-sm">
+                        <div className="w-1.5 h-1.5 bg-white" />
+                        <span className="text-white/70 text-xs uppercase tracking-[0.2em] font-medium">
+                            Galeria
+                        </span>
+                    </div>
                     {/* Title */}
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium text-white mb-6 leading-[1.1] tracking-tight">
                         {data.name}
@@ -82,12 +89,13 @@ export const FullscreenTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                         </p>
                     )}{" "}
                     {/* CTA Button */}
-                    <Link
+                    <a
                         href="#s"
-                        className="group relative inline-flex items-center justify-center px-8 md:px-12 py-3 border border-white/60 text-white/90 text-base md:text-lg overflow-hidden hover:bg-white/10 transition-color duration-200"
+                        className="group relative inline-flex items-center justify-center px-10 md:px-12 py-4 md:py-5 bg-white text-black font-semibold text-base md:text-lg overflow-hidden hover:bg-neutral-100 active:scale-[0.99] transition-all duration-200"
                     >
                         <span className="relative z-10">Zobacz galerię</span>
-                    </Link>
+                        <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+                    </a>
                 </div>
             </div>
 
