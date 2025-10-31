@@ -10,12 +10,14 @@ import Image from "next/image";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 
-// Helper to get index from hash
+// Helper to get index from hash. Accepts both "#photo-<n>" and the short "#<n>" format.
 function getPhotoIndexFromHash(photos: Photo[]): number | null {
     if (typeof window === "undefined") return null;
     const hash = window.location.hash;
-    if (!hash.startsWith("#photo-")) return null;
-    const numStr = hash.replace("#photo-", "");
+    if (!hash || hash.length <= 1) return null;
+    let numStr = "";
+    if (hash.startsWith("#photo-")) numStr = hash.replace("#photo-", "");
+    else if (hash.startsWith("#")) numStr = hash.slice(1);
     const n = parseInt(numStr, 10);
     if (Number.isNaN(n)) return null;
     const idx = n - 1; // convert 1-based to 0-based
@@ -241,7 +243,7 @@ export default function GalleryPhotosPage() {
                         const newUrl =
                             window.location.pathname +
                             window.location.search +
-                            `#photo-${idx + 1}`;
+                            `#${idx + 1}`;
                         window.history.replaceState(null, "", newUrl);
                     }
                 } catch (e) {
@@ -302,7 +304,7 @@ export default function GalleryPhotosPage() {
                                       const newUrl =
                                           window.location.pathname +
                                           window.location.search +
-                                          `#photo-${idx + 1}`;
+                                          `#${idx + 1}`;
                                       window.history.replaceState(
                                           null,
                                           "",
@@ -410,7 +412,7 @@ export default function GalleryPhotosPage() {
                     const newUrl =
                         window.location.pathname +
                         window.location.search +
-                        `#photo-${idx + 1}`;
+                        `#${idx + 1}`;
                     window.history.replaceState(null, "", newUrl);
                 }
             } catch (e) {
