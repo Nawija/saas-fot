@@ -183,7 +183,7 @@ export default function GalleryPhotosPage() {
                     <div
                         id="gallery"
                         ref={galleryRef}
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"
+                        className="columns-1 sm:columns-2 lg:columns-3 gap-0"
                     >
                         {photos.map((photo, index) => (
                             <a
@@ -193,23 +193,27 @@ export default function GalleryPhotosPage() {
                                 data-pswp-width={photo.width}
                                 data-pswp-height={photo.height}
                                 data-photo-id={photo.id}
-                                className="relative group cursor-pointer overflow-hidden bg-neutral-900 block"
-                                style={{
-                                    aspectRatio: `${photo.width} / ${photo.height}`,
-                                }}
+                                className="mb-0 block w-full group cursor-pointer p-1 overflow-hidden bg-neutral-900"
                                 onClick={(e) => {
                                     e.preventDefault();
                                 }}
                             >
-                                <Image
-                                    src={photo.file_path}
-                                    alt={`Photo ${index + 1}`}
-                                    fill
-                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                />
-                                {/* Hover Overlay */}
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                                <div
+                                    className="relative w-full"
+                                    style={{
+                                        aspectRatio: `${photo.width} / ${photo.height}`,
+                                    }}
+                                >
+                                    <Image
+                                        src={photo.file_path}
+                                        alt={`Photo ${index + 1}`}
+                                        fill
+                                        className="object-cover"
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                    />
+                                    {/* Hover Overlay */}
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                                </div>
                             </a>
                         ))}
                     </div>
