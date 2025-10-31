@@ -619,13 +619,13 @@ export default function CollectionDetailPage({
         <div className="min-h-screen">
             {/* Top Bar */}
             <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200 lg:sticky lg:top-0 z-40">
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+                <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
                     <CollectionHeader collection={collection} photos={photos} />
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+            <div className="max-w-[1500px] mx-auto px-4 md:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     {/* Left Sidebar - Hero Template & Stats */}
                     <div className="lg:col-span-4 xl:col-span-3 space-y-6 sticky top-16 self-start overflow-y-scroll h-[80vh] pb-20 pr-3">

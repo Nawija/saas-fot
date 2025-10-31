@@ -40,8 +40,8 @@ export default function DashboardLayoutClient({
                 )}
             <div className="flex flex-1 overflow-hidden w-full">
                 <DashboardSidebar
-                    // Force the sidebar closed on collection details pages on large screens
-                    isOpen={isCollectionDetails ? false : sidebarOpen}
+                    // allow mobile open/close, but hide on large screens for collection details
+                    isOpen={sidebarOpen}
                     onClose={() => setSidebarOpen(false)}
                     className={`transition-transform duration-300 ease-in-out ${
                         isCollectionDetails ? "lg:-translate-x-full" : ""
