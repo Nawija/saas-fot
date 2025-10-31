@@ -27,10 +27,10 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
             )}
 
             {/* Decorative Lines */}
-            <div className="absolute top-0 left-0 w-20 md:w-32 h-0.5 bg-white/30 z-10" />
-            <div className="absolute bottom-0 right-0 w-20 md:w-32 h-0.5 bg-white/30 z-10" />
-            <div className="absolute top-0 left-0 w-0.5 h-20 md:h-32 bg-white/30 z-10" />
-            <div className="absolute bottom-0 right-0 w-0.5 h-20 md:h-32 bg-white/30 z-10" />
+            <div className="absolute top-6 left-6 w-20 md:w-32 h-0.5 bg-white/30 z-10" />
+            <div className="absolute bottom-6 right-6 w-20 md:w-32 h-0.5 bg-white/30 z-10" />
+            <div className="absolute top-6 left-6 w-0.5 h-20 md:h-32 bg-white/30 z-10" />
+            <div className="absolute bottom-6 right-6 w-0.5 h-20 md:h-32 bg-white/30 z-10" />
 
             {/* Content */}
             <div className="absolute inset-0 flex items-center justify-center z-20 px-4 md:px-8">
@@ -49,11 +49,10 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
 
                     {/* CTA Button */}
                     <a
-                        href="#s"
-                        className="group relative inline-flex items-center justify-center px-10 md:px-12 py-4 md:py-5 bg-white text-black font-semibold text-base md:text-lg overflow-hidden hover:bg-neutral-100 active:scale-[0.99] transition-all duration-200"
+                        href="#gallery"
+                        className="group relative inline-flex items-center justify-center px-10 py-3 border border-gray-200 hover:bg-gray-300 text-gray-300 font-semibold text-base md:text-lg overflow-hidden hover:text-gray-800 transition-all duration-200"
                     >
                         <span className="relative z-10">Zobacz galerię</span>
-                        <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
                     </a>
                 </div>
             </div>

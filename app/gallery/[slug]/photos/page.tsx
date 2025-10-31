@@ -401,7 +401,7 @@ export default function GalleryPhotosPage() {
                     </h2>
                 </div>
 
-                <div id="gallery" ref={galleryRef} className="flex gap-2">
+                <div id="gallery" ref={galleryRef} className="flex gap-2 scroll-m-2">
                     {columns.length === 0 ? (
                         <div className="w-full text-center text-white/60 py-6">
                             Brak zdjęć

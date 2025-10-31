@@ -90,7 +90,7 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                     )}{" "}
                     {/* CTA Button */}
                     <a
-                        href="#s"
+                        href="#gallery"
                         className="group relative inline-flex items-center justify-center px-10 md:px-12 py-4 md:py-5 bg-white text-black font-semibold text-base md:text-lg overflow-hidden hover:bg-neutral-100 active:scale-[0.99] transition-all duration-200"
                     >
                         <span className="relative z-10">Zobacz galerię</span>

@@ -132,7 +132,7 @@ export const CinematicTemplate: GalleryHeroTemplate = ({
                     )}
 
                     <motion.a
-                        href="#s"
+                        href="#gallery"
                         {...linkVariants}
                         className="inline-block py-3 px-8 border border-white/70 bg-white/10 hover:bg-black/10 text-white/90 text-sm font-semibold transition-all duration-300 hover:text-white"
                     >

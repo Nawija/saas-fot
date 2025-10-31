@@ -86,7 +86,7 @@ export const SplitTemplate: GalleryHeroTemplate = ({ data, options }) => {
 
                     <motion.div {...buttonVariants}>
                         <a
-                            href="#s"
+                            href="#gallery"
                             className="inline-block px-6 py-3 bg-black rounded-xl text-white border-gray-200 text-sm font-semibold hover:bg-gray-900 transition-colors duration-300"
                         >
                             Zobacz zdjęcia

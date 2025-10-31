@@ -83,7 +83,7 @@ export const FullscreenTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                     )}{" "}
                     {/* CTA Button */}
                     <Link
-                        href="#s"
+                        href="#gallery"
                         className="group relative inline-flex items-center justify-center px-8 md:px-12 py-3 border border-white/60 text-white/90 text-base md:text-lg overflow-hidden hover:bg-white/10 transition-color duration-200"
                     >
                         <span className="relative z-10">Zobacz galerię</span>
