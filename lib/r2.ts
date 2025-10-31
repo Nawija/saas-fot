@@ -103,18 +103,119 @@ export function extractKeyFromUrl(url: string): string | null {
  */
 export async function deleteMultipleFromR2(urls: string[]): Promise<void> {
     try {
-        const deletePromises = urls.map((url) => {
-            const key = extractKeyFromUrl(url);
-            if (key) {
-                return deleteFromR2(key);
-            }
-            return Promise.resolve();
-        });
+        const keys = urls
+            .map((url) => extractKeyFromUrl(url))
+            .filter((key): key is string => key !== null);
 
-        await Promise.all(deletePromises);
+        if (keys.length === 0) {
+            console.log("[R2] No valid keys to delete");
+            return;
+        }
+
+        console.log(`[R2] Deleting ${keys.length} objects`);
+
+        // Usuń w batch (max 1000 na raz)
+        const batchSize = 1000;
+        for (let i = 0; i < keys.length; i += batchSize) {
+            const batch = keys.slice(i, i + batchSize);
+
+            const deleteCommand = new DeleteObjectsCommand({
+                Bucket: BUCKET_NAME,
+                Delete: {
+                    Objects: batch.map((key) => ({ Key: key })),
+                    Quiet: true,
+                },
+            });
+
+            const result = await r2Client.send(deleteCommand);
+
+            if (result.Errors && result.Errors.length > 0) {
+                console.error("[R2] Errors deleting objects:", result.Errors);
+            }
+        }
+
+        console.log(`[R2] Successfully deleted ${keys.length} objects`);
     } catch (error) {
         console.error("Error deleting multiple from R2:", error);
-        // Nie rzucamy błędu - usunięcie jest opcjonalne
+        throw new Error("Nie udało się usunąć plików z R2");
+    }
+}
+
+/**
+ * Usuwa całą kolekcję z R2 (folder collections/{collectionId})
+ * @param userId - ID użytkownika
+ * @param collectionId - ID kolekcji
+ */
+export async function deleteCollectionFolder(
+    userId: string,
+    collectionId: number
+): Promise<void> {
+    try {
+        const prefix = `users/${userId}/collections/${collectionId}/`;
+        let totalDeleted = 0;
+        let continuationToken: string | undefined;
+
+        console.log(`[R2] Starting deletion of collection folder: ${prefix}`);
+
+        // Pętla do obsługi paginacji (R2 zwraca max 1000 obiektów na raz)
+        do {
+            // Pobierz listę obiektów
+            const listCommand = new ListObjectsV2Command({
+                Bucket: BUCKET_NAME,
+                Prefix: prefix,
+                ContinuationToken: continuationToken,
+            });
+
+            const listedObjects = await r2Client.send(listCommand);
+
+            if (
+                !listedObjects.Contents ||
+                listedObjects.Contents.length === 0
+            ) {
+                console.log(
+                    `[R2] No more objects found for collection ${collectionId}`
+                );
+                break;
+            }
+
+            // Usuń wszystkie obiekty z tej strony
+            const deleteCommand = new DeleteObjectsCommand({
+                Bucket: BUCKET_NAME,
+                Delete: {
+                    Objects: listedObjects.Contents.map((obj) => ({
+                        Key: obj.Key!,
+                    })),
+                    Quiet: true,
+                },
+            });
+
+            const deleteResult = await r2Client.send(deleteCommand);
+
+            const deletedCount = listedObjects.Contents.length;
+            totalDeleted += deletedCount;
+
+            console.log(
+                `[R2] Deleted ${deletedCount} objects (total: ${totalDeleted})`
+            );
+
+            // Sprawdź czy są błędy przy usuwaniu
+            if (deleteResult.Errors && deleteResult.Errors.length > 0) {
+                console.error(
+                    `[R2] Errors deleting objects:`,
+                    deleteResult.Errors
+                );
+            }
+
+            // Sprawdź czy są kolejne strony do przetworzenia
+            continuationToken = listedObjects.NextContinuationToken;
+        } while (continuationToken);
+
+        console.log(
+            `[R2] Successfully deleted ${totalDeleted} total objects for collection ${collectionId}`
+        );
+    } catch (error) {
+        console.error("[R2] Error deleting collection folder:", error);
+        throw new Error("Nie udało się usunąć kolekcji z R2");
     }
 }
 
@@ -125,37 +226,67 @@ export async function deleteMultipleFromR2(urls: string[]): Promise<void> {
 export async function deleteUserFolder(userId: string): Promise<void> {
     try {
         const prefix = `users/${userId}/`;
+        let totalDeleted = 0;
+        let continuationToken: string | undefined;
 
-        // Pobierz listę wszystkich obiektów w folderze użytkownika
-        const listCommand = new ListObjectsV2Command({
-            Bucket: BUCKET_NAME,
-            Prefix: prefix,
-        });
+        console.log(`[R2] Starting deletion of folder: ${prefix}`);
 
-        const listedObjects = await r2Client.send(listCommand);
+        // Pętla do obsługi paginacji (R2 zwraca max 1000 obiektów na raz)
+        do {
+            // Pobierz listę obiektów
+            const listCommand = new ListObjectsV2Command({
+                Bucket: BUCKET_NAME,
+                Prefix: prefix,
+                ContinuationToken: continuationToken,
+            });
 
-        if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
-            console.log(`No objects found for user ${userId}`);
-            return;
-        }
+            const listedObjects = await r2Client.send(listCommand);
 
-        // Usuń wszystkie obiekty
-        const deleteCommand = new DeleteObjectsCommand({
-            Bucket: BUCKET_NAME,
-            Delete: {
-                Objects: listedObjects.Contents.map((obj) => ({
-                    Key: obj.Key,
-                })),
-                Quiet: true,
-            },
-        });
+            if (
+                !listedObjects.Contents ||
+                listedObjects.Contents.length === 0
+            ) {
+                console.log(`[R2] No more objects found for user ${userId}`);
+                break;
+            }
 
-        await r2Client.send(deleteCommand);
+            // Usuń wszystkie obiekty z tej strony
+            const deleteCommand = new DeleteObjectsCommand({
+                Bucket: BUCKET_NAME,
+                Delete: {
+                    Objects: listedObjects.Contents.map((obj) => ({
+                        Key: obj.Key!,
+                    })),
+                    Quiet: true,
+                },
+            });
+
+            const deleteResult = await r2Client.send(deleteCommand);
+
+            const deletedCount = listedObjects.Contents.length;
+            totalDeleted += deletedCount;
+
+            console.log(
+                `[R2] Deleted ${deletedCount} objects (total: ${totalDeleted})`
+            );
+
+            // Sprawdź czy są błędy przy usuwaniu
+            if (deleteResult.Errors && deleteResult.Errors.length > 0) {
+                console.error(
+                    `[R2] Errors deleting objects:`,
+                    deleteResult.Errors
+                );
+            }
+
+            // Sprawdź czy są kolejne strony do przetworzenia
+            continuationToken = listedObjects.NextContinuationToken;
+        } while (continuationToken);
+
         console.log(
-            `Deleted ${listedObjects.Contents.length} objects for user ${userId}`
+            `[R2] Successfully deleted ${totalDeleted} total objects for user ${userId}`
         );
     } catch (error) {
-        console.error("Error deleting user folder from R2:", error);
+        console.error("[R2] Error deleting user folder:", error);
         throw new Error("Nie udało się usunąć plików użytkownika");
     }
 }

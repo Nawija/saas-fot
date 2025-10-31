@@ -56,27 +56,35 @@ export async function POST(req: NextRequest) {
                 `[Delete Account] Deleting R2 files for user: ${userId}`
             );
             await deleteUserFolder(userId);
+            console.log(
+                `[Delete Account] Successfully deleted all R2 files for user: ${userId}`
+            );
         } catch (error) {
             console.error("[Delete Account] Error deleting R2 files:", error);
-            // Kontynuujemy mimo błędu
+            // Rzuć błąd - nie chcemy usuwać konta jeśli pliki dalej są w R2
+            throw new Error(
+                "Nie udało się usunąć wszystkich plików. Spróbuj ponownie."
+            );
         }
 
-        // 3. Usuń wszystkie dane z bazy danych (CASCADE usunie powiązane rekordy)
+        // 3. Usuń wszystkie dane z bazy danych
         console.log(
             `[Delete Account] Deleting database records for user: ${userId}`
         );
 
-        // Usuń zdjęcia (CASCADE powinien to obsłużyć, ale dla pewności)
-        await query(
-            `DELETE FROM photos WHERE collection_id IN (SELECT id FROM collections WHERE user_id = $1)`,
+        // Usuń użytkownika (CASCADE automatycznie usunie collections i photos)
+        const deleteResult = await query(
+            `DELETE FROM users WHERE id = $1 RETURNING id`,
             [userId]
         );
 
-        // Usuń kolekcje
-        await query(`DELETE FROM collections WHERE user_id = $1`, [userId]);
+        if (deleteResult.rowCount === 0) {
+            throw new Error("Nie znaleziono użytkownika do usunięcia");
+        }
 
-        // Usuń użytkownika (wszystko inne powinno się usunąć przez CASCADE)
-        await query(`DELETE FROM users WHERE id = $1`, [userId]);
+        console.log(
+            `[Delete Account] Successfully deleted user and all related data from database`
+        );
 
         console.log(`[Delete Account] Successfully deleted account: ${userId}`);
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { getUser } from "@/lib/auth/getUser";
-import { deleteMultipleFromR2 } from "@/lib/r2";
+import { deleteCollectionFolder } from "@/lib/r2";
 
 export async function GET(
     request: NextRequest,
@@ -56,9 +56,9 @@ export async function DELETE(
             );
         }
 
-        // Pobierz hero image i wszystkie zdjęcia do usunięcia z R2
+        // Pobierz kolekcję aby sprawdzić czy istnieje i policzyć rozmiar
         const collectionResult = await query(
-            "SELECT hero_image FROM collections WHERE id = $1 AND user_id = $2",
+            "SELECT id FROM collections WHERE id = $1 AND user_id = $2",
             [id, user.id]
         );
 
@@ -69,48 +69,61 @@ export async function DELETE(
             );
         }
 
+        // Policz całkowity rozmiar zdjęć do zwolnienia
         const photosResult = await query(
-            "SELECT file_path, file_size FROM photos WHERE collection_id = $1",
+            "SELECT COUNT(*) as count, COALESCE(SUM(file_size), 0) as total_size FROM photos WHERE collection_id = $1",
             [id]
         );
 
-        // Zbierz wszystkie URL-e do usunięcia
-        const urlsToDelete: string[] = [];
-        const collection = collectionResult.rows[0];
+        const photoCount = parseInt(photosResult.rows[0]?.count || "0");
+        const totalSize = parseInt(photosResult.rows[0]?.total_size || "0");
 
-        if (collection.hero_image) {
-            urlsToDelete.push(collection.hero_image);
-        }
+        console.log(
+            `[Delete Collection] Deleting collection ${id} with ${photoCount} photos (${totalSize} bytes)`
+        );
 
-        let totalSize = 0;
-        photosResult.rows.forEach((photo: any) => {
-            urlsToDelete.push(photo.file_path);
-            totalSize += parseInt(photo.file_size) || 0;
-        });
-
-        // Usuń pliki z R2
-        if (urlsToDelete.length > 0) {
-            await deleteMultipleFromR2(urlsToDelete);
+        // Usuń całą kolekcję z R2 (hero + wszystkie zdjęcia)
+        try {
+            await deleteCollectionFolder(user.id, parseInt(id));
+            console.log(
+                `[Delete Collection] Successfully deleted all R2 files for collection ${id}`
+            );
+        } catch (error) {
+            console.error(
+                "[Delete Collection] Error deleting R2 files:",
+                error
+            );
+            throw new Error(
+                "Nie udało się usunąć wszystkich plików. Spróbuj ponownie."
+            );
         }
 
         // Usuń kolekcję z bazy (CASCADE usunie też photos i photo_likes)
-        await query("DELETE FROM collections WHERE id = $1 AND user_id = $2", [
-            id,
-            user.id,
-        ]);
+        const deleteResult = await query(
+            "DELETE FROM collections WHERE id = $1 AND user_id = $2 RETURNING id",
+            [id, user.id]
+        );
+
+        if (deleteResult.rowCount === 0) {
+            throw new Error("Nie udało się usunąć kolekcji z bazy danych");
+        }
 
         // Zmniejsz storage_used
         if (totalSize > 0) {
             await query(
-                "UPDATE users SET storage_used = storage_used - $1 WHERE id = $2",
+                "UPDATE users SET storage_used = GREATEST(storage_used - $1, 0) WHERE id = $2",
                 [totalSize, user.id]
             );
         }
 
+        console.log(
+            `[Delete Collection] Successfully deleted collection ${id} from database`
+        );
+
         return NextResponse.json({
             ok: true,
             message: "Collection deleted",
-            deletedFiles: urlsToDelete.length,
+            deletedPhotos: photoCount,
             freedSpace: totalSize,
         });
     } catch (error) {

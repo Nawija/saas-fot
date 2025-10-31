@@ -88,11 +88,11 @@ export default function CollectionsPage() {
 
     return (
         <div className="min-h-screen">
-            <div className="container mx-auto px-4 py-12 max-w-7xl">
+            <div className="container mx-auto px-4 py-12 max-w-[1500px]">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-12">
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-bold  mb-3">
+                        <h1 className="text-2xl md:text-3xl font-bold mb-3">
                             My galleries
                         </h1>
                         <p className="text-gray-600 text-lg">
@@ -131,7 +131,7 @@ export default function CollectionsPage() {
                         />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4  gap-6">
                         {collections.map((collection) => (
                             <div
                                 key={collection.id}
@@ -210,6 +210,7 @@ export default function CollectionsPage() {
                                                 <ExternalLink className="w-4 h-4" />
                                             }
                                             label="View"
+                                            variant="purple"
                                             className="text-sm w-full"
                                         />
 

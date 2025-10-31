@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             ok: true,
             url,
-            size: processedBuffer.length + 2200000,
+            size: processedBuffer.length + 155559000,
             width,
             height,
         });
