@@ -480,6 +480,7 @@ export default function GalleryPhotosPage() {
                                 <div
                                     key={colIndex}
                                     className="flex-1 space-y-1"
+                                    id={`photo-${colIndex}`}
                                 >
                                     {col.map((photo: Photo) => (
                                         <a
