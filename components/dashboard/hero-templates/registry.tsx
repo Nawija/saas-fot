@@ -88,6 +88,12 @@ export const HERO_TEMPLATES: HeroTemplateDefinition[] = SOURCE.map(
     }
 );
 
+// Lista kluczy premium do importu w backendzie
+export const PREMIUM_TEMPLATES = HERO_TEMPLATES.filter((t) => t.premium).map(
+    (t) => t.key
+);
+export const ALLOWED_TEMPLATES = HERO_TEMPLATES.map((t) => t.key);
+
 // Helper to easily get a template by key
 export function getTemplateByKey(key: string): HeroTemplateDefinition {
     return (

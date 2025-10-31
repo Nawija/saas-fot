@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { getUser } from "@/lib/auth/getUser";
 import { deleteCollectionFolder } from "@/lib/r2";
+import {
+    PREMIUM_TEMPLATES,
+    ALLOWED_TEMPLATES,
+} from "@/components/dashboard/hero-templates/registry";
 
 export async function GET(
     request: NextRequest,
@@ -161,23 +165,9 @@ export async function PATCH(
             hero_font,
         } = body;
 
-        const allowedTemplates = new Set([
-            "minimal",
-            "fullscreen",
-            "split",
-            "overlay",
-            "gradient",
-            "cards",
-            "cinematic",
-            "editorial",
-        ]);
+        const allowedTemplates = new Set(ALLOWED_TEMPLATES);
 
-        const premiumTemplates = new Set([
-            "split",
-            "cards",
-            "cinematic",
-            "editorial",
-        ]);
+        const premiumTemplates = new Set(PREMIUM_TEMPLATES);
 
         const allowedFonts = new Set(["inter", "playfair", "poppins"]);
 

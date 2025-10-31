@@ -44,14 +44,6 @@ const flattenLeftToRight = (cols: Photo[][]) => {
     return arr;
 };
 
-const getPhotoIndexFromHash = (photos: Photo[]) => {
-    if (typeof window === "undefined") return null;
-    const match = window.location.hash.match(/\d+$/);
-    if (!match) return null;
-    const idx = parseInt(match[0], 10) - 1;
-    return idx >= 0 && idx < photos.length ? idx : null;
-};
-
 const getPhotoIndexFromQuery = (photos: Photo[], paramName = "photo") => {
     if (typeof window === "undefined") return null;
     try {
@@ -97,7 +89,7 @@ export default function GalleryPhotosPage() {
     useEffect(() => {
         const updateCols = () => {
             const w = window.innerWidth;
-            setColumnsCount(w < 640 ? 1 : w < 1024 ? 2 : 3);
+            setColumnsCount(w < 640 ? 1 : w < 1024 ? 2 : w < 1280 ? 3 : 5);
         };
         updateCols();
         window.addEventListener("resize", updateCols);
@@ -402,18 +394,14 @@ export default function GalleryPhotosPage() {
     return (
         <>
             <GalleryHero collection={collection} />
-            <div className="min-h-screen bg-neutral-950 py-12 px-2">
-                <div className="mb-8">
-                    <h2 className="text-2xl md:text-3xl font-medium text-white mb-2">
+            <div className="min-h-screen bg-white pb-12 px-2">
+                <div className="">
+                    <h2 className="text-base md:text-lg p-3 font-medium text-gray-600">
                         {collection.name}
                     </h2>
-                    <p className="text-white/60">
-                        {allPhotos.length}{" "}
-                        {allPhotos.length === 1 ? "zdjęcie" : "zdjęć"}
-                    </p>
                 </div>
 
-                <div id="gallery" ref={galleryRef} className="flex gap-1">
+                <div id="gallery" ref={galleryRef} className="flex gap-2">
                     {columns.length === 0 ? (
                         <div className="w-full text-center text-white/60 py-6">
                             Brak zdjęć
@@ -430,7 +418,7 @@ export default function GalleryPhotosPage() {
                                         data-pswp-width={photo.width}
                                         data-pswp-height={photo.height}
                                         data-photo-id={photo.id}
-                                        className="mb-1 block w-full group cursor-pointer overflow-hidden bg-neutral-900"
+                                        className="mb-2 block w-full group cursor-pointer overflow-hidden bg-neutral-900"
                                         onClick={(e) => {
                                             e.preventDefault();
                                             openPhotoInLightbox(photo.id);
