@@ -256,6 +256,8 @@ export default function GalleryPhotosPage() {
 
         // Attach handlers to both the underlying pswp instance (if present)
         // and the PhotoSwipeLightbox wrapper — some navigation events come from one or the other
+        // retry timer used to wait until the thumbnail is rendered in the gallery after closing
+        let scrollRetryTimer: number | null = null;
         const closeHandler = () => {
             try {
                 if (typeof window !== "undefined" && "history" in window) {
@@ -264,6 +266,73 @@ export default function GalleryPhotosPage() {
                         "",
                         window.location.pathname + window.location.search
                     );
+                }
+            } catch (e) {
+                // ignore
+            }
+
+            // After closing, attempt to scroll the gallery to the thumbnail that was being shown
+            try {
+                const idx = tryGetIndex();
+                if (idx == null) return;
+                const allCols = distributePhotosIntoColumns(
+                    allPhotos,
+                    columnsCount
+                ).cols;
+                const flatAll = flattenLeftToRight(allCols, columnsCount);
+                const photo = flatAll[idx];
+                if (!photo) return;
+
+                let attempts = 0;
+                const maxAttempts = 20;
+                const tryScroll = () => {
+                    attempts++;
+                    try {
+                        const visible = galleryRef.current?.querySelector(
+                            `a[data-photo-id="${photo.id}"]`
+                        ) as HTMLElement | null;
+                        if (visible) {
+                            try {
+                                visible.scrollIntoView({
+                                    behavior: "smooth",
+                                    block: "center",
+                                });
+                            } catch (e) {}
+                            if (scrollRetryTimer) {
+                                try {
+                                    window.clearInterval(scrollRetryTimer);
+                                } catch (e) {}
+                                scrollRetryTimer = null;
+                            }
+                            return;
+                        }
+                        // If thumbnail isn't rendered yet, calculate page that contains it and request it
+                        const neededPage =
+                            Math.floor(idx / PHOTOS_PER_PAGE) + 1;
+                        if (neededPage > page) setPage(neededPage);
+                    } catch (e) {
+                        // ignore
+                    }
+
+                    if (attempts >= maxAttempts && scrollRetryTimer) {
+                        try {
+                            window.clearInterval(scrollRetryTimer);
+                        } catch (e) {}
+                        scrollRetryTimer = null;
+                    }
+                };
+
+                // run immediately then start polling until thumbnail appears
+                tryScroll();
+                if (
+                    !galleryRef.current?.querySelector(
+                        `a[data-photo-id="${photo.id}"]`
+                    )
+                ) {
+                    scrollRetryTimer =
+                        typeof window !== "undefined"
+                            ? window.setInterval(tryScroll, 250)
+                            : null;
                 }
             } catch (e) {
                 // ignore
@@ -361,6 +430,8 @@ export default function GalleryPhotosPage() {
             orderContainer.removeEventListener("click", onIndexChange);
             try {
                 if (pollInterval) window.clearInterval(pollInterval);
+                if (typeof window !== "undefined" && scrollRetryTimer)
+                    window.clearInterval(scrollRetryTimer);
             } catch (e) {}
             try {
                 lightbox.destroy();
