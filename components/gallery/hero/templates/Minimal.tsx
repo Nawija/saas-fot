@@ -7,7 +7,7 @@ import { GalleryHeroTemplate } from "../types";
 export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
     const Scroll = elements.ScrollIndicator;
     return (
-        <div className="relative h-screen w-full bg-neutral-950 overflow-hidden">
+        <div className="relative h-screen w-full bg-black overflow-hidden">
             {/* Background Image */}
             {data.image ? (
                 <div className="absolute inset-0">
@@ -20,10 +20,10 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                         priority
                     />
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/30 to-black/50" />
+                    <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/30 to-black/40" />
                 </div>
             ) : (
-                <div className="absolute inset-0 bg-linear-to-br from-neutral-900 via-neutral-950 to-black" />
+                <div className="absolute inset-0 bg-black" />
             )}
 
             {/* Decorative Lines */}

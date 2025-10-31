@@ -224,13 +224,13 @@ export default function NewCollectionPage() {
                         </label>
                         <div className="relative">
                             {preview ? (
-                                <div className="relative h-64 rounded-xl overflow-hidden group">
+                                <div className="relative aspect-video rounded-xl overflow-hidden group">
                                     <img
                                         src={preview}
                                         alt="Preview"
                                         className="w-full h-full object-cover"
                                     />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    {/* <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <label className="cursor-pointer px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg">
                                             Change image
                                             <input
@@ -240,7 +240,7 @@ export default function NewCollectionPage() {
                                                 className="hidden"
                                             />
                                         </label>
-                                    </div>
+                                    </div> */}
                                 </div>
                             ) : (
                                 <label className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition-colors bg-gray-50">

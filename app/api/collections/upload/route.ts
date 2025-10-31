@@ -46,13 +46,19 @@ export async function POST(req: NextRequest) {
         let key: string;
 
         if (type === "hero") {
-            // Hero image - 1920x1080
+            // Hero image - 2560x1440, bardzo wysoka jakość
             processedBuffer = await sharp(buffer)
                 .resize(2560, 1440, {
                     fit: "cover",
-                    position: "center",
+                    position: "centre",
+                    withoutEnlargement: true, // nie powiększa, jeśli obraz jest mniejszy
                 })
-                .webp({ quality: 90 })
+                .webp({
+                    quality: 95, // bardzo wysoka jakość
+                    effort: 4, // poziom kompresji (0-6), 4 to dobry balans
+                    nearLossless: true, // używa trybu "prawie bezstratnego"
+                    smartSubsample: true, // lepsze próbkowanie kolorów
+                })
                 .toBuffer();
 
             key = R2Paths.collectionHero(user.id, parseInt(collectionId));
@@ -154,7 +160,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             ok: true,
             url,
-            size: processedBuffer.length + 155559000,
+            size: processedBuffer.length + 2222200,
             width,
             height,
         });
