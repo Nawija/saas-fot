@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import LoadingGallery from "@/components/ui/LoadingGallery";
 import type { Photo, Collection } from "@/types/gallery";
 import GalleryHero from "@/components/gallery/GalleryHero";
@@ -9,6 +9,8 @@ import { getPhotos as apiGetPhotos } from "@/lib/services/galleryService";
 import Image from "next/image";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
+import MainButton from "@/components/buttons/MainButton";
+import { ArrowLeft } from "lucide-react";
 
 const PHOTOS_PER_PAGE = 20;
 
@@ -68,6 +70,7 @@ const getPhotoIndexFromQuery = (photos: Photo[], paramName = "photo") => {
 export default function GalleryPhotosPage() {
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [collection, setCollection] = useState<Collection | null>(null);
     const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
     const [displayedPhotos, setDisplayedPhotos] = useState<Photo[]>([]);
@@ -77,10 +80,18 @@ export default function GalleryPhotosPage() {
     const [columnsCount, setColumnsCount] = useState(3);
     const [singleMode, setSingleMode] = useState(false);
     const [singlePhoto, setSinglePhoto] = useState<Photo | null>(null);
-    const suppressScrollRef = useRef(false);
 
     const galleryRef = useRef<HTMLDivElement>(null);
     const lightboxRef = useRef<PhotoSwipeLightbox | null>(null);
+
+    // monitoruj zmiany w URL (np. usunięcie ?photo) i resetuj singleMode
+    useEffect(() => {
+        const photoParam = searchParams.get("photo");
+        if (!photoParam) {
+            setSingleMode(false);
+            setSinglePhoto(null);
+        }
+    }, [searchParams]);
 
     // responsive columns
     useEffect(() => {
@@ -350,7 +361,7 @@ export default function GalleryPhotosPage() {
                 <div className="text-center">
                     <h1 className="text-2xl font-bold mb-4">Brak dostępu</h1>
                     <button
-                        onClick={() => router.push(`/gallery/${params.slug}/photos`)}
+                        onClick={() => router.push(`/gallery/${params.slug}`)}
                         className="text-white/70 hover:text-white"
                     >
                         Powrót do galerii
@@ -362,23 +373,25 @@ export default function GalleryPhotosPage() {
     // Single-photo mode view
     if (singleMode && singlePhoto) {
         return (
-            <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-6">
-                <div className="w-full max-w-4xl mb-6 flex items-center justify-start">
-                    <button
-                        onClick={() => router.push(`/gallery/${params.slug}`)}
-                        className="px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20"
-                    >
-                        Powrót do galerii
-                    </button>
+            <div className="h-screen bg-gray-50 flex flex-col items-center justify-center">
+                <div className="w-full bg-white border-b border-gray-200 p-2 flex items-center justify-start">
+                    <MainButton
+                        onClick={() => {
+                            router.push(`/gallery/${params.slug}/photos`);
+                        }}
+                        icon={<ArrowLeft size={16} />}
+                        variant="secondary"
+                        label="Back"
+                    />
                 </div>
                 <div className="w-full flex-1 flex items-center justify-center">
-                    <div className="w-full max-w-5xl">
+                    <div className="w-full">
                         <Image
                             src={singlePhoto.file_path}
                             alt={singlePhoto.file_path}
-                            width={singlePhoto.width || 1200}
-                            height={singlePhoto.height || 800}
-                            className="w-full h-auto object-contain mx-auto"
+                            width={singlePhoto.width}
+                            height={singlePhoto.height}
+                            className="max-h-[80vh] object-contain mx-auto"
                         />
                     </div>
                 </div>
