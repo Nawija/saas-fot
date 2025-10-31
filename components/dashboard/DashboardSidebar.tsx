@@ -22,16 +22,18 @@ const menuItems = [
 interface DashboardSidebarProps {
     isOpen: boolean;
     onClose: () => void;
+    className?: string;
 }
 
 export default function DashboardSidebar({
     isOpen,
     onClose,
+    className = "",
 }: DashboardSidebarProps) {
     const pathname = usePathname();
 
     return (
-        <>
+        <div className={className}>
             {/* Overlay dla mobile */}
             <AnimatePresence>
                 {isOpen && (
@@ -49,9 +51,9 @@ export default function DashboardSidebar({
             <aside
                 className={`fixed top-0 left-0 w-64 bg-white z-40 lg:static lg:shadow-none transition-transform duration-300 ease-in-out h-full ${
                     isOpen
-                        ? "translate-x-0"
+                        ? ""
                         : "-translate-x-full lg:translate-x-0"
-                }`}
+                } `}
             >
                 <div className="flex flex-col h-full">
                     {/* Navigation */}
@@ -98,6 +100,6 @@ export default function DashboardSidebar({
                     </div>
                 </div>
             </aside>
-        </>
+        </div>
     );
 }
