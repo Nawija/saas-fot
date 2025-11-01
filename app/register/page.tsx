@@ -12,6 +12,8 @@ import ErrorMessage from "@/components/auth/ErrorMessage";
 import EmailPasswordForm from "@/components/auth/EmailPasswordForm";
 import VerificationForm from "@/components/auth/VerificationForm";
 import AuthSidePanel from "@/components/auth/AuthSidePanel";
+import { useRedirectIfAuthenticated } from "@/hooks/useRedirectIfAuthenticated";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -24,6 +26,11 @@ export default function RegisterPage() {
         setSuccess,
     } = useRegisterForm();
     const { validatePasswords } = usePasswordValidation();
+    const { checking } = useRedirectIfAuthenticated();
+
+    if (checking) {
+        return <LoadingScreen message="Sprawdzanie sesji..." />;
+    }
 
     // 🔹 Etap 1 — wysłanie kodu
     const handleSendCode = async (e: React.FormEvent) => {

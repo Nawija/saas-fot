@@ -60,7 +60,8 @@ const getPhotoIndexFromQuery = (photos: Photo[], paramName = "photo") => {
 };
 
 export default function GalleryPhotosPage() {
-    const params = useParams();
+    const params = useParams<{ slug: string }>();
+    const { slug } = params;
     const router = useRouter();
     const searchParams = useSearchParams();
     const [collection, setCollection] = useState<Collection | null>(null);
@@ -98,11 +99,14 @@ export default function GalleryPhotosPage() {
 
     // fetch gallery
     useEffect(() => {
+        if (!slug) return;
+
         const fetchGallery = async () => {
             try {
-                const token = sessionStorage.getItem(`gallery_${params.slug}`);
+                setLoading(true);
+                const token = sessionStorage.getItem(`gallery_${slug}`);
                 const { ok, collection, photos, status } = await apiGetPhotos(
-                    String(params.slug),
+                    String(slug),
                     token ?? undefined
                 );
                 if (ok && collection && photos) {
@@ -132,7 +136,7 @@ export default function GalleryPhotosPage() {
                         // ignore
                     }
                 } else if (status === 401) {
-                    router.push(`/gallery/${params.slug}`);
+                    router.push(`/g/${slug}`);
                 }
             } catch (error) {
                 console.error(error);
@@ -140,8 +144,8 @@ export default function GalleryPhotosPage() {
                 setLoading(false);
             }
         };
-        fetchGallery();
-    }, [params.slug, router]);
+        void fetchGallery();
+    }, [slug, router]);
 
     // infinite scroll
     const handleScroll = useCallback(() => {
@@ -353,7 +357,7 @@ export default function GalleryPhotosPage() {
                 <div className="text-center">
                     <h1 className="text-2xl font-bold mb-4">Brak dostępu</h1>
                     <button
-                        onClick={() => router.push(`/gallery/${params.slug}`)}
+                        onClick={() => router.push(`/g/${slug}`)}
                         className="text-white/70 hover:text-white"
                     >
                         Powrót do galerii
@@ -369,7 +373,7 @@ export default function GalleryPhotosPage() {
                 <div className="w-full bg-white border-b border-gray-200 p-2 flex items-center justify-start">
                     <MainButton
                         onClick={() => {
-                            router.push(`/gallery/${params.slug}/photos`);
+                            router.push(`/g/${slug}/p`);
                         }}
                         icon={<ArrowLeft size={16} />}
                         variant="secondary"
@@ -401,7 +405,11 @@ export default function GalleryPhotosPage() {
                     </h2>
                 </div>
 
-                <div id="gallery" ref={galleryRef} className="flex gap-2 scroll-m-2">
+                <div
+                    id="gallery"
+                    ref={galleryRef}
+                    className="flex gap-2 scroll-m-2"
+                >
                     {columns.length === 0 ? (
                         <div className="w-full text-center text-white/60 py-6">
                             Brak zdjęć

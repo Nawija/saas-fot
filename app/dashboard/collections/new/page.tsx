@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Upload, Lock, Globe } from "lucide-react";
+import { ArrowLeft, Lock, Globe } from "lucide-react";
 import { toast } from "sonner";
 import MainButton from "@/components/buttons/MainButton";
 import UpgradeDialog from "@/components/ui/UpgradeDialog";
+import HeroImageEditor from "@/components/dashboard/HeroImageEditor";
 
 export default function NewCollectionPage() {
     const router = useRouter();
@@ -26,7 +27,6 @@ export default function NewCollectionPage() {
         is_public: true,
     });
     const [heroImage, setHeroImage] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string>("");
 
     useEffect(() => {
         // Fetch user plan
@@ -59,16 +59,8 @@ export default function NewCollectionPage() {
         });
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setHeroImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
+    const handleImageReady = (file: File) => {
+        setHeroImage(file);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -217,50 +209,8 @@ export default function NewCollectionPage() {
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Hero Image Upload */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <label className="block text-sm font-semibold text-gray-900 mb-3">
-                            Hero image
-                        </label>
-                        <div className="relative">
-                            {preview ? (
-                                <div className="relative aspect-video rounded-xl overflow-hidden group">
-                                    <img
-                                        src={preview}
-                                        alt="Preview"
-                                        className="w-full h-full object-cover"
-                                    />
-                                    {/* <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <label className="cursor-pointer px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg">
-                                            Change image
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleImageChange}
-                                                className="hidden"
-                                            />
-                                        </label>
-                                    </div> */}
-                                </div>
-                            ) : (
-                                <label className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition-colors bg-gray-50">
-                                    <Upload className="w-12 h-12 text-gray-400 mb-3" />
-                                    <span className="text-sm font-medium text-gray-600">
-                                        Click to add an image
-                                    </span>
-                                    <span className="text-xs text-gray-500 mt-1">
-                                        This image will be displayed fullscreen
-                                    </span>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                        className="hidden"
-                                    />
-                                </label>
-                            )}
-                        </div>
-                    </div>
+                    {/* Hero Image Editor */}
+                    <HeroImageEditor onImageReady={handleImageReady} />
 
                     {/* Basic Info */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
@@ -286,7 +236,7 @@ export default function NewCollectionPage() {
                             </label>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-500">
-                                    /gallery/
+                                    /g/
                                 </span>
                                 <input
                                     type="text"

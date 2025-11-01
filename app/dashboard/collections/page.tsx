@@ -204,7 +204,7 @@ export default function CollectionsPage() {
                                     {/* Actions */}
                                     <div className="flex items-center gap-2">
                                         <MainButton
-                                            href={`/gallery/${collection.slug}`}
+                                            href={`/g/${collection.slug}`}
                                             target="_blank"
                                             icon={
                                                 <ExternalLink className="w-4 h-4" />

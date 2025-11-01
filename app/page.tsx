@@ -13,6 +13,8 @@ import {
 import type { Metadata } from "next";
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
+import { getUser } from "@/lib/auth/getUser";
 
 export const metadata: Metadata = {
     title: "Seovileo - Online photo galleries for photographers | Share, protect with password, deliver fast",
@@ -44,7 +46,13 @@ export const metadata: Metadata = {
     ],
 };
 
-export default function Home() {
+export default async function Home() {
+    // Przekieruj zalogowanych użytkowników do dashboard
+    const user = await getUser();
+    if (user) {
+        redirect("/dashboard");
+    }
+
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",

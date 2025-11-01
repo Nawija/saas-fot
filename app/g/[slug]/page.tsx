@@ -17,7 +17,6 @@ interface Collection {
     has_password: boolean;
 }
 
-// Konfiguracja fontów
 const FONT_MAP: Record<string, { href: string; family: string }> = {
     inter: {
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap",
@@ -34,8 +33,9 @@ const FONT_MAP: Record<string, { href: string; family: string }> = {
 };
 
 export default function GalleryLandingPage() {
-    const params = useParams();
+    const params = useParams<{ slug: string }>();
     const router = useRouter();
+    const slug = params.slug;
     const [collection, setCollection] = useState<Collection | null>(null);
     const [loading, setLoading] = useState(true);
     const [password, setPassword] = useState("");
@@ -43,10 +43,38 @@ export default function GalleryLandingPage() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        fetchCollection();
-    }, []);
+        if (!slug) return;
 
-    // Załaduj wybrany font
+        const loadCollection = async () => {
+            try {
+                setLoading(true);
+                const res = await fetch(`/api/gallery/${slug}`);
+                const data = await res.json();
+
+                if (data.ok) {
+                    setCollection(data.collection);
+                    if (data.collection.has_password) {
+                        setShowPasswordPrompt(true);
+                    } else {
+                        setShowPasswordPrompt(false);
+                    }
+                    setError("");
+                } else {
+                    setError("Nie znaleziono galerii");
+                    setCollection(null);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                setError("Wystąpił błąd");
+                setCollection(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        void loadCollection();
+    }, [slug]);
+
     useEffect(() => {
         if (!collection?.hero_font) return;
         const font = FONT_MAP[collection.hero_font as keyof typeof FONT_MAP];
@@ -62,32 +90,11 @@ export default function GalleryLandingPage() {
         link.href = font.href;
     }, [collection?.hero_font]);
 
-    const fetchCollection = async () => {
-        try {
-            const res = await fetch(`/api/gallery/${params.slug}`);
-            const data = await res.json();
-
-            if (data.ok) {
-                setCollection(data.collection);
-                if (data.collection.has_password) {
-                    setShowPasswordPrompt(true);
-                }
-            } else {
-                setError("Nie znaleziono galerii");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            setError("Wystąpił błąd");
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleViewGallery = () => {
         if (collection?.has_password && !showPasswordPrompt) {
             setShowPasswordPrompt(true);
         } else {
-            router.push(`/gallery/${params.slug}/photos`);
+            router.push(`/g/${slug}/p`);
         }
     };
 
@@ -96,7 +103,7 @@ export default function GalleryLandingPage() {
         setError("");
 
         try {
-            const res = await fetch(`/api/gallery/${params.slug}/verify`, {
+            const res = await fetch(`/api/gallery/${slug}/verify`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ password }),
@@ -105,8 +112,8 @@ export default function GalleryLandingPage() {
             const data = await res.json();
 
             if (data.ok) {
-                sessionStorage.setItem(`gallery_${params.slug}`, data.token);
-                router.push(`/gallery/${params.slug}/photos`);
+                sessionStorage.setItem(`gallery_${slug}`, data.token);
+                router.push(`/g/${slug}/p`);
             } else {
                 setError("Nieprawidłowe hasło");
             }
@@ -140,7 +147,6 @@ export default function GalleryLandingPage() {
     const fontKey = collection.hero_font || "inter";
     const fontFamily = FONT_MAP[fontKey]?.family || FONT_MAP.inter.family;
 
-    // Renderowanie formularza hasła
     const renderPasswordPrompt = () => (
         <div className="w-full max-w-md mx-auto px-3">
             <div className="bg-white/10 backdrop-blur-xl border-2 border-white/20 overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
@@ -188,7 +194,6 @@ export default function GalleryLandingPage() {
         </div>
     );
 
-    // Renderowanie przycisku "Zobacz"
     const renderViewButton = () => (
         <div className="w-full max-w-2xl mx-auto text-center px-4">
             <div className="space-y-12" style={{ fontFamily }}>
@@ -218,18 +223,15 @@ export default function GalleryLandingPage() {
         </div>
     );
 
-    // Funkcja do wyboru stylu tła
     const getBackgroundStyle = () => {
         const hasHeroImage = collection.hero_image;
 
         if (!hasHeroImage) {
-            // Bez hero image - elegancki gradient
             return {
                 background: "black",
             };
         }
 
-        // Z hero image
         return {
             backgroundImage: `url(${collection.hero_image})`,
             backgroundSize: "cover",
@@ -242,10 +244,7 @@ export default function GalleryLandingPage() {
             className="relative min-h-screen w-full flex items-center justify-center p-4"
             style={getBackgroundStyle()}
         >
-            {/* Premium overlay */}
             <div className="absolute inset-0 bg-black/60" />
-
-            {/* Zawartość */}
             <div className="relative z-10 w-full py-12">
                 {showPasswordPrompt && collection.has_password
                     ? renderPasswordPrompt()

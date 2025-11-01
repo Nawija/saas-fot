@@ -8,10 +8,17 @@ import ErrorMessage from "@/components/auth/ErrorMessage";
 import LoginForm from "@/components/auth/LoginForm";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 import AuthSidePanel from "@/components/auth/AuthSidePanel";
+import { useRedirectIfAuthenticated } from "@/hooks/useRedirectIfAuthenticated";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 
 export default function LoginPage() {
     const router = useRouter();
     const { state, updateField, setError, setLoading } = useLoginForm();
+    const { checking } = useRedirectIfAuthenticated();
+
+    if (checking) {
+        return <LoadingScreen message="Sprawdzanie sesji..." />;
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

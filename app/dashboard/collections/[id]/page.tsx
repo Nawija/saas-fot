@@ -646,9 +646,7 @@ export default function CollectionDetailPage({
                                     {currentTemplate && (
                                         <div className="relative bg-gray-900 rounded-xl overflow-hidden border border-gray-200">
                                             <div className="absolute top-0 right-0 z-10 bg-white/5 w-full h-full" />
-                                            <div
-                                                className="w-full overflow-hidden aspect-video"
-                                            >
+                                            <div className="w-full overflow-hidden aspect-video">
                                                 <div
                                                     className="origin-top-left"
                                                     style={{
@@ -700,7 +698,7 @@ export default function CollectionDetailPage({
                                         className="w-full"
                                     />
                                     <MainButton
-                                        href={`${origin}/gallery/${collection.slug}`}
+                                        href={`${origin}/g/${collection.slug}`}
                                         target="_blank"
                                         icon={<Eye size={15} />}
                                         label="View"
@@ -790,7 +788,7 @@ export default function CollectionDetailPage({
                         {/* Copy Gallery Link */}
                         <div className="mb-6">
                             <CopyLinkButton
-                                url={`${origin}/gallery/${collection.slug}`}
+                                url={`${origin}/g/${collection.slug}`}
                                 showUrl={true}
                                 label="Copy"
                                 variant="default"

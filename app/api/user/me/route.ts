@@ -1,13 +1,9 @@
-// /app/api/user/me/route.ts
 import { NextResponse } from "next/server";
-import { getUser } from "@/lib/auth/getUser";
+import { withMiddleware } from "@/lib/utils/apiMiddleware";
 
-export async function GET() {
-    const user = await getUser();
-    if (!user)
-        return NextResponse.json(
-            { ok: false, error: "Nie zalogowano" },
-            { status: 401 }
-        );
-    return NextResponse.json({ ok: true, user });
-}
+export const GET = withMiddleware(
+    async (req, { user }) => {
+        return NextResponse.json({ ok: true, user });
+    },
+    { requireAuth: true }
+);
