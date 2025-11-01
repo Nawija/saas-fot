@@ -58,6 +58,25 @@ export default function HeroImageEditor({
         }
     };
 
+    // Load initial image if provided
+    useEffect(() => {
+        if (initialImage && !preview) {
+            setPreview(initialImage);
+            // Create a dummy file for the original image
+            fetch(initialImage)
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const file = new File([blob], "hero.jpg", {
+                        type: "image/jpeg",
+                    });
+                    setOriginalFile(file);
+                })
+                .catch((err) => {
+                    console.error("Error loading initial image:", err);
+                });
+        }
+    }, [initialImage, preview]);
+
     // Update image size when preview changes
     useEffect(() => {
         if (preview && imageRef.current) {
@@ -135,7 +154,12 @@ export default function HeroImageEditor({
     // Rotation handlers
     const rotateLeft = () => {
         const newRotation = (transform.rotation - 90 + 360) % 360;
-        setTransform((prev) => ({ ...prev, rotation: newRotation, x: 0, y: 0 }));
+        setTransform((prev) => ({
+            ...prev,
+            rotation: newRotation,
+            x: 0,
+            y: 0,
+        }));
         // Recalculate scale for new rotation
         setTimeout(() => {
             calculateInitialScale(naturalSize.width, naturalSize.height);
@@ -144,7 +168,12 @@ export default function HeroImageEditor({
 
     const rotateRight = () => {
         const newRotation = (transform.rotation + 90) % 360;
-        setTransform((prev) => ({ ...prev, rotation: newRotation, x: 0, y: 0 }));
+        setTransform((prev) => ({
+            ...prev,
+            rotation: newRotation,
+            x: 0,
+            y: 0,
+        }));
         // Recalculate scale for new rotation
         setTimeout(() => {
             calculateInitialScale(naturalSize.width, naturalSize.height);
@@ -168,7 +197,12 @@ export default function HeroImageEditor({
 
     // Generate final image
     const generateFinalImage = useCallback(async () => {
-        if (!preview || !originalFile || !containerRef.current || !canvasRef.current)
+        if (
+            !preview ||
+            !originalFile ||
+            !containerRef.current ||
+            !canvasRef.current
+        )
             return;
 
         const canvas = canvasRef.current;
@@ -179,7 +213,7 @@ export default function HeroImageEditor({
         const containerWidth = containerRef.current.clientWidth;
         const containerHeight = containerRef.current.clientHeight;
 
-        // Use high resolution for quality (2x)
+        // Use high resolution for quality
         const outputWidth = 1920; // Full HD width
         const outputHeight = 1080; // Full HD height (16:9)
 
@@ -188,17 +222,22 @@ export default function HeroImageEditor({
 
         // Load original image
         const img = new Image();
+        img.crossOrigin = "anonymous"; // Enable CORS for R2 images
         img.src = preview;
 
-        await new Promise((resolve) => {
+        await new Promise((resolve, reject) => {
             img.onload = resolve;
+            img.onerror = reject;
+        }).catch((err) => {
+            console.error("Error loading image:", err);
+            return;
         });
 
         // Calculate scale factor from preview to output
         const scaleFactorX = outputWidth / containerWidth;
         const scaleFactorY = outputHeight / containerHeight;
 
-        // Clear canvas
+        // Clear canvas with black background
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, outputWidth, outputHeight);
 
@@ -219,7 +258,9 @@ export default function HeroImageEditor({
         const offsetX = transform.x * scaleFactorX;
         const offsetY = transform.y * scaleFactorY;
 
-        // Draw image centered
+        // Draw image centered with high quality
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
         ctx.drawImage(
             img,
             -scaledWidth / 2 + offsetX,
@@ -235,16 +276,17 @@ export default function HeroImageEditor({
         canvas.toBlob(
             (blob) => {
                 if (blob) {
+                    const fileName = originalFile.name || "hero-image.jpg";
                     const file = new File(
                         [blob],
-                        originalFile.name.replace(/\.[^/.]+$/, ".jpg"),
+                        fileName.replace(/\.[^/.]+$/, ".jpg"),
                         { type: "image/jpeg" }
                     );
                     onImageReady(file);
                 }
             },
             "image/jpeg",
-            0.95 // High quality
+            0.95 // High quality (95%)
         );
     }, [preview, originalFile, transform, onImageReady]);
 
@@ -303,7 +345,9 @@ export default function HeroImageEditor({
                             {/* Image with transforms */}
                             <div
                                 className={`absolute inset-0 flex items-center justify-center ${
-                                    isDragging ? "cursor-grabbing" : "cursor-grab"
+                                    isDragging
+                                        ? "cursor-grabbing"
+                                        : "cursor-grab"
                                 }`}
                                 onMouseDown={handleMouseDown}
                             >
@@ -437,9 +481,13 @@ export default function HeroImageEditor({
                         <ul className="text-xs text-blue-900 space-y-1">
                             <li>• Drag the image to reposition</li>
                             <li>• Use zoom to adjust the crop</li>
-                            <li>• Rotate for portrait images or different orientation</li>
                             <li>
-                                • The final image will be exported in Full HD quality (1920x1080)
+                                • Rotate for portrait images or different
+                                orientation
+                            </li>
+                            <li>
+                                • The final image will be exported in Full HD
+                                quality (1920x1080)
                             </li>
                         </ul>
                     </div>

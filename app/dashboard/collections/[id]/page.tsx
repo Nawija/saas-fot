@@ -13,6 +13,7 @@ import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import { HERO_TEMPLATES } from "@/components/dashboard/hero-templates/registry";
 import HeroPreviewModal from "@/components/dashboard/HeroPreviewModal";
 import CollectionSettingsModal from "@/components/dashboard/CollectionSettingsModal";
+import HeroImageEditModal from "@/components/dashboard/HeroImageEditModal";
 import CopyLinkButton from "@/components/buttons/CopyLinkButton";
 import UpgradeDialog from "@/components/ui/UpgradeDialog";
 import {
@@ -24,6 +25,7 @@ import {
     Settings,
     Globe,
     Lock,
+    ImagePlus,
 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 
@@ -81,8 +83,10 @@ export default function CollectionDetailPage({
     const [pendingPhotoId, setPendingPhotoId] = useState<number | null>(null);
     const [confirmDeleteAllOpen, setConfirmDeleteAllOpen] = useState(false);
     const [heroModalOpen, setHeroModalOpen] = useState(false);
+    const [heroImageEditModalOpen, setHeroImageEditModalOpen] = useState(false);
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
     const [savingSettings, setSavingSettings] = useState(false);
+    const [savingHeroImage, setSavingHeroImage] = useState(false);
     const [origin, setOrigin] = useState("");
     const [userPlan, setUserPlan] = useState<string>("free");
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
@@ -603,6 +607,55 @@ export default function CollectionDetailPage({
         }
     }
 
+    async function handleSaveHeroImage(file: File) {
+        if (!collectionId) return;
+
+        try {
+            setSavingHeroImage(true);
+
+            // 1. Upload image to R2
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("type", "hero");
+            formData.append("collectionId", collectionId.toString());
+
+            const uploadRes = await fetch("/api/collections/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!uploadRes.ok) {
+                const uploadData = await uploadRes.json();
+                throw new Error(uploadData.error || "Failed to upload image");
+            }
+
+            const { url } = await uploadRes.json();
+
+            // 2. Update collection with new hero image URL
+            const updateRes = await fetch(`/api/collections/${collectionId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    hero_image: url,
+                }),
+            });
+
+            if (!updateRes.ok) {
+                throw new Error("Failed to update collection");
+            }
+
+            const result = await updateRes.json();
+            setCollection(result.collection);
+            toast.success("Hero image updated!");
+            setHeroImageEditModalOpen(false);
+        } catch (error) {
+            console.error("Error updating hero image:", error);
+            toast.error("Error updating hero image");
+        } finally {
+            setSavingHeroImage(false);
+        }
+    }
+
     if (loading) {
         return <Loading />;
     }
@@ -690,18 +743,31 @@ export default function CollectionDetailPage({
                                         </div>
                                     </div>
 
-                                    {/* Edit Button */}
-                                    <MainButton
-                                        onClick={() => setHeroModalOpen(true)}
-                                        label="Open editor"
-                                        variant="secondary"
-                                        className="w-full"
-                                    />
+                                    {/* Edit Buttons */}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <MainButton
+                                            onClick={() =>
+                                                setHeroImageEditModalOpen(true)
+                                            }
+                                            icon={<ImagePlus size={15} />}
+                                            label="Edit Image"
+                                            variant="secondary"
+                                            className="w-full"
+                                        />
+                                        <MainButton
+                                            onClick={() =>
+                                                setHeroModalOpen(true)
+                                            }
+                                            label="Template"
+                                            variant="secondary"
+                                            className="w-full"
+                                        />
+                                    </div>
                                     <MainButton
                                         href={`${origin}/g/${collection.slug}`}
                                         target="_blank"
                                         icon={<Eye size={15} />}
-                                        label="View"
+                                        label="View Gallery"
                                         className="w-full"
                                     />
                                 </div>
@@ -917,6 +983,14 @@ export default function CollectionDetailPage({
                     });
                     setUpgradeDialogOpen(true);
                 }}
+            />
+
+            <HeroImageEditModal
+                open={heroImageEditModalOpen}
+                onClose={() => setHeroImageEditModalOpen(false)}
+                currentHeroImage={collection.hero_image}
+                onSave={handleSaveHeroImage}
+                saving={savingHeroImage}
             />
 
             <UpgradeDialog
