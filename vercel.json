@@ -1,14 +1,14 @@
 {
-  "rewrites": [
-    {
-      "source": "/:path*",
-      "destination": "/:path*",
-      "has": [
+    "rewrites": [
         {
-          "type": "host",
-          "value": "(?<subdomain>.*)\\.seovileo\\.pl"
+            "source": "/:path*",
+            "destination": "/:path*",
+            "has": [
+                {
+                    "type": "host",
+                    "value": "(?<subdomain>.*)\\.seovileo\\.pl"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

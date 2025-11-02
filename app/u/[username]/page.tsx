@@ -73,7 +73,9 @@ export default function UserGalleriesPage() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center max-w-md px-6">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                        404
+                    </h1>
                     <p className="text-xl text-gray-600 mb-2">User not found</p>
                     <p className="text-gray-500">
                         The user <strong>{username}</strong> does not exist.
@@ -148,7 +150,7 @@ export default function UserGalleriesPage() {
                                                     <ImageIcon className="w-16 h-16 text-blue-300" />
                                                 </div>
                                             )}
-                                            
+
                                             {/* Badge */}
                                             <div className="absolute top-3 right-3">
                                                 {collection.has_password ? (
@@ -183,7 +185,9 @@ export default function UserGalleriesPage() {
                                                 <div className="flex items-center gap-1">
                                                     <ImageIcon className="w-4 h-4" />
                                                     <span>
-                                                        {collection.photo_count || 0} photos
+                                                        {collection.photo_count ||
+                                                            0}{" "}
+                                                        photos
                                                     </span>
                                                 </div>
                                             </div>
