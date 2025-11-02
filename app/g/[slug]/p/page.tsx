@@ -106,6 +106,8 @@ export default function GalleryPhotosPage() {
     useEffect(() => {
         if (!slug) return;
 
+        let isMounted = true;
+
         const fetchGallery = async () => {
             try {
                 setLoading(true);
@@ -114,6 +116,9 @@ export default function GalleryPhotosPage() {
                     String(slug),
                     token ?? undefined
                 );
+
+                if (!isMounted) return;
+
                 if (ok && collection && photos) {
                     // Validate photos array
                     const validPhotos = photos.filter(
@@ -128,7 +133,6 @@ export default function GalleryPhotosPage() {
                     );
 
                     if (validPhotos.length === 0) {
-                        console.warn("No valid photos found in gallery");
                         setCollection(collection);
                         setAllPhotos([]);
                         setDisplayedPhotos([]);
@@ -166,24 +170,27 @@ export default function GalleryPhotosPage() {
                                 setSingleImageError(false);
                             }
                         }
-                    } catch (e) {
-                        // ignore URL parsing errors
-                        console.warn("Failed to parse photo parameter:", e);
+                    } catch {
+                        // Ignore URL parsing errors - non-critical
                     }
                 } else if (status === 401) {
                     router.push(`/g/${slug}`);
                 } else {
-                    console.error("Failed to load gallery:", { ok, status });
                     setCollection(null);
                 }
-            } catch (error) {
-                console.error("Gallery fetch error:", error);
+            } catch {
                 setCollection(null);
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
         void fetchGallery();
+
+        return () => {
+            isMounted = false;
+        };
     }, [slug, router]);
 
     // infinite scroll
@@ -248,13 +255,11 @@ export default function GalleryPhotosPage() {
                     (p) => String(p.id) === String(id)
                 );
                 if (idx === -1) {
-                    console.warn(`Photo with id ${id} not found`);
                     return;
                 }
 
                 const orderContainer = document.getElementById("pswp-order");
                 if (!orderContainer) {
-                    console.error("Lightbox container not found");
                     return;
                 }
 
@@ -263,7 +268,6 @@ export default function GalleryPhotosPage() {
                 )[idx] as HTMLAnchorElement | undefined;
 
                 if (!link) {
-                    console.error(`Link not found for index ${idx}`);
                     return;
                 }
 
@@ -287,8 +291,7 @@ export default function GalleryPhotosPage() {
                         const url = new URL(window.location.href);
                         url.searchParams.set("photo", String(id));
                         window.history.replaceState(null, "", url.toString());
-                    } catch (e) {
-                        console.warn("Failed to update URL:", e);
+                    } catch {
                         window.history.replaceState(
                             null,
                             "",
@@ -296,8 +299,8 @@ export default function GalleryPhotosPage() {
                         );
                     }
                 }
-            } catch (error) {
-                console.error("Error opening lightbox:", error);
+            } catch {
+                // Silently fail - non-critical error
             }
         },
         [flatForHidden]
@@ -306,12 +309,22 @@ export default function GalleryPhotosPage() {
     // init Lightbox
     useEffect(() => {
         // jeśli tryb pojedynczego zdjęcia — nie inicjujemy lightboxa (wyświetlamy tylko to zdjęcie)
-        if (singleMode) return;
+        if (singleMode) {
+            // Cleanup any existing lightbox when entering single mode
+            if (lightboxRef.current) {
+                lightboxRef.current.destroy();
+                lightboxRef.current = null;
+            }
+            return;
+        }
 
         const orderContainer = document.getElementById("pswp-order");
         if (!orderContainer) return;
 
-        if (lightboxRef.current) lightboxRef.current.destroy();
+        if (lightboxRef.current) {
+            lightboxRef.current.destroy();
+            lightboxRef.current = null;
+        }
 
         const lightbox = new PhotoSwipeLightbox({
             gallery: "#pswp-order",
@@ -443,8 +456,15 @@ export default function GalleryPhotosPage() {
             }
         });
 
-        return () => lightbox.destroy();
-    }, [columnsCount, flatForHidden]);
+        return () => {
+            if (lightbox) {
+                lightbox.destroy();
+            }
+            if (lightboxRef.current) {
+                lightboxRef.current = null;
+            }
+        };
+    }, [columnsCount, flatForHidden, singleMode]);
 
     if (loading) return <LoadingGallery />;
 
@@ -480,7 +500,9 @@ export default function GalleryPhotosPage() {
                 <div className="w-full flex-1 flex items-center justify-center relative">
                     {/* Loading skeleton */}
                     {!singleImageLoaded && !singleImageError && (
-                        <LoadingGallery />
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                            <div className="w-16 h-16 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                        </div>
                     )}
 
                     {/* Error state */}
@@ -504,7 +526,9 @@ export default function GalleryPhotosPage() {
                         <div className="w-full" key={singlePhoto.id}>
                             <img
                                 src={singlePhoto.file_path}
-                                alt={singlePhoto.file_path}
+                                alt={`Photo ${singlePhoto.id} from ${
+                                    collection?.name || "gallery"
+                                }`}
                                 width={singlePhoto.width}
                                 height={singlePhoto.height}
                                 loading="eager"
@@ -515,18 +539,9 @@ export default function GalleryPhotosPage() {
                                     display: "block",
                                 }}
                                 onLoad={() => {
-                                    console.log(
-                                        "Image loaded:",
-                                        singlePhoto.id
-                                    );
                                     setSingleImageLoaded(true);
                                 }}
-                                onError={(e) => {
-                                    console.error(
-                                        "Image failed to load:",
-                                        singlePhoto.id,
-                                        e
-                                    );
+                                onError={() => {
                                     setSingleImageError(true);
                                     setSingleImageLoaded(false);
                                 }}
@@ -553,9 +568,7 @@ export default function GalleryPhotosPage() {
                     ref={galleryRef}
                     className="flex gap-2 scroll-m-2"
                 >
-                    {columns.length === 0 ||
-                    displayedPhotos.length === 0 ||
-                    allPhotos.length === 0 ? (
+                    {allPhotos.length === 0 ? (
                         <div className="w-full text-center text-gray-500 py-12">
                             <div className="flex flex-col items-center">
                                 <svg
@@ -594,7 +607,7 @@ export default function GalleryPhotosPage() {
                                             data-pswp-width={photo.width}
                                             data-pswp-height={photo.height}
                                             data-photo-id={photo.id}
-                                            className="mb-2 block w-full group cursor-pointer overflow-hidden bg-neutral-900 relative"
+                                            className="mb-2 block w-full group cursor-pointer overflow-hidden bg-gray-200 relative"
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 if (!isError) {
@@ -612,7 +625,7 @@ export default function GalleryPhotosPage() {
                                             >
                                                 {/* Loading skeleton */}
                                                 {isLoading && !isError && (
-                                                    <div className="absolute inset-0 bg-linear-to-br from-gray-800 via-gray-900 to-gray-800 animate-pulse" />
+                                                    <div className="absolute inset-0 bg-linear-to-br from-gray-100 via-gray-200 to-gray-100 animate-pulse" />
                                                 )}
 
                                                 {/* Error state */}
@@ -727,17 +740,13 @@ export default function GalleryPhotosPage() {
                         <p className="text-gray-600 text-sm font-medium">
                             Ładowanie kolejnych zdjęć...
                         </p>
-                        <p className="text-gray-400 text-xs mt-1">
-                            {displayedPhotos.length} z {allPhotos.length}
-                        </p>
                     </div>
                 )}
 
                 {displayedPhotos.length === allPhotos.length &&
                     allPhotos.length > 0 && (
                         <div className="text-center text-gray-400 py-6 text-sm">
-                            Wszystkie zdjęcia zostały załadowane (
-                            {allPhotos.length})
+                            Wszystkie zdjęcia zostały załadowane
                         </div>
                     )}
             </div>
