@@ -33,6 +33,8 @@ export default function HeroImageEditModal({
     const handleSave = async () => {
         if (heroFile) {
             await onSave(heroFile);
+            // Zamknij modal - rodzic odświeży widok
+            onClose();
         }
     };
 

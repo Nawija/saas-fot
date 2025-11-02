@@ -87,7 +87,7 @@ export default function CollectionsPage() {
 
     return (
         <div className="min-h-screen">
-            <div className="container mx-auto px-4 py-12 max-w-[1500px]">
+            <div className="container mx-auto px-6 py-10 max-w-[1500px]">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-12">
                     <div>
@@ -130,7 +130,7 @@ export default function CollectionsPage() {
                         />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4  gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {collections.map((collection) => (
                             <div
                                 key={collection.id}

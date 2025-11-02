@@ -629,7 +629,7 @@ export default function CollectionDetailPage({
                 throw new Error(uploadData.error || "Failed to upload image");
             }
 
-            const { url } = await uploadRes.json();
+            const { url, urlMobile } = await uploadRes.json();
 
             // 2. Update collection with new hero image URL
             const updateRes = await fetch(`/api/collections/${collectionId}`, {
@@ -637,6 +637,7 @@ export default function CollectionDetailPage({
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     hero_image: url,
+                    hero_image_mobile: urlMobile,
                 }),
             });
 
@@ -645,7 +646,19 @@ export default function CollectionDetailPage({
             }
 
             const result = await updateRes.json();
-            setCollection(result.collection);
+
+            // Dodaj timestamp do URL aby wymusić odświeżenie obrazu (cache busting)
+            const updatedCollection = {
+                ...result.collection,
+                hero_image: result.collection.hero_image
+                    ? `${result.collection.hero_image}?t=${Date.now()}`
+                    : result.collection.hero_image,
+                hero_image_mobile: result.collection.hero_image_mobile
+                    ? `${result.collection.hero_image_mobile}?t=${Date.now()}`
+                    : result.collection.hero_image_mobile,
+            };
+
+            setCollection(updatedCollection);
             toast.success("Hero image updated!");
             setHeroImageEditModalOpen(false);
         } catch (error) {

@@ -38,6 +38,7 @@ export default function HeroImageEditor({
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
+    const [isEditing, setIsEditing] = useState(false); // New state: editing mode
 
     const containerRef = useRef<HTMLDivElement>(null);
     const imageRef = useRef<HTMLImageElement>(null);
@@ -52,6 +53,7 @@ export default function HeroImageEditor({
             reader.onloadend = () => {
                 setPreview(reader.result as string);
                 setTransform({ x: 0, y: 0, scale: 1, rotation: 0 });
+                setIsEditing(true); // Enable editing mode when new image is selected
             };
             reader.readAsDataURL(file);
             // Reset input value AFTER reading so same file can be selected again
@@ -113,7 +115,7 @@ export default function HeroImageEditor({
 
     // Mouse drag handlers
     const handleMouseDown = (e: React.MouseEvent) => {
-        if (!preview) return;
+        if (!preview || !isEditing) return; // Only allow drag when in editing mode
         e.preventDefault();
         setIsDragging(true);
         setDragStart({
@@ -144,7 +146,7 @@ export default function HeroImageEditor({
 
     // Touch drag handlers for mobile
     const handleTouchStart = (e: React.TouchEvent) => {
-        if (!preview) return;
+        if (!preview || !isEditing) return; // Only allow drag when in editing mode
         const touch = e.touches[0];
         setIsDragging(true);
         setDragStart({
@@ -365,16 +367,18 @@ export default function HeroImageEditor({
                 <div
                     ref={containerRef}
                     className="relative aspect-video rounded-xl overflow-hidden bg-gray-200/70"
-                    style={{ touchAction: "none" }}
+                    style={{ touchAction: isEditing ? "none" : "auto" }}
                 >
                     {preview ? (
                         <>
                             {/* Image with transforms */}
                             <div
                                 className={`absolute inset-0 flex items-center justify-center ${
-                                    isDragging
-                                        ? "cursor-grabbing"
-                                        : "cursor-grab"
+                                    isEditing
+                                        ? isDragging
+                                            ? "cursor-grabbing"
+                                            : "cursor-grab"
+                                        : "cursor-default"
                                 }`}
                                 onMouseDown={handleMouseDown}
                                 onTouchStart={handleTouchStart}
@@ -397,17 +401,35 @@ export default function HeroImageEditor({
                                 />
                             </div>
 
-                            {/* Helper overlay */}
-                            <div className="absolute inset-0 pointer-events-none">
-                                {/* Center guide lines */}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="absolute w-px h-8 bg-white/30" />
-                                    <div className="absolute h-px w-8 bg-white/30" />
+                            {/* Helper overlay - tylko w trybie edycji */}
+                            {isEditing && (
+                                <div className="absolute inset-0 pointer-events-none">
+                                    {/* Center guide lines */}
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="absolute w-px h-8 bg-white/30" />
+                                        <div className="absolute h-px w-8 bg-white/30" />
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
-                            {/* Drag hint */}
-                            {!isDragging && (
+                            {/* Change Image Button - widoczny TYLKO gdy NIE edytujemy */}
+                            {!isEditing && !isDragging && (
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20">
+                                    <label className="px-6 py-3 bg-white/95 hover:bg-white backdrop-blur-sm text-gray-900 text-sm font-semibold rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xl hover:shadow-2xl active:scale-95 border-2 border-gray-200 hover:border-blue-500 pointer-events-auto">
+                                        <Upload className="w-5 h-5 text-blue-500" />
+                                        <span>Change image</span>
+                                        <input
+                                            type="file"
+                                            accept="image/jpeg,image/jpg,image/png,image/webp"
+                                            onChange={handleImageChange}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                </div>
+                            )}
+
+                            {/* Drag hint - tylko w trybie edycji */}
+                            {isEditing && !isDragging && (
                                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/60 text-white text-xs rounded-full flex items-center gap-2 pointer-events-none">
                                     <Move className="w-3 h-3" />
                                     <span className="hidden sm:inline">
@@ -438,8 +460,8 @@ export default function HeroImageEditor({
                     )}
                 </div>
 
-                {/* Controls */}
-                {preview && (
+                {/* Controls - tylko w trybie edycji */}
+                {preview && isEditing && (
                     <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
                         {/* Zoom */}
                         <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
@@ -487,7 +509,7 @@ export default function HeroImageEditor({
                             </button>
                         </div>
 
-                        {/* Reset & Change */}
+                        {/* Reset */}
                         <button
                             type="button"
                             onClick={resetTransform}
@@ -495,25 +517,11 @@ export default function HeroImageEditor({
                         >
                             Reset position
                         </button>
-                        {preview && (
-                            <div className="flex items-center gap-2">
-                                <label className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-2">
-                                    <Upload className="w-4 h-4" />
-                                    Change image
-                                    <input
-                                        type="file"
-                                        accept="image/jpeg,image/jpg,image/png,image/webp"
-                                        onChange={handleImageChange}
-                                        className="hidden"
-                                    />
-                                </label>
-                            </div>
-                        )}
                     </div>
                 )}
 
                 {/* Tips */}
-                {preview ? (
+                {preview && isEditing ? (
                     <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
                         <ul className="text-xs text-blue-900 space-y-1">
                             <li className="hidden sm:block">
@@ -526,6 +534,14 @@ export default function HeroImageEditor({
                             </li>
                             <li>• Recommended: 1920x1080px or higher</li>
                         </ul>
+                    </div>
+                ) : preview && !isEditing ? (
+                    <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                        <p className="text-xs text-gray-600 text-center">
+                            <strong>Current hero image.</strong> Click "Change
+                            image" above to select a new one and adjust its
+                            position.
+                        </p>
                     </div>
                 ) : (
                     <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">

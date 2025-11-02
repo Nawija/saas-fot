@@ -41,7 +41,7 @@ export default function ConfirmDialog({
                         </AlertDialogDescription>
                     )}
                 </AlertDialogHeader>
-                <AlertDialogFooter>
+                <AlertDialogFooter className="flex-col space-y-4 sm:flex-row sm:space-y-0">
                     <AlertDialogCancel onClick={() => onOpenChange(false)}>
                         {cancelLabel}
                     </AlertDialogCancel>
