@@ -243,7 +243,7 @@ export default function NewCollectionPage() {
 
     return (
         <div className="min-h-screen">
-            <div className="container mx-auto px-4 py-12 max-w-4xl">
+            <div className="container mx-auto px-3 py-12 max-w-4xl">
                 {/* Header */}
                 <Link
                     href="/dashboard/collections"

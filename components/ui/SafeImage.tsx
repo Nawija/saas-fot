@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect, useRef, CSSProperties } from "react";
-import Image from "next/image";
 import { AlertCircle } from "lucide-react";
 
 interface SafeImageProps {
@@ -152,48 +151,28 @@ export default function SafeImage({
                 </div>
             )}
 
-            {/* Image */}
+            {/* Image - Native img for zero Vercel costs */}
             {isVisible && imageState !== "error" && (
-                <>
-                    {fill ? (
-                        <Image
-                            src={currentSrc}
-                            alt={alt}
-                            fill
-                            sizes={sizes}
-                            className={`transition-opacity duration-300 ${
-                                imageState === "loaded"
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                            }`}
-                            style={{ objectFit }}
-                            quality={quality}
-                            priority={priority}
-                            loading={loading}
-                            onLoad={handleLoad}
-                            onError={handleError}
-                        />
-                    ) : (
-                        <Image
-                            src={currentSrc}
-                            alt={alt}
-                            width={width}
-                            height={height}
-                            sizes={sizes}
-                            className={`transition-opacity duration-300 ${
-                                imageState === "loaded"
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                            }`}
-                            style={{ objectFit }}
-                            quality={quality}
-                            priority={priority}
-                            loading={loading}
-                            onLoad={handleLoad}
-                            onError={handleError}
-                        />
-                    )}
-                </>
+                <img
+                    src={currentSrc}
+                    alt={alt}
+                    loading={priority ? "eager" : "lazy"}
+                    decoding="async"
+                    className={`transition-opacity duration-300 ${
+                        fill
+                            ? "absolute inset-0 w-full h-full"
+                            : width && height
+                            ? ""
+                            : "w-full h-auto"
+                    } ${imageState === "loaded" ? "opacity-100" : "opacity-0"}`}
+                    style={{
+                        objectFit: fill ? objectFit : undefined,
+                        width: !fill && width ? `${width}px` : undefined,
+                        height: !fill && height ? `${height}px` : undefined,
+                    }}
+                    onLoad={handleLoad}
+                    onError={handleError}
+                />
             )}
         </div>
     );

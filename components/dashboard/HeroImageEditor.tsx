@@ -262,9 +262,10 @@ export default function HeroImageEditor({
         const containerWidth = containerRef.current.clientWidth;
         const containerHeight = containerRef.current.clientHeight;
 
-        // Use high resolution for quality
-        const outputWidth = 1920; // Full HD width
-        const outputHeight = 1080; // Full HD height (16:9)
+        // Use 4K resolution for desktop hero (będzie przeskalowane przez Sharp)
+        // Ale zachowujemy obraz w 16:9 aspect ratio
+        const outputWidth = 3840; // 4K width
+        const outputHeight = 2160; // 4K height (16:9)
 
         canvas.width = outputWidth;
         canvas.height = outputHeight;
@@ -367,11 +368,8 @@ export default function HeroImageEditor({
             <canvas ref={canvasRef} className="hidden" />
 
             {/* Main Editor */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
                 <div className="flex items-center justify-between mb-4">
-                    <label className="block text-sm font-semibold text-gray-900">
-                        Hero image {preview && "(optional)"}
-                    </label>
                     {preview && (
                         <div className="flex items-center gap-2">
                             <label className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-2">
@@ -398,7 +396,7 @@ export default function HeroImageEditor({
 
                 <div
                     ref={containerRef}
-                    className="relative aspect-video rounded-xl overflow-hidden bg-gray-900"
+                    className="relative aspect-video rounded-xl overflow-hidden bg-gray-200/70"
                     style={{ touchAction: "none" }}
                 >
                     {preview ? (
@@ -456,10 +454,10 @@ export default function HeroImageEditor({
                     ) : (
                         <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors group">
                             <Upload className="w-12 h-12 text-gray-500 group-hover:text-gray-400 mb-3 transition-colors" />
-                            <span className="text-sm font-medium text-gray-400 group-hover:text-gray-300 transition-colors">
+                            <span className="text-sm font-medium text-gray-500 group-hover:text-gray-300 transition-colors">
                                 Click to add hero image
                             </span>
-                            <span className="text-xs text-gray-600 mt-2">
+                            <span className="text-xs text-gray-500 mt-2">
                                 Recommended: 1920x1080px or higher
                             </span>
                             <input

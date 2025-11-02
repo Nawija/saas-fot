@@ -53,13 +53,15 @@ export async function POST(req: NextRequest) {
 
             // Przetwarzaj OBA obrazy RÓWNOLEGLE dla szybkości
             const [heroDesktopBuffer, heroMobileBuffer] = await Promise.all([
-                // Hero Desktop - 3840x2160 (4K)
+                // Hero Desktop - 3840x2160 (4K) - Landscape 16:9
+                // fit: 'cover' wypełnia cały obszar, przycinając nadmiar
+                // position: 'centre' centruje obraz podczas przycinania
                 sharp(rotatedBuffer)
                     .resize(3840, 2160, {
-                        fit: "inside",
+                        fit: "cover",
                         position: "centre",
                         withoutEnlargement: false,
-                        kernel: sharp.kernel.lanczos3, // Szybszy niż domyślny
+                        kernel: sharp.kernel.lanczos3, // Najlepsza jakość
                     })
                     .webp({
                         quality: 92, // Obniżone z 98 - nadal świetna jakość
@@ -68,17 +70,20 @@ export async function POST(req: NextRequest) {
                     })
                     .toBuffer(),
 
-                // Hero Mobile - 1920x1080
+                // Hero Mobile - 828x1472 - Portrait 9:16 (optimized)
+                // Dopasowane do rzeczywistego renderowania ~800x1100px
+                // Pionowa orientacja idealna dla telefonów
+                // fit: 'cover' zachowuje proporcje i wypełnia cały obszar
                 sharp(rotatedBuffer)
-                    .resize(1920, 1080, {
-                        fit: "inside",
+                    .resize(828, 1472, {
+                        fit: "cover",
                         position: "centre",
                         withoutEnlargement: false,
                         kernel: sharp.kernel.lanczos3,
                     })
                     .webp({
-                        quality: 85, // Obniżone z 90 - wystarczające dla mobile
-                        effort: 3, // Szybsze przetwarzanie
+                        quality: 90, // Wyższa jakość dla lepszej ostrości
+                        effort: 4, // Lepsza kompresja
                     })
                     .toBuffer(),
             ]);
@@ -88,15 +93,31 @@ export async function POST(req: NextRequest) {
                 user.id,
                 parseInt(collectionId)
             );
-            const keyMobile = R2Paths.collectionHero(
+            const keyMobile = R2Paths.collectionHeroMobile(
                 user.id,
                 parseInt(collectionId)
-            ).replace(".webp", "-mobile.webp");
+            );
+
+            console.log("[Hero Upload] Desktop key:", keyDesktop);
+            console.log("[Hero Upload] Mobile key:", keyMobile);
+            console.log(
+                "[Hero Upload] Desktop size:",
+                heroDesktopBuffer.length,
+                "bytes"
+            );
+            console.log(
+                "[Hero Upload] Mobile size:",
+                heroMobileBuffer.length,
+                "bytes"
+            );
 
             const [urlDesktop, urlMobile] = await Promise.all([
                 uploadToR2(heroDesktopBuffer, keyDesktop, contentType),
                 uploadToR2(heroMobileBuffer, keyMobile, contentType),
             ]);
+
+            console.log("[Hero Upload] Desktop URL:", urlDesktop);
+            console.log("[Hero Upload] Mobile URL:", urlMobile);
 
             // Zwróć desktop URL jako główny, mobile w metadata
             processedBuffer = heroDesktopBuffer;

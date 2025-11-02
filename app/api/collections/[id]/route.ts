@@ -104,6 +104,7 @@ export const PATCH = withMiddleware(
         const body = await req.json();
         const {
             hero_image,
+            hero_image_mobile,
             name,
             description,
             password,
@@ -128,6 +129,10 @@ export const PATCH = withMiddleware(
         if (hero_image !== undefined) {
             updates.push(`hero_image = $${paramCount++}`);
             values.push(hero_image);
+        }
+        if (hero_image_mobile !== undefined) {
+            updates.push(`hero_image_mobile = $${paramCount++}`);
+            values.push(hero_image_mobile);
         }
         if (name !== undefined) {
             updates.push(`name = $${paramCount++}`);

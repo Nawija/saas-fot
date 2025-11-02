@@ -3,7 +3,6 @@
 
 import { Upload, Trash2, X, AlertCircle } from "lucide-react";
 import MainButton from "../buttons/MainButton";
-import Image from "next/image";
 import { useState } from "react";
 
 interface Photo {
@@ -45,17 +44,17 @@ function PhotoThumbnail({
                     </span>
                 </div>
             ) : (
-                <Image
+                // Native <img> to avoid Vercel image optimization costs
+                // R2/CDN serves images directly = unlimited, zero Vercel bandwidth
+                <img
                     src={photo.file_path}
                     alt={photo.file_name}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                    className="object-cover transition-opacity duration-300"
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                     style={{
                         opacity: imageLoading ? 0 : 1,
                     }}
-                    loading="lazy"
-                    quality={75}
                     onLoad={() => setImageLoading(false)}
                     onError={() => {
                         setImageError(true);

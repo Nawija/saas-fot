@@ -25,7 +25,9 @@ const PUBLIC_DOMAIN = process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN;
 export const R2Paths = {
     avatar: (userId: string) => `users/${userId}/avatar/profile.jpg`,
     collectionHero: (userId: string, collectionId: number) =>
-        `users/${userId}/collections/${collectionId}/hero.jpg`,
+        `users/${userId}/collections/${collectionId}/hero.webp`,
+    collectionHeroMobile: (userId: string, collectionId: number) =>
+        `users/${userId}/collections/${collectionId}/hero-mobile.webp`,
     collectionPhoto: (
         userId: string,
         collectionId: number,

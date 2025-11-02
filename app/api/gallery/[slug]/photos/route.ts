@@ -12,7 +12,7 @@ export async function GET(
 
         // Pobierz kolekcję
         const collectionResult = await query(
-            `SELECT id, name, description, hero_image, hero_template, hero_font, is_public, password_hash 
+            `SELECT id, name, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public, password_hash 
             FROM collections 
             WHERE slug = $1`,
             [slug]
@@ -80,6 +80,7 @@ export async function GET(
                 name: collection.name,
                 description: collection.description,
                 hero_image: collection.hero_image,
+                hero_image_mobile: collection.hero_image_mobile,
                 hero_template: collection.hero_template,
                 hero_font: collection.hero_font,
             },

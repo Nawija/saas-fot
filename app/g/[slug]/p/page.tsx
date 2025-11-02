@@ -6,7 +6,6 @@ import LoadingGallery from "@/components/ui/LoadingGallery";
 import type { Photo, Collection } from "@/types/gallery";
 import GalleryHero from "@/components/gallery/GalleryHero";
 import { getPhotos as apiGetPhotos } from "@/lib/services/galleryService";
-import Image from "next/image";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 import MainButton from "@/components/buttons/MainButton";
@@ -648,22 +647,20 @@ export default function GalleryPhotosPage() {
                                                     </div>
                                                 ) : (
                                                     <>
-                                                        <Image
+                                                        <img
                                                             src={
                                                                 photo.file_path
                                                             }
                                                             alt={`Photo ${photo.id}`}
-                                                            fill
                                                             loading="lazy"
-                                                            quality={75}
-                                                            className="object-cover transition-opacity duration-300"
+                                                            decoding="async"
+                                                            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                                                             style={{
                                                                 opacity:
                                                                     isLoading
                                                                         ? 0
                                                                         : 1,
                                                             }}
-                                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
                                                             onLoad={() => {
                                                                 setImageLoading(
                                                                     (prev) => {

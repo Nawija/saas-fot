@@ -15,7 +15,6 @@ import {
     Lock,
 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
-import Image from "next/image";
 
 interface Collection {
     id: number;
@@ -144,11 +143,11 @@ export default function CollectionsPage() {
                                     <div className="relative h-48 bg-linear-to-br from-blue-50 to-blue-100 overflow-hidden">
                                         {collection.hero_image ? (
                                             <>
-                                                <Image
+                                                <img
                                                     src={collection.hero_image}
                                                     alt={collection.name}
-                                                    height={350}
-                                                    width={350}
+                                                    loading="lazy"
+                                                    decoding="async"
                                                     className="w-full h-full object-cover transition-transform duration-300"
                                                 />
                                                 <div className="absolute inset-0 bg-linear-to-t from-white/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
