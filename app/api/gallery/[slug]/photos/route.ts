@@ -16,14 +16,15 @@ export async function GET(
         let collectionResult;
         if (subdomain) {
             collectionResult = await query(
-                `SELECT id, name, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public, password_hash, subdomain
-                FROM collections 
-                WHERE subdomain = $1`,
-                [subdomain]
+                `SELECT c.id, c.name, c.description, c.hero_image, c.hero_image_mobile, c.hero_template, c.hero_font, c.is_public, c.password_hash
+                FROM collections c
+                INNER JOIN users u ON c.user_id = u.id
+                WHERE u.username = $1 AND c.slug = $2`,
+                [subdomain, slug]
             );
         } else {
             collectionResult = await query(
-                `SELECT id, name, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public, password_hash, subdomain
+                `SELECT id, name, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public, password_hash
                 FROM collections 
                 WHERE slug = $1`,
                 [slug]

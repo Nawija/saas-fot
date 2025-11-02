@@ -11,9 +11,13 @@ export interface GetPhotosResponse {
 
 export async function getPhotos(
     slug: string,
-    token?: string
+    token?: string,
+    subdomain?: string
 ): Promise<GetPhotosResponse> {
-    const res = await fetch(`/api/gallery/${slug}/photos`, {
+    const url = subdomain 
+        ? `/api/gallery/${slug}/photos?subdomain=${subdomain}`
+        : `/api/gallery/${slug}/photos`;
+    const res = await fetch(url, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     const data = await res.json();

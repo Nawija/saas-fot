@@ -111,9 +111,11 @@ export default function GalleryPhotosPage() {
             try {
                 setLoading(true);
                 const token = sessionStorage.getItem(`gallery_${slug}`);
+                const subdomain = searchParams.get("subdomain");
                 const { ok, collection, photos, status } = await apiGetPhotos(
                     String(slug),
-                    token ?? undefined
+                    token ?? undefined,
+                    subdomain ?? undefined
                 );
 
                 if (!isMounted) return;
@@ -177,9 +179,16 @@ export default function GalleryPhotosPage() {
                     const photoParam = new URL(
                         window.location.href
                     ).searchParams.get("photo");
-                    const redirectUrl = photoParam
-                        ? `/g/${slug}?photo=${photoParam}`
-                        : `/g/${slug}`;
+                    const subdomain = searchParams.get("subdomain");
+                    
+                    let redirectUrl = `/g/${slug}`;
+                    if (subdomain) {
+                        redirectUrl += `?subdomain=${subdomain}`;
+                        if (photoParam) redirectUrl += `&photo=${photoParam}`;
+                    } else if (photoParam) {
+                        redirectUrl += `?photo=${photoParam}`;
+                    }
+                    
                     router.push(redirectUrl);
                 } else {
                     setCollection(null);
