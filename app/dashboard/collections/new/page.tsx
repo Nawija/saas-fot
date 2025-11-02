@@ -133,11 +133,6 @@ export default function NewCollectionPage() {
 
             const data = await res.json();
 
-            console.log("Collection creation response:", {
-                status: res.status,
-                data,
-            });
-
             if (!res.ok || !data.ok) {
                 // Check if it's an upgrade-required error
                 if (res.status === 403 && data.upgradeRequired) {
@@ -165,6 +160,8 @@ export default function NewCollectionPage() {
 
             // STEP 2: Upload hero image if present (with collectionId)
             if (heroImage) {
+                toast.loading("Uploading hero image...", { id: "hero-upload" });
+
                 const imageFormData = new FormData();
                 imageFormData.append("file", heroImage);
                 imageFormData.append("type", "hero");
@@ -174,6 +171,8 @@ export default function NewCollectionPage() {
                     method: "POST",
                     body: imageFormData,
                 });
+
+                toast.dismiss("hero-upload");
 
                 const uploadData = await uploadRes.json();
 

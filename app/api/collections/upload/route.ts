@@ -46,38 +46,44 @@ export async function POST(req: NextRequest) {
         let key: string;
 
         if (type === "hero") {
-            // Najpierw rotate dla poprawnej orientacji
-            const rotatedBuffer = await sharp(buffer).rotate().toBuffer();
+            // Najpierw rotate dla poprawnej orientacji (szybki pipeline)
+            const rotatedBuffer = await sharp(buffer)
+                .rotate()
+                .toBuffer({ resolveWithObject: false });
 
-            // Hero Desktop - 3840x2160 (4K) dla dużych ekranów
-            const heroDesktopBuffer = await sharp(rotatedBuffer)
-                .resize(3840, 2160, {
-                    fit: "inside",
-                    position: "centre",
-                    withoutEnlargement: false,
-                })
-                .webp({
-                    quality: 98,
-                    effort: 6,
-                    nearLossless: true,
-                    smartSubsample: true,
-                })
-                .toBuffer();
+            // Przetwarzaj OBA obrazy RÓWNOLEGLE dla szybkości
+            const [heroDesktopBuffer, heroMobileBuffer] = await Promise.all([
+                // Hero Desktop - 3840x2160 (4K)
+                sharp(rotatedBuffer)
+                    .resize(3840, 2160, {
+                        fit: "inside",
+                        position: "centre",
+                        withoutEnlargement: false,
+                        kernel: sharp.kernel.lanczos3, // Szybszy niż domyślny
+                    })
+                    .webp({
+                        quality: 92, // Obniżone z 98 - nadal świetna jakość
+                        effort: 4, // Obniżone z 6 - dużo szybsze
+                        smartSubsample: true,
+                    })
+                    .toBuffer(),
 
-            // Hero Mobile - 1920x1080 dla urządzeń mobilnych (oszczędność danych)
-            const heroMobileBuffer = await sharp(rotatedBuffer)
-                .resize(1920, 1080, {
-                    fit: "inside",
-                    position: "centre",
-                    withoutEnlargement: false,
-                })
-                .webp({
-                    quality: 90,
-                    effort: 4,
-                })
-                .toBuffer();
+                // Hero Mobile - 1920x1080
+                sharp(rotatedBuffer)
+                    .resize(1920, 1080, {
+                        fit: "inside",
+                        position: "centre",
+                        withoutEnlargement: false,
+                        kernel: sharp.kernel.lanczos3,
+                    })
+                    .webp({
+                        quality: 85, // Obniżone z 90 - wystarczające dla mobile
+                        effort: 3, // Szybsze przetwarzanie
+                    })
+                    .toBuffer(),
+            ]);
 
-            // Upload obu wersji
+            // Upload obu wersji RÓWNOLEGLE do R2
             const keyDesktop = R2Paths.collectionHero(
                 user.id,
                 parseInt(collectionId)
@@ -87,16 +93,10 @@ export async function POST(req: NextRequest) {
                 parseInt(collectionId)
             ).replace(".webp", "-mobile.webp");
 
-            const urlDesktop = await uploadToR2(
-                heroDesktopBuffer,
-                keyDesktop,
-                contentType
-            );
-            const urlMobile = await uploadToR2(
-                heroMobileBuffer,
-                keyMobile,
-                contentType
-            );
+            const [urlDesktop, urlMobile] = await Promise.all([
+                uploadToR2(heroDesktopBuffer, keyDesktop, contentType),
+                uploadToR2(heroMobileBuffer, keyMobile, contentType),
+            ]);
 
             // Zwróć desktop URL jako główny, mobile w metadata
             processedBuffer = heroDesktopBuffer;
@@ -132,6 +132,7 @@ export async function POST(req: NextRequest) {
             let composed = sharp(rotatedBuffer).resize(targetMaxWidth, null, {
                 fit: "inside",
                 withoutEnlargement: true,
+                kernel: sharp.kernel.lanczos3, // Szybszy kernel
             });
 
             // Dla planu FREE dodaj watermark z pliku public/watermark.svg
@@ -193,7 +194,12 @@ export async function POST(req: NextRequest) {
                 ]);
             }
 
-            processedBuffer = await composed.webp({ quality: 85 }).toBuffer();
+            processedBuffer = await composed
+                .webp({
+                    quality: 85,
+                    effort: 3, // Szybsze przetwarzanie dla zwykłych zdjęć
+                })
+                .toBuffer();
 
             // Użyj ID zdjęcia lub timestamp
             const fileExt = "webp";

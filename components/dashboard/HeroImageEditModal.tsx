@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import MainButton from "@/components/buttons/MainButton";
 import HeroImageEditor from "./HeroImageEditor";
 import {
@@ -39,10 +39,21 @@ export default function HeroImageEditModal({
         <AlertDialog open={open} onOpenChange={onClose}>
             <AlertDialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Edit hero image</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Adjust position, zoom and rotation of the hero image
-                    </AlertDialogDescription>
+                    <div className="flex items-start justify-between">
+                        <div className="flex items-start justify-center flex-col">
+                            <AlertDialogTitle>Edit image</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Adjust position, zoom and rotation of the hero
+                                image
+                            </AlertDialogDescription>
+                        </div>
+                        <MainButton
+                            onClick={onClose}
+                            label="Cancel"
+                            variant="secondary"
+                            disabled={saving}
+                        />
+                    </div>
                 </AlertDialogHeader>
 
                 <div className="py-4">
@@ -53,12 +64,6 @@ export default function HeroImageEditModal({
                 </div>
 
                 <AlertDialogFooter>
-                    <MainButton
-                        onClick={onClose}
-                        label="Cancel"
-                        variant="secondary"
-                        disabled={saving}
-                    />
                     <MainButton
                         onClick={handleSave}
                         label="Save changes"

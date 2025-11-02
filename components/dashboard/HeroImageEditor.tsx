@@ -55,7 +55,10 @@ export default function HeroImageEditor({
                 setTransform({ x: 0, y: 0, scale: 1, rotation: 0 });
             };
             reader.readAsDataURL(file);
+            // Reset input value AFTER reading so same file can be selected again
+            e.target.value = "";
         }
+        // If no file selected (user cancelled), do nothing - old image stays
     };
 
     // Load initial image if provided
@@ -367,17 +370,29 @@ export default function HeroImageEditor({
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center justify-between mb-4">
                     <label className="block text-sm font-semibold text-gray-900">
-                        Hero image
+                        Hero image {preview && "(optional)"}
                     </label>
                     {preview && (
-                        <button
-                            type="button"
-                            onClick={removeImage}
-                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Remove image"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <label className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-2">
+                                <Upload className="w-4 h-4" />
+                                Change image
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                />
+                            </label>
+                            <button
+                                type="button"
+                                onClick={removeImage}
+                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Remove image completely"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
                     )}
                 </div>
 
@@ -518,7 +533,7 @@ export default function HeroImageEditor({
                 )}
 
                 {/* Tips */}
-                {preview && (
+                {preview ? (
                     <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
                         <ul className="text-xs text-blue-900 space-y-1">
                             <li className="hidden sm:block">
@@ -536,7 +551,20 @@ export default function HeroImageEditor({
                                 • The final image will be exported in Full HD
                                 quality (1920x1080)
                             </li>
+                            <li className="font-semibold">
+                                • Click "Change image" to select a different
+                                photo or "X" to remove completely
+                            </li>
                         </ul>
+                    </div>
+                ) : (
+                    <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                        <p className="text-xs text-gray-600">
+                            <strong>Hero image is optional.</strong> You can add
+                            it now or skip and add photos directly to your
+                            gallery. The hero image creates a beautiful header
+                            for your gallery page.
+                        </p>
                     </div>
                 )}
             </div>
