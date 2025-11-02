@@ -37,7 +37,6 @@ export default function HeroImageEditor({
     });
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-    const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -356,12 +355,6 @@ export default function HeroImageEditor({
         calculateInitialScale(naturalSize.width, naturalSize.height);
     };
 
-    const removeImage = () => {
-        setPreview("");
-        setOriginalFile(null);
-        setTransform({ x: 0, y: 0, scale: 1, rotation: 0 });
-    };
-
     return (
         <div className="space-y-4">
             {/* Canvas for generating final image (hidden) */}
@@ -369,31 +362,6 @@ export default function HeroImageEditor({
 
             {/* Main Editor */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
-                <div className="flex items-center justify-between mb-4">
-                    {preview && (
-                        <div className="flex items-center gap-2">
-                            <label className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-2">
-                                <Upload className="w-4 h-4" />
-                                Change image
-                                <input
-                                    type="file"
-                                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                                    onChange={handleImageChange}
-                                    className="hidden"
-                                />
-                            </label>
-                            <button
-                                type="button"
-                                onClick={removeImage}
-                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Remove image completely"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-                    )}
-                </div>
-
                 <div
                     ref={containerRef}
                     className="relative aspect-video rounded-xl overflow-hidden bg-gray-200/70"
@@ -527,6 +495,20 @@ export default function HeroImageEditor({
                         >
                             Reset position
                         </button>
+                        {preview && (
+                            <div className="flex items-center gap-2">
+                                <label className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-2">
+                                    <Upload className="w-4 h-4" />
+                                    Change image
+                                    <input
+                                        type="file"
+                                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                                        onChange={handleImageChange}
+                                        className="hidden"
+                                    />
+                                </label>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -537,22 +519,12 @@ export default function HeroImageEditor({
                             <li className="hidden sm:block">
                                 • Drag the image to reposition
                             </li>
-                            <li className="block sm:hidden">
-                                • Swipe with finger to move the image
-                            </li>
                             <li>• Use zoom to adjust the crop</li>
                             <li>
                                 • Rotate for portrait images or different
                                 orientation
                             </li>
-                            <li>
-                                • The final image will be exported in Full HD
-                                quality (1920x1080)
-                            </li>
-                            <li className="font-semibold">
-                                • Click "Change image" to select a different
-                                photo or "X" to remove completely
-                            </li>
+                            <li>• Recommended: 1920x1080px or higher</li>
                         </ul>
                     </div>
                 ) : (

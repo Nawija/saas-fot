@@ -355,15 +355,13 @@ export default function HeroPreviewModal({
                                     Hero design editor
                                 </h2>
 
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                <button
                                     onClick={onClose}
                                     className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-150"
                                     aria-label="Close editor (Esc)"
                                 >
                                     <X className="w-5 h-5" />
-                                </motion.button>
+                                </button>
                             </motion.div>
 
                             {/* Main area */}

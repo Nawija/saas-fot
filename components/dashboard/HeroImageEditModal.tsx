@@ -11,6 +11,7 @@ import {
     AlertDialogTitle,
     AlertDialogFooter,
 } from "@/components/ui/alert-dialog";
+import { X } from "lucide-react";
 
 interface HeroImageEditModalProps {
     open: boolean;
@@ -47,22 +48,16 @@ export default function HeroImageEditModal({
                                 image
                             </AlertDialogDescription>
                         </div>
-                        <MainButton
+
+                        <button
                             onClick={onClose}
-                            label="Cancel"
-                            variant="secondary"
-                            disabled={saving}
-                        />
+                            className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-150"
+                            aria-label="Close editor (Esc)"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
                     </div>
                 </AlertDialogHeader>
-
-                <div className="py-4">
-                    <HeroImageEditor
-                        onImageReady={setHeroFile}
-                        initialImage={currentHeroImage}
-                    />
-                </div>
-
                 <AlertDialogFooter>
                     <MainButton
                         onClick={handleSave}
@@ -72,6 +67,13 @@ export default function HeroImageEditModal({
                         disabled={!heroFile}
                     />
                 </AlertDialogFooter>
+
+                <div className="py-4">
+                    <HeroImageEditor
+                        onImageReady={setHeroFile}
+                        initialImage={currentHeroImage}
+                    />
+                </div>
             </AlertDialogContent>
         </AlertDialog>
     );

@@ -1,8 +1,6 @@
 // components/gallery/hero/ResponsiveHeroImage.tsx
 "use client";
 
-import Image from "next/image";
-
 interface ResponsiveHeroImageProps {
     desktop: string;
     mobile?: string;
@@ -25,27 +23,23 @@ export default function ResponsiveHeroImage({
         <>
             {/* Mobile Image - wyświetlane tylko na małych ekranach */}
             <div className="md:hidden absolute inset-0">
-                <Image
+                <img
                     src={mobileImage}
                     alt={alt}
-                    quality={75}
-                    fill
-                    className={className}
-                    priority={priority}
-                    sizes="100vw"
+                    loading={priority ? "eager" : "lazy"}
+                    decoding="async"
+                    className={`w-full h-full object-cover ${className}`}
                 />
             </div>
 
             {/* Desktop Image - wyświetlane tylko na dużych ekranach */}
             <div className="hidden md:block absolute inset-0">
-                <Image
+                <img
                     src={desktop}
                     alt={alt}
-                    quality={75}
-                    fill
-                    className={className}
-                    priority={priority}
-                    sizes="100vw"
+                    loading={priority ? "eager" : "lazy"}
+                    decoding="async"
+                    className={`w-full h-full object-cover ${className}`}
                 />
             </div>
         </>
