@@ -12,15 +12,25 @@ export async function POST(
     try {
         const { slug } = await params;
         const { password } = await req.json();
+        const url = new URL(req.url);
+        const subdomain = url.searchParams.get("subdomain");
 
         if (!password) {
             return createErrorResponse("Brak hasła", 400);
         }
 
-        const result = await query(
-            "SELECT id, password_hash FROM collections WHERE slug = $1",
-            [slug]
-        );
+        let result;
+        if (subdomain) {
+            result = await query(
+                "SELECT id, password_hash, subdomain FROM collections WHERE subdomain = $1",
+                [subdomain]
+            );
+        } else {
+            result = await query(
+                "SELECT id, password_hash, subdomain FROM collections WHERE slug = $1",
+                [slug]
+            );
+        }
 
         if (result.rows.length === 0) {
             return createErrorResponse("Nie znaleziono galerii", 404);

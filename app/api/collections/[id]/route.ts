@@ -112,6 +112,7 @@ export const PATCH = withMiddleware(
             is_public,
             hero_template,
             hero_font,
+            subdomain,
         } = body;
 
         const { plan } = await getUserPlan(user!.id);
@@ -188,6 +189,43 @@ export const PATCH = withMiddleware(
             }
             updates.push(`hero_font = $${paramCount++}`);
             values.push(hero_font);
+        }
+        if (subdomain !== undefined) {
+            if (subdomain === null || subdomain === "") {
+                updates.push(`subdomain = $${paramCount++}`);
+                values.push(null);
+            } else {
+                // Walidacja subdomeny
+                if (typeof subdomain !== "string") {
+                    return createErrorResponse(
+                        "Subdomain must be a string",
+                        400
+                    );
+                }
+                const subdomainRegex = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/;
+                if (!subdomainRegex.test(subdomain)) {
+                    return createErrorResponse(
+                        "Subdomain can only contain lowercase letters, numbers, and hyphens (max 63 chars)",
+                        400
+                    );
+                }
+
+                // Sprawdź czy subdomena jest już zajęta
+                const existingSubdomain = await query(
+                    "SELECT id FROM collections WHERE subdomain = $1 AND id != $2",
+                    [subdomain, params.id]
+                );
+
+                if (existingSubdomain.rows.length > 0) {
+                    return createErrorResponse(
+                        "This subdomain is already taken. Please choose another one.",
+                        409
+                    );
+                }
+
+                updates.push(`subdomain = $${paramCount++}`);
+                values.push(subdomain);
+            }
         }
         if (password !== undefined) {
             const bcrypt = require("bcrypt");

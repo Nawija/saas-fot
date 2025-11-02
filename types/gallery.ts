@@ -16,4 +16,5 @@ export interface Collection {
     hero_image_mobile?: string;
     hero_template?: string;
     hero_font?: string;
+    subdomain?: string;
 }

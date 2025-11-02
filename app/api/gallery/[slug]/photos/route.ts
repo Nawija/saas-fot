@@ -9,14 +9,26 @@ export async function GET(
 ) {
     try {
         const { slug } = await params;
+        const url = new URL(req.url);
+        const subdomain = url.searchParams.get("subdomain");
 
         // Pobierz kolekcję
-        const collectionResult = await query(
-            `SELECT id, name, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public, password_hash 
-            FROM collections 
-            WHERE slug = $1`,
-            [slug]
-        );
+        let collectionResult;
+        if (subdomain) {
+            collectionResult = await query(
+                `SELECT id, name, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public, password_hash, subdomain
+                FROM collections 
+                WHERE subdomain = $1`,
+                [subdomain]
+            );
+        } else {
+            collectionResult = await query(
+                `SELECT id, name, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public, password_hash, subdomain
+                FROM collections 
+                WHERE slug = $1`,
+                [slug]
+            );
+        }
 
         if (collectionResult.rows.length === 0) {
             return createErrorResponse("Nie znaleziono galerii", 404);

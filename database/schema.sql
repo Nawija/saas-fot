@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS collections (
     slug VARCHAR(255) NOT NULL,
     description TEXT,
     hero_image TEXT,
+    subdomain VARCHAR(63),
     password_hash TEXT,
     password_plain TEXT,
     is_public BOOLEAN DEFAULT false,
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS collections (
 
 CREATE INDEX IF NOT EXISTS idx_collections_user_id ON collections(user_id);
 CREATE INDEX IF NOT EXISTS idx_collections_slug ON collections(slug);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_collections_subdomain ON collections(subdomain) WHERE subdomain IS NOT NULL;
 
 -- Tabela dla zdjęć w kolekcjach
 CREATE TABLE IF NOT EXISTS photos (

@@ -8,14 +8,32 @@ export async function GET(
 ) {
     try {
         const { slug } = await params;
-        const result = await query(
-            `SELECT 
-                id, name, slug, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public,
-                CASE WHEN password_hash IS NOT NULL THEN true ELSE false END as has_password
-            FROM collections 
-            WHERE slug = $1`,
-            [slug]
-        );
+        const url = new URL(req.url);
+        const subdomain = url.searchParams.get("subdomain");
+
+        let result;
+
+        // Jeśli jest subdomena, szukaj po subdomenie
+        if (subdomain) {
+            result = await query(
+                `SELECT 
+                    id, name, slug, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public, subdomain,
+                    CASE WHEN password_hash IS NOT NULL THEN true ELSE false END as has_password
+                FROM collections 
+                WHERE subdomain = $1`,
+                [subdomain]
+            );
+        } else {
+            // Standardowe wyszukiwanie po slug
+            result = await query(
+                `SELECT 
+                    id, name, slug, description, hero_image, hero_image_mobile, hero_template, hero_font, is_public, subdomain,
+                    CASE WHEN password_hash IS NOT NULL THEN true ELSE false END as has_password
+                FROM collections 
+                WHERE slug = $1`,
+                [slug]
+            );
+        }
 
         if (result.rows.length === 0) {
             return createErrorResponse("Nie znaleziono galerii", 404);

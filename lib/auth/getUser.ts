@@ -19,7 +19,9 @@ export async function getUser() {
                 CAST(storage_limit AS BIGINT) as storage_limit,
                 lemon_squeezy_customer_id,
                 lemon_squeezy_subscription_id,
-                subscription_ends_at
+                subscription_ends_at,
+                username,
+                is_username_set
             FROM users 
             WHERE id = $1`,
             [payload.sub]

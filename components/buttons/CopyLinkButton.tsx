@@ -4,9 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import {
     Copy,
-    Check,
     Link as LinkIcon,
-    Sparkles,
     CheckCircle,
 } from "lucide-react";
 

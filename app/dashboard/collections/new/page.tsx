@@ -13,6 +13,7 @@ export default function NewCollectionPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [userPlan, setUserPlan] = useState<string>("free");
+    const [username, setUsername] = useState<string>("");
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
     const [upgradeContext, setUpgradeContext] = useState({
         title: "Feature available on higher plans",
@@ -29,12 +30,15 @@ export default function NewCollectionPage() {
     const [heroImage, setHeroImage] = useState<File | null>(null);
 
     useEffect(() => {
-        // Fetch user plan
+        // Fetch user plan and username
         fetch("/api/user/me")
             .then((res) => (res.ok ? res.json() : Promise.reject(res)))
             .then((data) => {
                 if (data.user?.subscription_plan) {
                     setUserPlan(data.user.subscription_plan);
+                }
+                if (data.user?.username) {
+                    setUsername(data.user.username);
                 }
             })
             .catch(() => {
@@ -278,7 +282,7 @@ export default function NewCollectionPage() {
                                 onChange={(e) =>
                                     handleNameChange(e.target.value)
                                 }
-                                placeholder="e.g. Anna & Tom - Wedding"
+                                placeholder="e.g. Anna & Tom"
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                             />
                         </div>
@@ -289,7 +293,9 @@ export default function NewCollectionPage() {
                             </label>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-500">
-                                    https://seovileo.pl/g/
+                                    {username
+                                        ? `https://${username}.seovileo.pl/g/`
+                                        : "https://seovileo.pl/g/"}
                                 </span>
                                 <input
                                     type="text"

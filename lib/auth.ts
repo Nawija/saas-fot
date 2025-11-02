@@ -115,8 +115,8 @@ export async function createUserWithEmail(
     salt: string
 ): Promise<any> {
     const res = await query(
-        `INSERT INTO users (email, password_hash, salt, provider, subscription_plan, subscription_status) 
-         VALUES ($1, $2, $3, 'email', 'free', 'free') RETURNING *`,
+        `INSERT INTO users (email, password_hash, salt, provider, subscription_plan, subscription_status, is_username_set) 
+         VALUES ($1, $2, $3, 'email', 'free', 'free', FALSE) RETURNING *`,
         [email, passwordHash, salt]
     );
     return res.rows[0];
@@ -191,8 +191,8 @@ export async function createOrUpdateGoogleUser(
 
         // 3. Utwórz nowego użytkownika (pierwsza rejestracja - użyj avatar z Google)
         const res = await query(
-            `INSERT INTO users (email, provider, google_id, name, avatar, subscription_plan, subscription_status) 
-             VALUES ($1, 'google', $2, $3, $4, 'free', 'free')
+            `INSERT INTO users (email, provider, google_id, name, avatar, subscription_plan, subscription_status, is_username_set) 
+             VALUES ($1, 'google', $2, $3, $4, 'free', 'free', FALSE)
              RETURNING *`,
             [email, googleId, name, picture]
         );

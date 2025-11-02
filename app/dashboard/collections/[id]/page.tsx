@@ -16,17 +16,7 @@ import CollectionSettingsModal from "@/components/dashboard/CollectionSettingsMo
 import HeroImageEditModal from "@/components/dashboard/HeroImageEditModal";
 import CopyLinkButton from "@/components/buttons/CopyLinkButton";
 import UpgradeDialog from "@/components/ui/UpgradeDialog";
-import {
-    BookImage,
-    Eye,
-    Trash2,
-    Download,
-    Share2,
-    Settings,
-    Globe,
-    Lock,
-    ImagePlus,
-} from "lucide-react";
+import { Eye, Trash2, Download, Globe, Lock, ImagePlus } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 
 interface Collection {
@@ -39,6 +29,7 @@ interface Collection {
     hero_font?: string;
     is_public: boolean;
     password_plain?: string;
+    subdomain?: string;
     created_at: string;
     photo_count: number;
 }
@@ -89,6 +80,7 @@ export default function CollectionDetailPage({
     const [savingHeroImage, setSavingHeroImage] = useState(false);
     const [origin, setOrigin] = useState("");
     const [userPlan, setUserPlan] = useState<string>("free");
+    const [username, setUsername] = useState<string>("");
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
     const [upgradeContext, setUpgradeContext] = useState({
         title: "Feature available on higher plans",
@@ -159,11 +151,12 @@ export default function CollectionDetailPage({
                 router.push("/dashboard/collections");
             }
 
-            // Fetch user's plan
+            // Fetch user's plan and username
             const userRes = await fetch("/api/user/me");
             if (userRes.ok) {
                 const userData = await userRes.json();
                 setUserPlan(userData.user?.subscription_plan || "free");
+                setUsername(userData.user?.username || "");
             }
         } catch (error) {
             console.error("Error fetching collection:", error);
@@ -592,16 +585,17 @@ export default function CollectionDetailPage({
             });
 
             if (!res.ok) {
-                throw new Error("Failed to update settings");
+                const errorData = await res.json();
+                throw new Error(errorData.error || "Failed to update settings");
             }
 
             const result = await res.json();
             setCollection(result.collection);
             toast.success("Settings updated");
             setSettingsModalOpen(false);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error updating settings:", error);
-            toast.error("Error saving settings");
+            toast.error(error.message || "Error saving settings");
         } finally {
             setSavingSettings(false);
         }
@@ -777,7 +771,11 @@ export default function CollectionDetailPage({
                                         />
                                     </div>
                                     <MainButton
-                                        href={`${origin}/g/${collection.slug}`}
+                                        href={
+                                            username
+                                                ? `https://${username}.seovileo.pl/g/${collection.slug}`
+                                                : `${origin}/g/${collection.slug}`
+                                        }
                                         target="_blank"
                                         icon={<Eye size={15} />}
                                         label="View Gallery"
@@ -867,7 +865,11 @@ export default function CollectionDetailPage({
                         {/* Copy Gallery Link */}
                         <div className="mb-6">
                             <CopyLinkButton
-                                url={`${origin}/g/${collection.slug}`}
+                                url={
+                                    username
+                                        ? `https://${username}.seovileo.pl/g/${collection.slug}`
+                                        : `${origin}/g/${collection.slug}`
+                                }
                                 showUrl={true}
                                 label="Copy"
                                 variant="default"

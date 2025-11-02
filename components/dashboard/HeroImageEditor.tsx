@@ -534,9 +534,9 @@ export default function HeroImageEditor({
                             )}
                         </>
                     ) : (
-                        <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors group">
+                        <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors group">
                             <Upload className="w-12 h-12 text-gray-500 group-hover:text-gray-400 mb-3 transition-colors" />
-                            <span className="text-sm font-medium text-gray-500 group-hover:text-gray-300 transition-colors">
+                            <span className="text-sm font-medium text-gray-500">
                                 Click to add hero image
                             </span>
                             <span className="text-xs text-gray-500 mt-2">

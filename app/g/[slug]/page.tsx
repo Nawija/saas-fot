@@ -49,7 +49,14 @@ export default function GalleryLandingPage() {
         const loadCollection = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`/api/gallery/${slug}`);
+
+                // Sprawdź czy jest subdomena w parametrach URL
+                const subdomain = searchParams.get("subdomain");
+                const apiUrl = subdomain
+                    ? `/api/gallery/${slug}?subdomain=${subdomain}`
+                    : `/api/gallery/${slug}`;
+
+                const res = await fetch(apiUrl);
                 const data = await res.json();
 
                 if (data.ok) {
@@ -74,7 +81,7 @@ export default function GalleryLandingPage() {
         };
 
         void loadCollection();
-    }, [slug]);
+    }, [slug, searchParams]);
 
     useEffect(() => {
         if (!collection?.hero_font) return;

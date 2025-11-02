@@ -35,10 +35,24 @@ export default function CollectionsPage() {
     const [pending, setPending] = useState<{ id: number; name: string } | null>(
         null
     );
+    const [username, setUsername] = useState<string>("");
 
     useEffect(() => {
         fetchCollections();
+        fetchUsername();
     }, []);
+
+    const fetchUsername = async () => {
+        try {
+            const res = await fetch("/api/user/me");
+            const data = await res.json();
+            if (data.ok && data.user?.username) {
+                setUsername(data.user.username);
+            }
+        } catch (error) {
+            console.error("Error fetching username:", error);
+        }
+    };
 
     const fetchCollections = async () => {
         try {
@@ -203,7 +217,11 @@ export default function CollectionsPage() {
                                     {/* Actions */}
                                     <div className="flex items-center gap-2">
                                         <MainButton
-                                            href={`/g/${collection.slug}`}
+                                            href={
+                                                username
+                                                    ? `https://${username}.seovileo.pl/g/${collection.slug}`
+                                                    : `/g/${collection.slug}`
+                                            }
                                             target="_blank"
                                             icon={
                                                 <ExternalLink className="w-4 h-4" />

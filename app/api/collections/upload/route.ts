@@ -70,20 +70,20 @@ export async function POST(req: NextRequest) {
                     })
                     .toBuffer(),
 
-                // Hero Mobile - 828x1472 - Portrait 9:16 (optimized)
-                // Dopasowane do rzeczywistego renderowania ~800x1100px
+                // Hero Mobile - 1080x1920 - Portrait 9:16 (Full HD)
+                // Wyższa rozdzielczość dla lepszej jakości na mobile
                 // Pionowa orientacja idealna dla telefonów
                 // fit: 'cover' zachowuje proporcje i wypełnia cały obszar
                 sharp(rotatedBuffer)
-                    .resize(828, 1472, {
+                    .resize(1080, 1920, {
                         fit: "cover",
                         position: "centre",
                         withoutEnlargement: false,
                         kernel: sharp.kernel.lanczos3,
                     })
                     .webp({
-                        quality: 90, // Wyższa jakość dla lepszej ostrości
-                        effort: 4, // Lepsza kompresja
+                        quality: 92, // Wyższa jakość dla ostrości
+                        effort: 4,
                     })
                     .toBuffer(),
             ]);
