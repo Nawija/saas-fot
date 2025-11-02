@@ -93,6 +93,37 @@ export default function HeroImageEditor({
         }
     }, [preview]);
 
+    // Constrain position to prevent image from going outside container
+    const constrainPosition = useCallback(
+        (x: number, y: number) => {
+            if (!containerRef.current || !imageRef.current) return { x, y };
+
+            const container = containerRef.current;
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+
+            const isRotated =
+                transform.rotation === 90 || transform.rotation === 270;
+            const imgWidth = isRotated ? naturalSize.height : naturalSize.width;
+            const imgHeight = isRotated
+                ? naturalSize.width
+                : naturalSize.height;
+
+            const scaledWidth = imgWidth * transform.scale;
+            const scaledHeight = imgHeight * transform.scale;
+
+            // Calculate boundaries
+            const maxX = Math.max(0, (scaledWidth - containerWidth) / 2);
+            const maxY = Math.max(0, (scaledHeight - containerHeight) / 2);
+
+            return {
+                x: Math.min(Math.max(x, -maxX), maxX),
+                y: Math.min(Math.max(y, -maxY), maxY),
+            };
+        },
+        [transform.scale, transform.rotation, naturalSize]
+    );
+
     // Calculate initial scale to fit container
     const calculateInitialScale = (imgWidth: number, imgHeight: number) => {
         if (!containerRef.current) return;
@@ -108,9 +139,10 @@ export default function HeroImageEditor({
 
         const scaleX = containerWidth / effectiveWidth;
         const scaleY = containerHeight / effectiveHeight;
-        const initialScale = Math.max(scaleX, scaleY) * 1.1; // 110% to cover
+        // Dokładnie pokryj kontener bez dodatkowego zoom
+        const initialScale = Math.max(scaleX, scaleY);
 
-        setTransform((prev) => ({ ...prev, scale: initialScale }));
+        setTransform((prev) => ({ ...prev, scale: initialScale, x: 0, y: 0 }));
     };
 
     // Mouse drag handlers
@@ -126,18 +158,21 @@ export default function HeroImageEditor({
 
     const handleMouseMove = useCallback(
         (e: MouseEvent) => {
-            if (!isDragging) return;
+            if (!isDragging || !containerRef.current || !imageRef.current)
+                return;
 
             const newX = e.clientX - dragStart.x;
             const newY = e.clientY - dragStart.y;
 
+            const constrained = constrainPosition(newX, newY);
+
             setTransform((prev) => ({
                 ...prev,
-                x: newX,
-                y: newY,
+                x: constrained.x,
+                y: constrained.y,
             }));
         },
-        [isDragging, dragStart]
+        [isDragging, dragStart, constrainPosition]
     );
 
     const handleMouseUp = useCallback(() => {
@@ -157,20 +192,23 @@ export default function HeroImageEditor({
 
     const handleTouchMove = useCallback(
         (e: TouchEvent) => {
-            if (!isDragging) return;
+            if (!isDragging || !containerRef.current || !imageRef.current)
+                return;
             e.preventDefault(); // Prevent scrolling while dragging
 
             const touch = e.touches[0];
             const newX = touch.clientX - dragStart.x;
             const newY = touch.clientY - dragStart.y;
 
+            const constrained = constrainPosition(newX, newY);
+
             setTransform((prev) => ({
                 ...prev,
-                x: newX,
-                y: newY,
+                x: constrained.x,
+                y: constrained.y,
             }));
         },
-        [isDragging, dragStart]
+        [isDragging, dragStart, constrainPosition]
     );
 
     const handleTouchEnd = useCallback(() => {
@@ -230,20 +268,74 @@ export default function HeroImageEditor({
         }, 0);
     };
 
-    // Zoom handlers
-    const zoomIn = () => {
-        setTransform((prev) => ({
-            ...prev,
-            scale: Math.min(prev.scale * 1.2, 5),
-        }));
-    };
+    // Zoom handlers with position constraint
+    const zoomIn = useCallback(() => {
+        setTransform((prev) => {
+            const newScale = Math.min(prev.scale * 1.15, 5);
 
-    const zoomOut = () => {
-        setTransform((prev) => ({
-            ...prev,
-            scale: Math.max(prev.scale * 0.8, 0.1),
-        }));
-    };
+            // Recalculate constrained position with new scale
+            if (!containerRef.current) return { ...prev, scale: newScale };
+
+            const container = containerRef.current;
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+
+            const isRotated = prev.rotation === 90 || prev.rotation === 270;
+            const imgWidth = isRotated ? naturalSize.height : naturalSize.width;
+            const imgHeight = isRotated
+                ? naturalSize.width
+                : naturalSize.height;
+
+            const scaledWidth = imgWidth * newScale;
+            const scaledHeight = imgHeight * newScale;
+
+            const maxX = Math.max(0, (scaledWidth - containerWidth) / 2);
+            const maxY = Math.max(0, (scaledHeight - containerHeight) / 2);
+
+            return {
+                ...prev,
+                scale: newScale,
+                x: Math.min(Math.max(prev.x, -maxX), maxX),
+                y: Math.min(Math.max(prev.y, -maxY), maxY),
+            };
+        });
+    }, [naturalSize]);
+
+    const zoomOut = useCallback(() => {
+        if (!containerRef.current) return;
+
+        setTransform((prev) => {
+            const containerWidth = containerRef.current!.clientWidth;
+            const containerHeight = containerRef.current!.clientHeight;
+
+            const isRotated = prev.rotation === 90 || prev.rotation === 270;
+            const effectiveWidth = isRotated
+                ? naturalSize.height
+                : naturalSize.width;
+            const effectiveHeight = isRotated
+                ? naturalSize.width
+                : naturalSize.height;
+
+            const scaleX = containerWidth / effectiveWidth;
+            const scaleY = containerHeight / effectiveHeight;
+            const minScale = Math.max(scaleX, scaleY);
+
+            const newScale = Math.max(prev.scale * 0.85, minScale);
+
+            const scaledWidth = effectiveWidth * newScale;
+            const scaledHeight = effectiveHeight * newScale;
+
+            const maxX = Math.max(0, (scaledWidth - containerWidth) / 2);
+            const maxY = Math.max(0, (scaledHeight - containerHeight) / 2);
+
+            return {
+                ...prev,
+                scale: newScale,
+                x: Math.min(Math.max(prev.x, -maxX), maxX),
+                y: Math.min(Math.max(prev.y, -maxY), maxY),
+            };
+        });
+    }, [naturalSize]);
 
     // Generate final image
     const generateFinalImage = useCallback(async () => {
