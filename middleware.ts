@@ -47,13 +47,20 @@ export default function proxy(request: NextRequest) {
 
         // Jeśli jest subdomena (nie www)
         if (subdomain && subdomain !== "www") {
-            // Przekieruj na /g/[subdomain] z parametrem
+            // Root subdomain - pokaż listę galerii użytkownika
             if (pathname === "/" || pathname === "") {
-                url.pathname = `/g/${subdomain}`;
-                url.searchParams.set("subdomain", subdomain);
+                url.pathname = `/u/${subdomain}`;
                 console.log(
                     `  → subdomain detected: ${subdomain}, rewrite to ${url.pathname}`
                 );
+                return NextResponse.rewrite(url);
+            }
+
+            // /g/slug - konkretna galeria użytkownika
+            if (pathname.startsWith("/g/")) {
+                const slug = pathname.replace("/g/", "");
+                url.searchParams.set("username", subdomain);
+                console.log(`  → subdomain gallery: ${subdomain}/g/${slug}`);
                 return NextResponse.rewrite(url);
             }
 
@@ -103,5 +110,15 @@ export default function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/api/protected/:path*"],
+    // Obsługuj wszystkie ścieżki OPRÓCZ statycznych plików
+    matcher: [
+        /*
+         * Match all request paths except for:
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * - public folder files
+         */
+        "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    ],
 };
