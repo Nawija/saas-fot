@@ -14,7 +14,7 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                     <Image
                         src={data.image}
                         alt={data.name}
-                        quality={100}
+                        quality={75}
                         fill
                         className="object-cover"
                         priority

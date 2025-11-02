@@ -678,7 +678,7 @@ export default function CollectionDetailPage({
             </div>
 
             {/* Main Content */}
-            <div className="max-w-[1500px] mx-auto px-4 md:px-6 py-6">
+            <div className="max-w-[1500px] mx-auto p-2 md:p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
                     {/* Left Sidebar - Hero Template & Stats */}
                     <div className="lg:col-span-4 xl:col-span-3 space-y-6 lg:sticky lg:top-16 lg:self-start lg:overflow-y-auto lg:h-[85vh] lg:pr-3 scrollbar-hidden">

@@ -46,6 +46,30 @@ export default function PhotoUploadSection({
         e.stopPropagation();
     };
 
+    const validateFile = (file: File): boolean => {
+        // Check file type
+        const allowedTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp",
+            "image/gif",
+            "image/heic",
+            "image/heif",
+        ];
+        if (!allowedTypes.includes(file.type.toLowerCase())) {
+            return false;
+        }
+
+        // Check file size (max 50MB for safety)
+        const maxSize = 50 * 1024 * 1024; // 50MB
+        if (file.size > maxSize) {
+            return false;
+        }
+
+        return true;
+    };
+
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -55,9 +79,9 @@ export default function PhotoUploadSection({
 
         const files = e.dataTransfer.files;
         if (files && files.length > 0) {
-            // Filter only image files
-            const imageFiles = Array.from(files).filter((file) =>
-                file.type.startsWith("image/")
+            // Filter and validate image files
+            const imageFiles = Array.from(files).filter(
+                (file) => file.type.startsWith("image/") && validateFile(file)
             );
 
             if (imageFiles.length > 0 && onDrop) {
@@ -65,6 +89,14 @@ export default function PhotoUploadSection({
                 const dataTransfer = new DataTransfer();
                 imageFiles.forEach((file) => dataTransfer.items.add(file));
                 onDrop(dataTransfer.files);
+            }
+
+            // Show warning if some files were rejected
+            const rejectedCount = files.length - imageFiles.length;
+            if (rejectedCount > 0) {
+                console.warn(
+                    `${rejectedCount} file(s) rejected: invalid type or size > 50MB`
+                );
             }
         }
     };
@@ -80,7 +112,7 @@ export default function PhotoUploadSection({
             <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/heic,image/heif"
                 multiple
                 onChange={onUpload}
                 disabled={uploading}

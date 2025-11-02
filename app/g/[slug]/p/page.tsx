@@ -10,7 +10,7 @@ import Image from "next/image";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 import MainButton from "@/components/buttons/MainButton";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 
 const PHOTOS_PER_PAGE = 20;
 
@@ -73,9 +73,14 @@ export default function GalleryPhotosPage() {
     const [columnsCount, setColumnsCount] = useState(3);
     const [singleMode, setSingleMode] = useState(false);
     const [singlePhoto, setSinglePhoto] = useState<Photo | null>(null);
+    const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+    const [imageLoading, setImageLoading] = useState<Set<number>>(new Set());
+    const [singleImageLoaded, setSingleImageLoaded] = useState(false);
+    const [singleImageError, setSingleImageError] = useState(false);
 
     const galleryRef = useRef<HTMLDivElement>(null);
     const lightboxRef = useRef<PhotoSwipeLightbox | null>(null);
+    const preloadedImages = useRef<Set<string>>(new Set());
 
     // monitoruj zmiany w URL (np. usunięcie ?photo) i resetuj singleMode
     useEffect(() => {
@@ -110,7 +115,28 @@ export default function GalleryPhotosPage() {
                     token ?? undefined
                 );
                 if (ok && collection && photos) {
-                    const sorted = [...photos].sort((a, b) =>
+                    // Validate photos array
+                    const validPhotos = photos.filter(
+                        (p) =>
+                            p &&
+                            p.id &&
+                            p.file_path &&
+                            typeof p.width === "number" &&
+                            typeof p.height === "number" &&
+                            p.width > 0 &&
+                            p.height > 0
+                    );
+
+                    if (validPhotos.length === 0) {
+                        console.warn("No valid photos found in gallery");
+                        setCollection(collection);
+                        setAllPhotos([]);
+                        setDisplayedPhotos([]);
+                        setLoading(false);
+                        return;
+                    }
+
+                    const sorted = [...validPhotos].sort((a, b) =>
                         a.file_path.localeCompare(b.file_path, undefined, {
                             numeric: true,
                         })
@@ -118,6 +144,11 @@ export default function GalleryPhotosPage() {
                     setCollection(collection);
                     setAllPhotos(sorted);
                     setDisplayedPhotos(sorted.slice(0, PHOTOS_PER_PAGE));
+                    // Initialize loading state for first batch
+                    const firstBatchIds = new Set(
+                        sorted.slice(0, PHOTOS_PER_PAGE).map((p) => p.id)
+                    );
+                    setImageLoading(firstBatchIds);
                     // jeśli jest ?photo=ID -> przejdź w tryb pojedynczego zdjęcia
                     try {
                         const val = new URL(
@@ -130,16 +161,24 @@ export default function GalleryPhotosPage() {
                             if (target) {
                                 setSingleMode(true);
                                 setSinglePhoto(target);
+                                // Reset loading states for new photo
+                                setSingleImageLoaded(false);
+                                setSingleImageError(false);
                             }
                         }
                     } catch (e) {
-                        // ignore
+                        // ignore URL parsing errors
+                        console.warn("Failed to parse photo parameter:", e);
                     }
                 } else if (status === 401) {
                     router.push(`/g/${slug}`);
+                } else {
+                    console.error("Failed to load gallery:", { ok, status });
+                    setCollection(null);
                 }
             } catch (error) {
-                console.error(error);
+                console.error("Gallery fetch error:", error);
+                setCollection(null);
             } finally {
                 setLoading(false);
             }
@@ -169,9 +208,23 @@ export default function GalleryPhotosPage() {
         const nextBatch = allPhotos.slice(start, start + PHOTOS_PER_PAGE);
         if (nextBatch.length > 0) {
             setDisplayedPhotos((prev) => [...prev, ...nextBatch]);
+            // Add new photos to loading state
+            setImageLoading((prev) => {
+                const next = new Set(prev);
+                nextBatch.forEach((p) => next.add(p.id));
+                return next;
+            });
         }
         setIsLoadingMore(false);
     }, [page, allPhotos]);
+
+    // Monitor when exiting single mode
+    useEffect(() => {
+        if (!singleMode) {
+            setSingleImageLoaded(false);
+            setSingleImageError(false);
+        }
+    }, [singleMode]);
 
     // columns memoized
     const columns = useMemo(
@@ -188,44 +241,67 @@ export default function GalleryPhotosPage() {
         [allPhotos, columnsCount]
     );
 
-    const openPhotoInLightbox = (id: string | number) => {
-        const idx = flatForHidden.findIndex((p) => String(p.id) === String(id));
-        const orderContainer = document.getElementById("pswp-order");
-        const link = orderContainer?.querySelectorAll("a[data-photo-id]")[
-            idx
-        ] as HTMLAnchorElement | undefined;
-
-        if (!link) return;
-
-        // zapamiętaj aktualną pozycję scrolla
-        const prevScrollY = window.scrollY || window.pageYOffset || 0;
-
-        // kliknij link (otworzy lightbox)
-        link.click();
-
-        // natychmiast przywróć pozycję scrolla, żeby przeglądarka nie zdążyła przewinąć do linku
-        // używamy requestAnimationFrame + setTimeout dla odporności na różne przeglądarki/frames
-        requestAnimationFrame(() => {
-            window.scrollTo(0, prevScrollY);
-            // dodatkowe zabezpieczenie po kilku ms
-            setTimeout(() => window.scrollTo(0, prevScrollY), 50);
-        });
-
-        // aktualizacja URL bez przewijania
-        if (typeof window !== "undefined" && "history" in window) {
+    const openPhotoInLightbox = useCallback(
+        (id: string | number) => {
             try {
-                const url = new URL(window.location.href);
-                url.searchParams.set("photo", String(id));
-                window.history.replaceState(null, "", url.toString());
-            } catch {
-                window.history.replaceState(
-                    null,
-                    "",
-                    `${window.location.pathname}?photo=${id}`
+                const idx = flatForHidden.findIndex(
+                    (p) => String(p.id) === String(id)
                 );
+                if (idx === -1) {
+                    console.warn(`Photo with id ${id} not found`);
+                    return;
+                }
+
+                const orderContainer = document.getElementById("pswp-order");
+                if (!orderContainer) {
+                    console.error("Lightbox container not found");
+                    return;
+                }
+
+                const link = orderContainer.querySelectorAll(
+                    "a[data-photo-id]"
+                )[idx] as HTMLAnchorElement | undefined;
+
+                if (!link) {
+                    console.error(`Link not found for index ${idx}`);
+                    return;
+                }
+
+                // zapamiętaj aktualną pozycję scrolla
+                const prevScrollY = window.scrollY || window.pageYOffset || 0;
+
+                // kliknij link (otworzy lightbox)
+                link.click();
+
+                // natychmiast przywróć pozycję scrolla, żeby przeglądarka nie zdążyła przewinąć do linku
+                // używamy requestAnimationFrame + setTimeout dla odporności na różne przeglądarki/frames
+                requestAnimationFrame(() => {
+                    window.scrollTo(0, prevScrollY);
+                    // dodatkowe zabezpieczenie po kilku ms
+                    setTimeout(() => window.scrollTo(0, prevScrollY), 50);
+                });
+
+                // aktualizacja URL bez przewijania
+                if (typeof window !== "undefined" && "history" in window) {
+                    try {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set("photo", String(id));
+                        window.history.replaceState(null, "", url.toString());
+                    } catch (e) {
+                        console.warn("Failed to update URL:", e);
+                        window.history.replaceState(
+                            null,
+                            "",
+                            `${window.location.pathname}?photo=${id}`
+                        );
+                    }
+                }
+            } catch (error) {
+                console.error("Error opening lightbox:", error);
             }
-        }
-    };
+        },
+        [flatForHidden]
+    );
 
     // init Lightbox
     useEffect(() => {
@@ -244,17 +320,35 @@ export default function GalleryPhotosPage() {
             bgOpacity: 0.95,
             spacing: 0.1,
             loop: true,
+            preload: [1, 2], // Moderate preloading - 1 before, 2 after
+            errorMsg:
+                '<div style="text-align:center;padding:20px;color:#fff;"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><p style="margin-top:16px;font-size:18px;">Nie udało się załadować zdjęcia</p><p style="margin-top:8px;font-size:14px;opacity:0.7;">Przesuń dalej lub naciśnij strzałkę</p></div>',
         });
 
-        lightbox.init();
-        lightboxRef.current = lightbox;
-
-        // Event aktualizacji URL przy zmianie zdjęcia -> sync z ?photo=ID
+        // Smart preloading on slide change
         lightbox.on("change", () => {
-            const pswp = (lightbox as any).pswp; // instancja PhotoSwipe
+            const pswp = (lightbox as any).pswp;
             if (pswp && typeof pswp.currIndex === "number") {
                 const idx = pswp.currIndex;
                 const photo = flatForHidden?.[idx];
+
+                // Preload only next 2 images to avoid blocking
+                const toPreload = [idx + 1, idx + 2];
+                toPreload.forEach((i) => {
+                    if (i >= 0 && i < flatForHidden.length) {
+                        const p = flatForHidden[i];
+                        if (
+                            p?.file_path &&
+                            !preloadedImages.current.has(p.file_path)
+                        ) {
+                            preloadedImages.current.add(p.file_path);
+                            const img = new window.Image();
+                            img.src = p.file_path;
+                        }
+                    }
+                });
+
+                // Update URL
                 if (photo) {
                     try {
                         const url = new URL(window.location.href);
@@ -270,6 +364,9 @@ export default function GalleryPhotosPage() {
                 }
             }
         });
+
+        lightbox.init();
+        lightboxRef.current = lightbox;
 
         // jeśli ?photo=ID w URL -> otwórz odpowiednie zdjęcie od razu
         const idxFromQuery = getPhotoIndexFromQuery(flatForHidden, "photo");
@@ -380,16 +477,62 @@ export default function GalleryPhotosPage() {
                         label="Back"
                     />
                 </div>
-                <div className="w-full flex-1 flex items-center justify-center">
-                    <div className="w-full">
-                        <Image
-                            src={singlePhoto.file_path}
-                            alt={singlePhoto.file_path}
-                            width={singlePhoto.width}
-                            height={singlePhoto.height}
-                            className="max-h-[80vh] object-contain mx-auto"
-                        />
-                    </div>
+                <div className="w-full flex-1 flex items-center justify-center relative">
+                    {/* Loading skeleton */}
+                    {!singleImageLoaded && !singleImageError && (
+                        <LoadingGallery />
+                    )}
+
+                    {/* Error state */}
+                    {singleImageError ? (
+                        <div className="flex flex-col items-center justify-center text-gray-500">
+                            <AlertCircle size={64} className="mb-4" />
+                            <p className="text-lg font-medium">
+                                Failed to load image
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setSingleImageError(false);
+                                    setSingleImageLoaded(false);
+                                }}
+                                className="mt-4 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                            >
+                                Try Again
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="w-full" key={singlePhoto.id}>
+                            <img
+                                src={singlePhoto.file_path}
+                                alt={singlePhoto.file_path}
+                                width={singlePhoto.width}
+                                height={singlePhoto.height}
+                                loading="eager"
+                                decoding="async"
+                                className="max-h-[85vh] object-contain mx-auto transition-opacity duration-300"
+                                style={{
+                                    opacity: singleImageLoaded ? 1 : 0,
+                                    display: "block",
+                                }}
+                                onLoad={() => {
+                                    console.log(
+                                        "Image loaded:",
+                                        singlePhoto.id
+                                    );
+                                    setSingleImageLoaded(true);
+                                }}
+                                onError={(e) => {
+                                    console.error(
+                                        "Image failed to load:",
+                                        singlePhoto.id,
+                                        e
+                                    );
+                                    setSingleImageError(true);
+                                    setSingleImageLoaded(false);
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -410,46 +553,145 @@ export default function GalleryPhotosPage() {
                     ref={galleryRef}
                     className="flex gap-2 scroll-m-2"
                 >
-                    {columns.length === 0 ? (
-                        <div className="w-full text-center text-white/60 py-6">
-                            Brak zdjęć
+                    {columns.length === 0 ||
+                    displayedPhotos.length === 0 ||
+                    allPhotos.length === 0 ? (
+                        <div className="w-full text-center text-gray-500 py-12">
+                            <div className="flex flex-col items-center">
+                                <svg
+                                    className="w-16 h-16 mb-4 opacity-30"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    />
+                                </svg>
+                                <p className="text-lg font-medium">
+                                    Brak zdjęć w galerii
+                                </p>
+                            </div>
                         </div>
                     ) : (
                         columns.map((col, colIndex) => (
                             <div key={colIndex} className="flex-1 space-y-1">
-                                {col.map((photo) => (
-                                    <a
-                                        id={`photo-id-${photo.id}`}
-                                        key={photo.id}
-                                        href={photo.file_path}
-                                        data-pswp-src={photo.file_path}
-                                        data-pswp-width={photo.width}
-                                        data-pswp-height={photo.height}
-                                        data-photo-id={photo.id}
-                                        className="mb-2 block w-full group cursor-pointer overflow-hidden bg-neutral-900"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            openPhotoInLightbox(photo.id);
-                                        }}
-                                    >
-                                        <div
-                                            className="relative w-full"
-                                            style={{
-                                                aspectRatio: `${photo.width} / ${photo.height}`,
+                                {col.map((photo) => {
+                                    const isError = imageErrors.has(photo.id);
+                                    const isLoading = imageLoading.has(
+                                        photo.id
+                                    );
+
+                                    return (
+                                        <a
+                                            id={`photo-id-${photo.id}`}
+                                            key={photo.id}
+                                            href={photo.file_path}
+                                            data-pswp-src={photo.file_path}
+                                            data-pswp-width={photo.width}
+                                            data-pswp-height={photo.height}
+                                            data-photo-id={photo.id}
+                                            className="mb-2 block w-full group cursor-pointer overflow-hidden bg-neutral-900 relative"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (!isError) {
+                                                    openPhotoInLightbox(
+                                                        photo.id
+                                                    );
+                                                }
                                             }}
                                         >
-                                            <Image
-                                                src={photo.file_path}
-                                                alt={`Photo ${photo.id}`}
-                                                fill
-                                                loading="lazy"
-                                                className="object-cover transition-opacity duration-500 opacity-100"
-                                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                            />
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-                                        </div>
-                                    </a>
-                                ))}
+                                            <div
+                                                className="relative w-full"
+                                                style={{
+                                                    aspectRatio: `${photo.width} / ${photo.height}`,
+                                                }}
+                                            >
+                                                {/* Loading skeleton */}
+                                                {isLoading && !isError && (
+                                                    <div className="absolute inset-0 bg-linear-to-br from-gray-800 via-gray-900 to-gray-800 animate-pulse" />
+                                                )}
+
+                                                {/* Error state */}
+                                                {isError ? (
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 text-gray-500">
+                                                        <AlertCircle
+                                                            size={32}
+                                                            className="mb-2"
+                                                        />
+                                                        <span className="text-xs">
+                                                            Failed to load
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <Image
+                                                            src={
+                                                                photo.file_path
+                                                            }
+                                                            alt={`Photo ${photo.id}`}
+                                                            fill
+                                                            loading="lazy"
+                                                            quality={75}
+                                                            className="object-cover transition-opacity duration-300"
+                                                            style={{
+                                                                opacity:
+                                                                    isLoading
+                                                                        ? 0
+                                                                        : 1,
+                                                            }}
+                                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                                                            onLoad={() => {
+                                                                setImageLoading(
+                                                                    (prev) => {
+                                                                        const next =
+                                                                            new Set(
+                                                                                prev
+                                                                            );
+                                                                        next.delete(
+                                                                            photo.id
+                                                                        );
+                                                                        return next;
+                                                                    }
+                                                                );
+                                                            }}
+                                                            onError={() => {
+                                                                setImageErrors(
+                                                                    (prev) => {
+                                                                        const next =
+                                                                            new Set(
+                                                                                prev
+                                                                            );
+                                                                        next.add(
+                                                                            photo.id
+                                                                        );
+                                                                        return next;
+                                                                    }
+                                                                );
+                                                                setImageLoading(
+                                                                    (prev) => {
+                                                                        const next =
+                                                                            new Set(
+                                                                                prev
+                                                                            );
+                                                                        next.delete(
+                                                                            photo.id
+                                                                        );
+                                                                        return next;
+                                                                    }
+                                                                );
+                                                            }}
+                                                        />
+                                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                                                    </>
+                                                )}
+                                            </div>
+                                        </a>
+                                    );
+                                })}
                             </div>
                         ))
                     )}
@@ -480,10 +722,24 @@ export default function GalleryPhotosPage() {
                 </div>
 
                 {displayedPhotos.length < allPhotos.length && (
-                    <div className="text-center text-white/70 py-6">
-                        Ładowanie kolejnych zdjęć...
+                    <div className="flex flex-col items-center justify-center py-8">
+                        <div className="w-10 h-10 border-4 border-gray-300 border-t-gray-900 rounded-full animate-spin mb-3" />
+                        <p className="text-gray-600 text-sm font-medium">
+                            Ładowanie kolejnych zdjęć...
+                        </p>
+                        <p className="text-gray-400 text-xs mt-1">
+                            {displayedPhotos.length} z {allPhotos.length}
+                        </p>
                     </div>
                 )}
+
+                {displayedPhotos.length === allPhotos.length &&
+                    allPhotos.length > 0 && (
+                        <div className="text-center text-gray-400 py-6 text-sm">
+                            Wszystkie zdjęcia zostały załadowane (
+                            {allPhotos.length})
+                        </div>
+                    )}
             </div>
         </>
     );

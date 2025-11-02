@@ -74,6 +74,27 @@ export default function Lightbox({
         setPan({ x: 0, y: 0 });
     }, [index]);
 
+    // Preload adjacent images for smooth navigation
+    useEffect(() => {
+        if (!open || !photos.length) return;
+
+        const preloadImage = (src: string) => {
+            const img = new Image();
+            img.src = src;
+        };
+
+        // Preload previous and next images
+        const prevIndex = (index - 1 + photos.length) % photos.length;
+        const nextIndex = (index + 1) % photos.length;
+
+        if (photos[prevIndex]) {
+            preloadImage(photos[prevIndex].file_path);
+        }
+        if (photos[nextIndex]) {
+            preloadImage(photos[nextIndex].file_path);
+        }
+    }, [open, index, photos]);
+
     // Keyboard navigation when visible
     useEffect(() => {
         if (!open) return;
@@ -342,6 +363,9 @@ export default function Lightbox({
                     src={current.file_path}
                     alt={`Zdjęcie ${index + 1}`}
                     draggable="false"
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
                     className={`max-w-full max-h-full object-contain will-change-transform ${
                         animating ? "opacity-0 scale-95" : "opacity-100"
                     }`}
@@ -359,6 +383,19 @@ export default function Lightbox({
                                     ? "grabbing"
                                     : "grab"
                                 : "zoom-in",
+                    }}
+                    onError={(e) => {
+                        const img = e.currentTarget;
+                        // Prevent infinite loop
+                        if (!img.dataset.retried) {
+                            img.dataset.retried = "true";
+                            // Force reload
+                            const src = img.src;
+                            img.src = "";
+                            setTimeout(() => {
+                                img.src = src;
+                            }, 100);
+                        }
                     }}
                 />
             </div>
