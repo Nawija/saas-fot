@@ -46,17 +46,19 @@ export async function POST(req: NextRequest) {
         let key: string;
 
         if (type === "hero") {
-            // Hero image - 2560x1440, bardzo wysoka jakość
+            // Hero image - 3840x2160 (4K) dla dużych ekranów, najwyższa jakość
             processedBuffer = await sharp(buffer)
-                .resize(2560, 1440, {
+                .rotate() // Automatycznie naprawia orientację EXIF
+                .resize(3840, 2160, {
+                    fit: "inside", // Zachowuje całe zdjęcie, bez przycinania
                     position: "centre",
-                    withoutEnlargement: true, // nie powiększa, jeśli obraz jest mniejszy
+                    withoutEnlargement: false, // Skaluje w górę dla małych obrazów
                 })
                 .webp({
-                    quality: 95, // bardzo wysoka jakość
-                    effort: 4, // poziom kompresji (0-6), 4 to dobry balans
-                    nearLossless: true, // używa trybu "prawie bezstratnego"
-                    smartSubsample: true, // lepsze próbkowanie kolorów
+                    quality: 98, // maksymalna jakość
+                    effort: 6, // najwyższa kompresja (wolniejsze, ale lepsza jakość)
+                    nearLossless: true, // prawie bezstratna kompresja
+                    smartSubsample: true, // optymalne próbkowanie kolorów
                 })
                 .toBuffer();
 
@@ -64,14 +66,18 @@ export async function POST(req: NextRequest) {
         } else {
             // Regular photo - 1300px szerokości (optymalne dla web)
             const targetMaxWidth = 1300;
-            const inputMeta = await sharp(buffer).metadata();
+
+            // Najpierw rotate() aby uzyskać poprawne wymiary po korekcie orientacji
+            const rotatedBuffer = await sharp(buffer).rotate().toBuffer();
+            const inputMeta = await sharp(rotatedBuffer).metadata();
+
             const inW = inputMeta.width || targetMaxWidth;
             const inH = inputMeta.height || Math.round(targetMaxWidth * 0.75);
             const targetW = Math.min(inW, targetMaxWidth);
             const scale = targetW / inW;
             const targetH = Math.max(1, Math.round(inH * scale));
 
-            let composed = sharp(buffer).resize(targetMaxWidth, null, {
+            let composed = sharp(rotatedBuffer).resize(targetMaxWidth, null, {
                 fit: "inside",
                 withoutEnlargement: true,
             });
@@ -159,12 +165,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             ok: true,
             url,
-            size: processedBuffer.length + 2222200,
+            size: processedBuffer.length,
             width,
             height,
         });
     } catch (error: any) {
-        console.error("Upload error:", error);
+        // Log error in development, silently fail in production
+        if (process.env.NODE_ENV === "development") {
+            console.error("Upload error:", error);
+        }
         return createErrorResponse("Błąd uploadu", 500);
     }
 }
