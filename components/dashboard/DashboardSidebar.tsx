@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Images, CreditCard } from "lucide-react";
+import { Images, CreditCard, LifeBuoy } from "lucide-react";
 import LogoutButton from "../buttons/LogoutButton";
 
 const menuItems = [
@@ -16,6 +16,11 @@ const menuItems = [
         label: "Billing",
         href: "/dashboard/billing",
         icon: CreditCard,
+    },
+    {
+        label: "Support",
+        href: "/support",
+        icon: LifeBuoy,
     },
 ];
 
@@ -50,9 +55,7 @@ export default function DashboardSidebar({
             {/* Sidebar */}
             <aside
                 className={`fixed top-0 left-0 w-64 bg-white z-40 lg:static lg:shadow-none transition-transform duration-300 ease-in-out h-full ${
-                    isOpen
-                        ? ""
-                        : "-translate-x-full lg:translate-x-0"
+                    isOpen ? "" : "-translate-x-full lg:translate-x-0"
                 } `}
             >
                 <div className="flex flex-col h-full">

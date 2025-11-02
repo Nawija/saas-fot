@@ -14,7 +14,7 @@ export async function getPhotos(
     token?: string,
     subdomain?: string
 ): Promise<GetPhotosResponse> {
-    const url = subdomain 
+    const url = subdomain
         ? `/api/gallery/${slug}/photos?subdomain=${subdomain}`
         : `/api/gallery/${slug}/photos`;
     const res = await fetch(url, {

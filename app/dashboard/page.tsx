@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 import Loading from "@/components/ui/Loading";
+import FooterDashboard from "@/components/ui/FooterDashboard";
 
 export default function DashboardPage() {
     const [user, setUser] = useState<User | null>(null);
@@ -343,6 +344,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
             </section>
+                <FooterDashboard />
         </div>
     );
 }

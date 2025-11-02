@@ -180,7 +180,7 @@ export default function GalleryPhotosPage() {
                         window.location.href
                     ).searchParams.get("photo");
                     const subdomain = searchParams.get("subdomain");
-                    
+
                     let redirectUrl = `/g/${slug}`;
                     if (subdomain) {
                         redirectUrl += `?subdomain=${subdomain}`;
@@ -188,7 +188,7 @@ export default function GalleryPhotosPage() {
                     } else if (photoParam) {
                         redirectUrl += `?photo=${photoParam}`;
                     }
-                    
+
                     router.push(redirectUrl);
                 } else {
                     setCollection(null);
