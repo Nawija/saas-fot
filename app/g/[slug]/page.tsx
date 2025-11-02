@@ -244,7 +244,7 @@ export default function GalleryLandingPage() {
             className="relative min-h-screen w-full flex items-center justify-center p-4"
             style={getBackgroundStyle()}
         >
-            <div className="absolute inset-0 bg-black/60" />
+            <div className="absolute inset-0 bg-black/80" />
             <div className="relative z-10 w-full py-12">
                 {showPasswordPrompt && collection.has_password
                     ? renderPasswordPrompt()

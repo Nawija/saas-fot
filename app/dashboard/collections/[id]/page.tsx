@@ -751,7 +751,7 @@ export default function CollectionDetailPage({
                                             }
                                             icon={<ImagePlus size={15} />}
                                             label="Edit Image"
-                                            variant="secondary"
+                                            variant="orange"
                                             className="w-full"
                                         />
                                         <MainButton
@@ -759,7 +759,7 @@ export default function CollectionDetailPage({
                                                 setHeroModalOpen(true)
                                             }
                                             label="Template"
-                                            variant="secondary"
+                                            variant="purple"
                                             className="w-full"
                                         />
                                     </div>

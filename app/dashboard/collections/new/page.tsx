@@ -51,11 +51,54 @@ export default function NewCollectionPage() {
             .trim();
     };
 
+    const checkSlugAvailability = async (slug: string): Promise<string> => {
+        try {
+            const res = await fetch(
+                `/api/collections/check-slug?slug=${encodeURIComponent(slug)}`
+            );
+            const data = await res.json();
+
+            if (data.available) {
+                return slug;
+            }
+
+            // Slug zajęty, generuj unikalny
+            let counter = 1;
+            let uniqueSlug = `${slug}-${counter}`;
+
+            while (true) {
+                const checkRes = await fetch(
+                    `/api/collections/check-slug?slug=${encodeURIComponent(
+                        uniqueSlug
+                    )}`
+                );
+                const checkData = await checkRes.json();
+
+                if (checkData.available) {
+                    return uniqueSlug;
+                }
+
+                counter++;
+                uniqueSlug = `${slug}-${counter}`;
+
+                // Zabezpieczenie przed nieskończoną pętlą
+                if (counter > 100) {
+                    return `${slug}-${Date.now()}`;
+                }
+            }
+        } catch (error) {
+            console.error("Error checking slug:", error);
+            // W przypadku błędu, dodaj timestamp
+            return `${slug}-${Date.now()}`;
+        }
+    };
+
     const handleNameChange = (name: string) => {
+        const baseSlug = generateSlug(name);
         setFormData({
             ...formData,
             name,
-            slug: generateSlug(name),
+            slug: baseSlug,
         });
     };
 
@@ -68,12 +111,22 @@ export default function NewCollectionPage() {
         setLoading(true);
 
         try {
+            // Verify slug availability one more time before submission
+            const finalSlug = await checkSlugAvailability(formData.slug);
+            if (finalSlug !== formData.slug) {
+                setFormData((prev) => ({ ...prev, slug: finalSlug }));
+                toast.info(
+                    `Slug changed to "${finalSlug}" to ensure uniqueness`
+                );
+            }
+
             // STEP 1: Create collection (without hero image)
             const res = await fetch("/api/collections", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
+                    slug: finalSlug,
                     hero_image: "", // Empty for now
                 }),
             });
@@ -236,7 +289,7 @@ export default function NewCollectionPage() {
                             </label>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-500">
-                                    /g/
+                                    https://seovileo.pl/g/
                                 </span>
                                 <input
                                     type="text"
@@ -253,7 +306,9 @@ export default function NewCollectionPage() {
                                 />
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
-                                This link will be shared with clients
+                                This link will be shared with clients. If slug
+                                exists, a unique number will be added
+                                automatically.
                             </p>
                         </div>
 

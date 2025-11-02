@@ -49,7 +49,6 @@ export async function POST(req: NextRequest) {
             // Hero image - 2560x1440, bardzo wysoka jakość
             processedBuffer = await sharp(buffer)
                 .resize(2560, 1440, {
-                    fit: "cover",
                     position: "centre",
                     withoutEnlargement: true, // nie powiększa, jeśli obraz jest mniejszy
                 })

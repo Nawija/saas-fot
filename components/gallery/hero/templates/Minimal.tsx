@@ -20,7 +20,7 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                         priority
                     />
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/30 to-black/40" />
+                    <div className="absolute inset-0 bg-black/60" />
                 </div>
             ) : (
                 <div className="absolute inset-0 bg-black" />

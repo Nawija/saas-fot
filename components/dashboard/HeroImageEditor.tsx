@@ -112,6 +112,7 @@ export default function HeroImageEditor({
     // Mouse drag handlers
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!preview) return;
+        e.preventDefault();
         setIsDragging(true);
         setDragStart({
             x: e.clientX - transform.x,
@@ -139,17 +140,62 @@ export default function HeroImageEditor({
         setIsDragging(false);
     }, []);
 
+    // Touch drag handlers for mobile
+    const handleTouchStart = (e: React.TouchEvent) => {
+        if (!preview) return;
+        const touch = e.touches[0];
+        setIsDragging(true);
+        setDragStart({
+            x: touch.clientX - transform.x,
+            y: touch.clientY - transform.y,
+        });
+    };
+
+    const handleTouchMove = useCallback(
+        (e: TouchEvent) => {
+            if (!isDragging) return;
+            e.preventDefault(); // Prevent scrolling while dragging
+
+            const touch = e.touches[0];
+            const newX = touch.clientX - dragStart.x;
+            const newY = touch.clientY - dragStart.y;
+
+            setTransform((prev) => ({
+                ...prev,
+                x: newX,
+                y: newY,
+            }));
+        },
+        [isDragging, dragStart]
+    );
+
+    const handleTouchEnd = useCallback(() => {
+        setIsDragging(false);
+    }, []);
+
     useEffect(() => {
         if (isDragging) {
             window.addEventListener("mousemove", handleMouseMove);
             window.addEventListener("mouseup", handleMouseUp);
+            window.addEventListener("touchmove", handleTouchMove, {
+                passive: false,
+            });
+            window.addEventListener("touchend", handleTouchEnd);
 
             return () => {
                 window.removeEventListener("mousemove", handleMouseMove);
                 window.removeEventListener("mouseup", handleMouseUp);
+                window.removeEventListener("touchmove", handleTouchMove);
+                window.removeEventListener("touchend", handleTouchEnd);
             };
         }
-    }, [isDragging, handleMouseMove, handleMouseUp]);
+    }, [
+        isDragging,
+        handleMouseMove,
+        handleMouseUp,
+        handleTouchMove,
+        handleTouchEnd,
+    ]);
 
     // Rotation handlers
     const rotateLeft = () => {
@@ -191,7 +237,7 @@ export default function HeroImageEditor({
     const zoomOut = () => {
         setTransform((prev) => ({
             ...prev,
-            scale: Math.max(prev.scale * 0.8, 0.5),
+            scale: Math.max(prev.scale * 0.8, 0.1),
         }));
     };
 
@@ -350,6 +396,7 @@ export default function HeroImageEditor({
                                         : "cursor-grab"
                                 }`}
                                 onMouseDown={handleMouseDown}
+                                onTouchStart={handleTouchStart}
                             >
                                 <img
                                     ref={imageRef}
@@ -382,7 +429,12 @@ export default function HeroImageEditor({
                             {!isDragging && (
                                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/60 text-white text-xs rounded-full flex items-center gap-2 pointer-events-none">
                                     <Move className="w-3 h-3" />
-                                    <span>Drag to reposition</span>
+                                    <span className="hidden sm:inline">
+                                        Drag to reposition
+                                    </span>
+                                    <span className="inline sm:hidden">
+                                        Swipe to move
+                                    </span>
                                 </div>
                             )}
                         </>
@@ -462,16 +514,6 @@ export default function HeroImageEditor({
                         >
                             Reset position
                         </button>
-
-                        <label className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer">
-                            Change image
-                            <input
-                                type="file"
-                                accept="image/jpeg,image/jpg,image/png,image/webp"
-                                onChange={handleImageChange}
-                                className="hidden"
-                            />
-                        </label>
                     </div>
                 )}
 
@@ -479,7 +521,12 @@ export default function HeroImageEditor({
                 {preview && (
                     <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
                         <ul className="text-xs text-blue-900 space-y-1">
-                            <li>• Drag the image to reposition</li>
+                            <li className="hidden sm:block">
+                                • Drag the image to reposition
+                            </li>
+                            <li className="block sm:hidden">
+                                • Swipe with finger to move the image
+                            </li>
                             <li>• Use zoom to adjust the crop</li>
                             <li>
                                 • Rotate for portrait images or different
