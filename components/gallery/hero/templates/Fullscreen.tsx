@@ -1,10 +1,10 @@
 // components/gallery/hero/templates/FullScreen.tsx
 "use client";
 
-import Image from "next/image";
 import { GalleryHeroTemplate } from "../types";
 import { ArrowBigDown } from "lucide-react";
 import Link from "next/link";
+import ResponsiveHeroImage from "../ResponsiveHeroImage";
 
 export const FullscreenTemplate: GalleryHeroTemplate = ({ data, elements }) => {
     return (
@@ -12,11 +12,10 @@ export const FullscreenTemplate: GalleryHeroTemplate = ({ data, elements }) => {
             {/* Background Image */}
             {data.image ? (
                 <div className="absolute inset-0">
-                    <Image
-                        src={data.image}
+                    <ResponsiveHeroImage
+                        desktop={data.image}
+                        mobile={data.imageMobile}
                         alt={data.name}
-                        quality={75}
-                        fill
                         className="object-cover"
                         priority
                     />

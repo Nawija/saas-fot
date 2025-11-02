@@ -46,23 +46,75 @@ export async function POST(req: NextRequest) {
         let key: string;
 
         if (type === "hero") {
-            // Hero image - 3840x2160 (4K) dla dużych ekranów, najwyższa jakość
-            processedBuffer = await sharp(buffer)
-                .rotate() // Automatycznie naprawia orientację EXIF
+            // Najpierw rotate dla poprawnej orientacji
+            const rotatedBuffer = await sharp(buffer).rotate().toBuffer();
+
+            // Hero Desktop - 3840x2160 (4K) dla dużych ekranów
+            const heroDesktopBuffer = await sharp(rotatedBuffer)
                 .resize(3840, 2160, {
-                    fit: "inside", // Zachowuje całe zdjęcie, bez przycinania
+                    fit: "inside",
                     position: "centre",
-                    withoutEnlargement: false, // Skaluje w górę dla małych obrazów
+                    withoutEnlargement: false,
                 })
                 .webp({
-                    quality: 98, // maksymalna jakość
-                    effort: 6, // najwyższa kompresja (wolniejsze, ale lepsza jakość)
-                    nearLossless: true, // prawie bezstratna kompresja
-                    smartSubsample: true, // optymalne próbkowanie kolorów
+                    quality: 98,
+                    effort: 6,
+                    nearLossless: true,
+                    smartSubsample: true,
                 })
                 .toBuffer();
 
-            key = R2Paths.collectionHero(user.id, parseInt(collectionId));
+            // Hero Mobile - 1920x1080 dla urządzeń mobilnych (oszczędność danych)
+            const heroMobileBuffer = await sharp(rotatedBuffer)
+                .resize(1920, 1080, {
+                    fit: "inside",
+                    position: "centre",
+                    withoutEnlargement: false,
+                })
+                .webp({
+                    quality: 90,
+                    effort: 4,
+                })
+                .toBuffer();
+
+            // Upload obu wersji
+            const keyDesktop = R2Paths.collectionHero(
+                user.id,
+                parseInt(collectionId)
+            );
+            const keyMobile = R2Paths.collectionHero(
+                user.id,
+                parseInt(collectionId)
+            ).replace(".webp", "-mobile.webp");
+
+            const urlDesktop = await uploadToR2(
+                heroDesktopBuffer,
+                keyDesktop,
+                contentType
+            );
+            const urlMobile = await uploadToR2(
+                heroMobileBuffer,
+                keyMobile,
+                contentType
+            );
+
+            // Zwróć desktop URL jako główny, mobile w metadata
+            processedBuffer = heroDesktopBuffer;
+            key = keyDesktop;
+
+            // Pobierz wymiary desktop version
+            const metadata = await sharp(processedBuffer).metadata();
+            const width = metadata.width || 0;
+            const height = metadata.height || 0;
+
+            return NextResponse.json({
+                ok: true,
+                url: urlDesktop,
+                urlMobile: urlMobile,
+                size: heroDesktopBuffer.length + heroMobileBuffer.length,
+                width,
+                height,
+            });
         } else {
             // Regular photo - 1300px szerokości (optymalne dla web)
             const targetMaxWidth = 1300;

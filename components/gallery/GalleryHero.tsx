@@ -35,6 +35,7 @@ export default function GalleryHero({ collection }: GalleryHeroProps) {
                     name: collection.name,
                     description: collection.description,
                     image: collection.hero_image,
+                    imageMobile: collection.hero_image_mobile,
                 },
                 elements: { ScrollIndicator },
             })}

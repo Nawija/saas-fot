@@ -13,6 +13,7 @@ export interface Collection {
     name: string;
     description?: string;
     hero_image?: string;
+    hero_image_mobile?: string;
     hero_template?: string;
     hero_font?: string;
 }

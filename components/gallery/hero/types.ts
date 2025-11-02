@@ -4,6 +4,7 @@ export interface GalleryHeroData {
     name: string;
     description?: string;
     image?: string;
+    imageMobile?: string;
 }
 
 export interface GalleryHeroElements {

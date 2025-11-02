@@ -1,9 +1,9 @@
 // components/gallery/hero/templates/Minimal.tsx
 "use client";
 
-import Image from "next/image";
 import { GalleryHeroTemplate } from "../types";
 import { ArrowBigDown } from "lucide-react";
+import ResponsiveHeroImage from "../ResponsiveHeroImage";
 
 export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
     const Scroll = elements.ScrollIndicator;
@@ -12,11 +12,10 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
             {/* Background Image */}
             {data.image ? (
                 <div className="absolute inset-0">
-                    <Image
-                        src={data.image}
+                    <ResponsiveHeroImage
+                        desktop={data.image}
+                        mobile={data.imageMobile}
                         alt={data.name}
-                        quality={75}
-                        fill
                         className="object-cover"
                         priority
                     />

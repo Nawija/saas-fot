@@ -195,12 +195,13 @@ export default function NewCollectionPage() {
                 }
 
                 if (uploadData.ok) {
-                    // STEP 3: Update collection with hero image URL
+                    // STEP 3: Update collection with hero image URLs (desktop + mobile)
                     await fetch(`/api/collections/${collectionId}`, {
                         method: "PATCH",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             hero_image: uploadData.url,
+                            hero_image_mobile: uploadData.urlMobile,
                         }),
                     });
 
