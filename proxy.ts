@@ -59,7 +59,7 @@ export default function proxy(request: NextRequest) {
             // /g/slug - konkretna galeria użytkownika
             if (pathname.startsWith("/g/")) {
                 const slug = pathname.replace("/g/", "");
-                url.searchParams.set("username", subdomain);
+                url.searchParams.set("subdomain", subdomain);
                 console.log(`  → subdomain gallery: ${subdomain}/g/${slug}`);
                 return NextResponse.rewrite(url);
             }
