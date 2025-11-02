@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Eye, Lock } from "lucide-react";
 import LoadingGallery from "../loading";
 
@@ -35,6 +35,7 @@ const FONT_MAP: Record<string, { href: string; family: string }> = {
 export default function GalleryLandingPage() {
     const params = useParams<{ slug: string }>();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const slug = params.slug;
     const [collection, setCollection] = useState<Collection | null>(null);
     const [loading, setLoading] = useState(true);
@@ -94,7 +95,12 @@ export default function GalleryLandingPage() {
         if (collection?.has_password && !showPasswordPrompt) {
             setShowPasswordPrompt(true);
         } else {
-            router.push(`/g/${slug}/p`);
+            // Preserve photo parameter if present
+            const photoParam = searchParams.get("photo");
+            const targetUrl = photoParam
+                ? `/g/${slug}/p?photo=${photoParam}`
+                : `/g/${slug}/p`;
+            router.push(targetUrl);
         }
     };
 
@@ -113,7 +119,12 @@ export default function GalleryLandingPage() {
 
             if (data.ok) {
                 sessionStorage.setItem(`gallery_${slug}`, data.token);
-                router.push(`/g/${slug}/p`);
+                // Preserve photo parameter if present
+                const photoParam = searchParams.get("photo");
+                const targetUrl = photoParam
+                    ? `/g/${slug}/p?photo=${photoParam}`
+                    : `/g/${slug}/p`;
+                router.push(targetUrl);
             } else {
                 setError("Nieprawidłowe hasło");
             }

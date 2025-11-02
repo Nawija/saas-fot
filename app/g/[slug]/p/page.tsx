@@ -174,7 +174,14 @@ export default function GalleryPhotosPage() {
                         // Ignore URL parsing errors - non-critical
                     }
                 } else if (status === 401) {
-                    router.push(`/g/${slug}`);
+                    // Redirect to password page, preserving photo parameter if present
+                    const photoParam = new URL(
+                        window.location.href
+                    ).searchParams.get("photo");
+                    const redirectUrl = photoParam
+                        ? `/g/${slug}?photo=${photoParam}`
+                        : `/g/${slug}`;
+                    router.push(redirectUrl);
                 } else {
                     setCollection(null);
                 }
