@@ -126,7 +126,7 @@ export default function GalleryLandingPage() {
             // Include subdomain in verify request if present
             const subdomain = searchParams.get("subdomain");
             const verifyUrl = subdomain
-                ? `/api/gallery/${slug}/verify?subdomain=${subdomain}`
+                ? `https://seovileo.pl/api/gallery/${slug}/verify`
                 : `/api/gallery/${slug}/verify`;
 
             console.log("🔐 Verifying password...", {
@@ -205,7 +205,6 @@ export default function GalleryLandingPage() {
         );
     }
 
-    const template = collection.hero_template || "minimal";
     const fontKey = collection.hero_font || "inter";
     const fontFamily = FONT_MAP[fontKey]?.family || FONT_MAP.inter.family;
 
