@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
                 // Pionowa orientacja idealna dla telefonów
                 // fit: 'cover' zachowuje proporcje i wypełnia cały obszar
                 sharp(rotatedBuffer)
-                    .resize(1080, 1920, {
+                    .resize(1080, 1080, {
                         fit: "cover",
                         position: "centre",
                         withoutEnlargement: false,
