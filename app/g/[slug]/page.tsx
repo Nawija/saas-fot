@@ -58,8 +58,8 @@ export default function GalleryLandingPage() {
                 );
 
                 const apiUrl = subdomain
-                    ? `https://seovileo.pl/api/gallery/${slug}`
-                    : `https://seovileo.pl/api/gallery/${slug}`;
+                    ? `/api/gallery/${slug}?subdomain=${subdomain}`
+                    : `/api/gallery/${slug}`;
 
                 console.log("📡 API URL:", apiUrl);
 
@@ -126,8 +126,8 @@ export default function GalleryLandingPage() {
             // Include subdomain in verify request if present
             const subdomain = searchParams.get("subdomain");
             const verifyUrl = subdomain
-                ? `https://seovileo.pl/api/gallery/${slug}/verify`
-                : `https://seovileo.pl/api/gallery/${slug}/verify`;
+                ? `/api/gallery/${slug}/verify?subdomain=${subdomain}`
+                : `/api/gallery/${slug}/verify`;
 
             console.log("🔐 Verifying password...", {
                 verifyUrl,
