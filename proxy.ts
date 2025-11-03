@@ -10,6 +10,7 @@ const PUBLIC_PATHS = [
     "/api/auth/register",
     "/api/auth/google",
     "/g/",
+    "/u/",
     "/api/gallery/",
     "/api/webhooks/lemon-squeezy",
 ];

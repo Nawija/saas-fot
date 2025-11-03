@@ -116,7 +116,13 @@ export default function GalleryLandingPage() {
         setError("");
 
         try {
-            const res = await fetch(`/api/gallery/${slug}/verify`, {
+            // Include subdomain in verify request if present
+            const subdomain = searchParams.get("subdomain");
+            const verifyUrl = subdomain
+                ? `/api/gallery/${slug}/verify?subdomain=${subdomain}`
+                : `/api/gallery/${slug}/verify`;
+
+            const res = await fetch(verifyUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ password }),
@@ -126,11 +132,15 @@ export default function GalleryLandingPage() {
 
             if (data.ok) {
                 sessionStorage.setItem(`gallery_${slug}`, data.token);
-                // Preserve photo parameter if present
+                // Preserve photo parameter and subdomain if present
                 const photoParam = searchParams.get("photo");
-                const targetUrl = photoParam
-                    ? `/g/${slug}/p?photo=${photoParam}`
-                    : `/g/${slug}/p`;
+                let targetUrl = `/g/${slug}/p`;
+                if (subdomain) {
+                    targetUrl += `?subdomain=${subdomain}`;
+                    if (photoParam) targetUrl += `&photo=${photoParam}`;
+                } else if (photoParam) {
+                    targetUrl += `?photo=${photoParam}`;
+                }
                 router.push(targetUrl);
             } else {
                 setError("Nieprawidłowe hasło");
