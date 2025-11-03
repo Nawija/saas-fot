@@ -52,9 +52,16 @@ export default function GalleryLandingPage() {
 
                 // Sprawdź czy jest subdomena w parametrach URL
                 const subdomain = searchParams.get("subdomain");
+                console.log(
+                    "🔍 Loading collection, subdomain from params:",
+                    subdomain
+                );
+
                 const apiUrl = subdomain
                     ? `/api/gallery/${slug}?subdomain=${subdomain}`
                     : `/api/gallery/${slug}`;
+
+                console.log("📡 API URL:", apiUrl);
 
                 const res = await fetch(apiUrl);
                 const data = await res.json();
@@ -122,13 +129,22 @@ export default function GalleryLandingPage() {
                 ? `/api/gallery/${slug}/verify?subdomain=${subdomain}`
                 : `/api/gallery/${slug}/verify`;
 
+            console.log("🔐 Verifying password...", {
+                verifyUrl,
+                subdomain,
+                slug,
+            });
+
             const res = await fetch(verifyUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ password }),
             });
 
+            console.log("📡 Response status:", res.status);
+
             const data = await res.json();
+            console.log("📦 Response data:", data);
 
             if (data.ok) {
                 sessionStorage.setItem(`gallery_${slug}`, data.token);
@@ -141,11 +157,14 @@ export default function GalleryLandingPage() {
                 } else if (photoParam) {
                     targetUrl += `?photo=${photoParam}`;
                 }
+                console.log("✅ Password correct, redirecting to:", targetUrl);
                 router.push(targetUrl);
             } else {
-                setError("Nieprawidłowe hasło");
+                console.error("❌ Password verification failed:", data);
+                setError(data.error || "Nieprawidłowe hasło");
             }
         } catch (error) {
+            console.error("❌ Request error:", error);
             setError("Wystąpił błąd");
         }
     };
