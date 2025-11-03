@@ -27,6 +27,11 @@ export async function POST(req: NextRequest) {
         const payload = JSON.parse(rawBody);
         const eventName = payload.meta.event_name;
 
+        console.log(
+            `[Webhook ${eventName}] Received payload:`,
+            JSON.stringify(payload, null, 2)
+        );
+
         // Zapisz webhook do bazy
         await query(
             `INSERT INTO lemon_squeezy_webhooks (event_name, payload, processed) 
@@ -35,30 +40,36 @@ export async function POST(req: NextRequest) {
         );
 
         const data = payload.data.attributes;
+        const subscriptionId = payload.data.id;
 
-        // Pobierz user_id na podstawie customer_id z Lemon Squeezy
-        const customerId = data.customer_id?.toString();
+        // Pobierz user_id z custom_data (przekazane podczas checkout)
+        let userId = payload.meta.custom_data?.user_id;
 
-        if (!customerId) {
-            console.error("No customer_id in webhook payload");
-            return NextResponse.json({ received: true });
+        // Jeśli nie ma custom_data, spróbuj znaleźć użytkownika po customer_id
+        if (!userId) {
+            const customerId = data.customer_id?.toString();
+
+            if (customerId) {
+                const userResult = await query(
+                    `SELECT id FROM users WHERE lemon_squeezy_customer_id = $1`,
+                    [customerId]
+                );
+
+                if (userResult.rows.length > 0) {
+                    userId = userResult.rows[0].id;
+                }
+            }
         }
 
-        const userResult = await query(
-            `SELECT id FROM users WHERE lemon_squeezy_customer_id = $1`,
-            [customerId]
-        );
-
-        if (userResult.rows.length === 0) {
-            console.error(`No user found for customer_id: ${customerId}`);
+        if (!userId) {
+            console.error(
+                `[Webhook ${eventName}] No user_id found in custom_data or customer_id mapping`
+            );
             return NextResponse.json({ received: true });
         }
-
-        const userId = userResult.rows[0].id;
-        const subscriptionId = payload.data.id; // ID subskrypcji jest tutaj, nie w attributes
 
         console.log(
-            `[Webhook ${eventName}] User: ${userId}, SubscriptionID: ${subscriptionId}`
+            `[Webhook ${eventName}] Processing for User: ${userId}, Customer: ${data.customer_id}, SubscriptionID: ${subscriptionId}, Variant: ${data.variant_id}`
         );
 
         // Obsługa różnych eventów
@@ -117,10 +128,10 @@ async function handleSubscriptionCreated(
     const storageLimit = getPlanStorageLimit(plan);
 
     console.log(
-        `[handleSubscriptionCreated] Saving subscription_id: ${subscriptionId} for user: ${userId}`
+        `[handleSubscriptionCreated] User: ${userId}, Plan: ${plan}, Storage: ${storageLimit}, Customer: ${data.customer_id}, Subscription: ${subscriptionId}`
     );
 
-    await query(
+    const result = await query(
         `UPDATE users 
          SET subscription_plan = $1,
              subscription_status = $2,
@@ -128,7 +139,8 @@ async function handleSubscriptionCreated(
              lemon_squeezy_customer_id = $4,
              lemon_squeezy_subscription_id = $5,
              subscription_ends_at = $6
-         WHERE id = $7`,
+         WHERE id = $7
+         RETURNING subscription_plan, subscription_status, lemon_squeezy_customer_id, lemon_squeezy_subscription_id`,
         [
             plan,
             data.status,
@@ -143,6 +155,17 @@ async function handleSubscriptionCreated(
             userId,
         ]
     );
+
+    if (result.rows.length > 0) {
+        console.log(
+            "[handleSubscriptionCreated] ✅ Updated user:",
+            result.rows[0]
+        );
+    } else {
+        console.error(
+            "[handleSubscriptionCreated] ❌ No user updated! Check if userId exists in database."
+        );
+    }
 }
 
 async function handleSubscriptionUpdated(
@@ -154,17 +177,18 @@ async function handleSubscriptionUpdated(
     const storageLimit = getPlanStorageLimit(plan);
 
     console.log(
-        `[handleSubscriptionUpdated] Saving subscription_id: ${subscriptionId} for user: ${userId}`
+        `[handleSubscriptionUpdated] User: ${userId}, Plan: ${plan}, Storage: ${storageLimit}, Subscription: ${subscriptionId}`
     );
 
-    await query(
+    const result = await query(
         `UPDATE users 
          SET subscription_plan = $1,
              subscription_status = $2,
              storage_limit = $3,
              lemon_squeezy_subscription_id = $4,
              subscription_ends_at = $5
-         WHERE id = $6`,
+         WHERE id = $6
+         RETURNING subscription_plan, subscription_status, lemon_squeezy_subscription_id`,
         [
             plan,
             data.status,
@@ -178,6 +202,17 @@ async function handleSubscriptionUpdated(
             userId,
         ]
     );
+
+    if (result.rows.length > 0) {
+        console.log(
+            "[handleSubscriptionUpdated] ✅ Updated user:",
+            result.rows[0]
+        );
+    } else {
+        console.error(
+            "[handleSubscriptionUpdated] ❌ No user updated! Check if userId exists in database."
+        );
+    }
 }
 
 async function handleSubscriptionCancelled(userId: string, data: any) {
@@ -199,17 +234,28 @@ async function handlePaymentSuccess(userId: string, data: any) {
     const storageLimit = getPlanStorageLimit(plan);
 
     console.log(
-        `[handlePaymentSuccess] Setting plan: ${plan}, storage: ${storageLimit} for user: ${userId}`
+        `[handlePaymentSuccess] User: ${userId}, Plan: ${plan}, Storage: ${storageLimit}, Customer: ${data.customer_id}`
     );
 
-    await query(
+    // Aktualizuj wszystkie dane subskrypcji podczas payment success
+    const result = await query(
         `UPDATE users 
          SET subscription_status = 'active',
              subscription_plan = $1,
-             storage_limit = $2
-         WHERE id = $3`,
-        [plan, storageLimit, userId]
+             storage_limit = $2,
+             lemon_squeezy_customer_id = $3
+         WHERE id = $4
+         RETURNING subscription_plan, subscription_status, lemon_squeezy_customer_id`,
+        [plan, storageLimit, data.customer_id.toString(), userId]
     );
+
+    if (result.rows.length > 0) {
+        console.log("[handlePaymentSuccess] ✅ Updated user:", result.rows[0]);
+    } else {
+        console.error(
+            "[handlePaymentSuccess] ❌ No user updated! Check if userId exists in database."
+        );
+    }
 }
 
 async function handlePaymentFailed(userId: string, data: any) {

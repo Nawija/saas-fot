@@ -44,7 +44,16 @@ export function mapVariantToPlan(variantId: string): string {
         [process.env.NEXT_PUBLIC_LS_VARIANT_UNLIMITED || ""]: "unlimited",
     };
 
-    return mapping[variantId] || "free";
+    const plan = mapping[variantId] || "free";
+
+    console.log(`[mapVariantToPlan] Variant ID: ${variantId} -> Plan: ${plan}`);
+    console.log(`[mapVariantToPlan] Available mappings:`, {
+        basic: process.env.NEXT_PUBLIC_LS_VARIANT_BASIC,
+        pro: process.env.NEXT_PUBLIC_LS_VARIANT_PRO,
+        unlimited: process.env.NEXT_PUBLIC_LS_VARIANT_UNLIMITED,
+    });
+
+    return plan;
 }
 
 /**
@@ -69,7 +78,7 @@ export function getPlanStorageLimit(plan: string): number {
 export async function generateCheckoutUrl(
     variantId: string,
     email: string,
-    userId: number,
+    userId: string | number,
     name?: string
 ): Promise<string> {
     const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
