@@ -32,6 +32,30 @@ const FONT_MAP: Record<string, { href: string; family: string }> = {
     },
 };
 
+// Funkcja do wykrywania subdomeny z hostname
+function getSubdomainFromHostname(): string | null {
+    if (typeof window === "undefined") return null;
+
+    const hostname = window.location.hostname;
+    const baseDomain = "seovileo.pl";
+
+    // Localhost lub IP - brak subdomeny
+    if (hostname === "localhost" || hostname.match(/^\d+\.\d+\.\d+\.\d+/)) {
+        return null;
+    }
+
+    // Usuń port jeśli jest
+    const cleanHostname = hostname.replace(/:\d+$/, "");
+
+    // Sprawdź czy to subdomena
+    if (cleanHostname.endsWith(`.${baseDomain}`)) {
+        const subdomain = cleanHostname.replace(`.${baseDomain}`, "");
+        return subdomain !== "www" ? subdomain : null;
+    }
+
+    return null;
+}
+
 export default function GalleryLandingPage() {
     const params = useParams<{ slug: string }>();
     const router = useRouter();
@@ -50,12 +74,12 @@ export default function GalleryLandingPage() {
             try {
                 setLoading(true);
 
-                // Sprawdź czy jest subdomena w parametrach URL
-                const subdomain = searchParams.get("subdomain");
-                console.log(
-                    "🔍 Loading collection, subdomain from params:",
-                    subdomain
-                );
+                // Sprawdź czy jest subdomena w parametrach URL lub wykryj z hostname
+                let subdomain = searchParams.get("subdomain");
+                if (!subdomain) {
+                    subdomain = getSubdomainFromHostname();
+                }
+                console.log("🔍 Loading collection, subdomain:", subdomain);
 
                 const apiUrl = subdomain
                     ? `/api/gallery/${slug}?subdomain=${subdomain}`
@@ -123,8 +147,11 @@ export default function GalleryLandingPage() {
         setError("");
 
         try {
-            // Include subdomain in verify request if present
-            const subdomain = searchParams.get("subdomain");
+            // Include subdomain in verify request if present or detect from hostname
+            let subdomain = searchParams.get("subdomain");
+            if (!subdomain) {
+                subdomain = getSubdomainFromHostname();
+            }
             const verifyUrl = subdomain
                 ? `/api/gallery/${slug}/verify?subdomain=${subdomain}`
                 : `/api/gallery/${slug}/verify`;
