@@ -183,11 +183,20 @@ async function handleSubscriptionCancelled(userId: string, data: any) {
 }
 
 async function handlePaymentSuccess(userId: string, data: any) {
+    const plan = mapVariantToPlan(data.variant_id.toString());
+    const storageLimit = getPlanStorageLimit(plan);
+
+    console.log(
+        `[handlePaymentSuccess] Setting plan: ${plan}, storage: ${storageLimit} for user: ${userId}`
+    );
+
     await query(
         `UPDATE users 
-         SET subscription_status = 'active'
-         WHERE id = $1`,
-        [userId]
+         SET subscription_status = 'active',
+             subscription_plan = $1,
+             storage_limit = $2
+         WHERE id = $3`,
+        [plan, storageLimit, userId]
     );
 }
 
