@@ -678,7 +678,7 @@ export default function CollectionDetailPage({
     return (
         <div className="min-h-screen">
             {/* Top Bar */}
-            <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+            <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
                 <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
                     <CollectionHeader collection={collection} photos={photos} />
                 </div>
@@ -751,7 +751,7 @@ export default function CollectionDetailPage({
                                     </div>
 
                                     {/* Edit Buttons */}
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         <MainButton
                                             onClick={() =>
                                                 setHeroImageEditModalOpen(true)
