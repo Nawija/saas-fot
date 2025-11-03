@@ -47,6 +47,26 @@ html {
     overscroll-behavior-y: none;
 }
 
+/* Image optimization for hero images */
+img,
+picture {
+    /* Smooth scaling for high-quality images */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* High quality rendering for hero images */
+.hero-image,
+picture img {
+    image-rendering: auto;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+/* Prevent layout shift during image load */
+picture {
+    display: contents;
+}
+
 .anim-opacity {
     animation: anim-opacity 0.4s both 0.1s;
 }

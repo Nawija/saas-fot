@@ -51,39 +51,46 @@ export async function POST(req: NextRequest) {
                 .rotate()
                 .toBuffer({ resolveWithObject: false });
 
+            // Pobierz metadane oryginału
+            const originalMeta = await sharp(rotatedBuffer).metadata();
+            const originalWidth = originalMeta.width || 1920;
+            const originalHeight = originalMeta.height || 1080;
+            const originalAspect = originalWidth / originalHeight;
+
             // Przetwarzaj OBA obrazy RÓWNOLEGLE dla szybkości
             const [heroDesktopBuffer, heroMobileBuffer] = await Promise.all([
-                // Hero Desktop - 3840x2160 (4K) - Landscape 16:9
-                // fit: 'cover' wypełnia cały obszar, przycinając nadmiar
-                // position: 'centre' centruje obraz podczas przycinania
+                // Hero Desktop - 2560x1440 (2K) - Landscape 16:9
+                // Optymalne dla webowych wyświetlaczy, lżejsze niż 4K
+                // fit: 'inside' zachowuje proporcje bez przycinania
+                // position: 'centre' centruje obraz
                 sharp(rotatedBuffer)
-                    .resize(3840, 2160, {
-                        fit: "cover",
+                    .resize(2560, 1440, {
+                        fit: originalAspect > 1.5 ? "inside" : "cover",
                         position: "centre",
                         withoutEnlargement: false,
                         kernel: sharp.kernel.lanczos3, // Najlepsza jakość
                     })
                     .webp({
-                        quality: 92, // Obniżone z 98 - nadal świetna jakość
-                        effort: 4, // Obniżone z 6 - dużo szybsze
+                        quality: 90, // Świetna jakość z dobrą kompresją
+                        effort: 4,
                         smartSubsample: true,
                     })
                     .toBuffer(),
 
-                // Hero Mobile - 1080x1920 - Portrait 9:16 (Full HD)
-                // Wyższa rozdzielczość dla lepszej jakości na mobile
-                // Pionowa orientacja idealna dla telefonów
-                // fit: 'cover' zachowuje proporcje i wypełnia cały obszar
+                // Hero Mobile - 1080x1920 - Portrait 9:16 dla pełnego ekranu
+                // Pionowa orientacja idealna dla telefonów w trybie portrait
+                // fit: 'cover' wypełnia cały obszar, przycinając minimalnie
                 sharp(rotatedBuffer)
-                    .resize(1080, 1080, {
-                        fit: "cover",
+                    .resize(1080, 1920, {
+                        fit: originalAspect < 1 ? "inside" : "cover",
                         position: "centre",
                         withoutEnlargement: false,
                         kernel: sharp.kernel.lanczos3,
                     })
                     .webp({
-                        quality: 92, // Wyższa jakość dla ostrości
+                        quality: 88, // Nieco niższa jakość dla mobile (mniejszy ekran)
                         effort: 4,
+                        smartSubsample: true,
                     })
                     .toBuffer(),
             ]);

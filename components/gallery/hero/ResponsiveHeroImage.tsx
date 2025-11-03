@@ -20,28 +20,29 @@ export default function ResponsiveHeroImage({
     const mobileImage = mobile || desktop;
 
     return (
-        <>
-            {/* Mobile Image - wyświetlane tylko na małych ekranach */}
-            <div className="md:hidden absolute inset-0">
-                <img
-                    src={mobileImage}
-                    alt={alt}
-                    loading={priority ? "eager" : "lazy"}
-                    decoding="async"
-                    className={`w-full h-full object-cover ${className}`}
+        <picture className="absolute inset-0">
+            {/* Mobile Image - optymalizowana dla portrait */}
+            {mobile && (
+                <source
+                    media="(max-width: 767px)"
+                    srcSet={mobileImage}
+                    type="image/webp"
                 />
-            </div>
+            )}
 
-            {/* Desktop Image - wyświetlane tylko na dużych ekranach */}
-            <div className="hidden md:block absolute inset-0">
-                <img
-                    src={desktop}
-                    alt={alt}
-                    loading={priority ? "eager" : "lazy"}
-                    decoding="async"
-                    className={`w-full h-full object-cover ${className}`}
-                />
-            </div>
-        </>
+            {/* Desktop Image - optymalizowana dla landscape */}
+            <img
+                src={desktop}
+                alt={alt}
+                loading={priority ? "eager" : "lazy"}
+                decoding="async"
+                fetchPriority={priority ? "high" : "auto"}
+                className={`w-full h-full ${className}`}
+                style={{
+                    objectFit: "cover",
+                    objectPosition: "center",
+                }}
+            />
+        </picture>
     );
 }

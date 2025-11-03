@@ -11,6 +11,7 @@ interface Collection {
     slug: string;
     description?: string;
     hero_image?: string;
+    hero_image_mobile?: string;
     hero_template?: string;
     hero_font?: string;
     is_public: boolean;
@@ -295,31 +296,38 @@ export default function GalleryLandingPage() {
         </div>
     );
 
-    const getBackgroundStyle = () => {
-        const hasHeroImage = collection.hero_image;
-
-        if (!hasHeroImage) {
-            return {
-                background: "black",
-            };
-        }
-
-        return {
-            backgroundImage: `url(${collection.hero_image})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-        };
-    };
-
     return (
         <div
-            className="relative w-full flex items-center justify-center p-4"
+            className="relative w-full flex items-center justify-center p-4 bg-black"
             style={{
-                ...getBackgroundStyle(),
                 minHeight: "100dvh",
                 height: "100dvh",
             }}
         >
+            {/* Background Image - responsive */}
+            {collection.hero_image && (
+                <picture className="absolute inset-0">
+                    {/* Mobile Image - optymalizowana dla portrait */}
+                    {collection.hero_image_mobile && (
+                        <source
+                            media="(max-width: 767px)"
+                            srcSet={collection.hero_image_mobile}
+                            type="image/webp"
+                        />
+                    )}
+
+                    {/* Desktop Image - optymalizowana dla landscape */}
+                    <img
+                        src={collection.hero_image}
+                        alt={collection.name}
+                        loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
+                        className="w-full h-full object-cover object-center"
+                    />
+                </picture>
+            )}
+
             <div className="absolute inset-0 bg-black/80" />
             <div className="relative z-10 w-full py-12">
                 {showPasswordPrompt && collection.has_password
