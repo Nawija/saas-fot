@@ -322,35 +322,16 @@ export default function HeroPreviewModal({
                     aria-label="Hero design editor"
                 >
                     {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                    <div
+                        className="absolute inset-0"
                         onClick={onClose}
                     />
 
                     {/* Content */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="relative z-10 flex h-full w-full items-stretch"
-                    >
+                    <div className="relative z-10 flex h-full w-full items-stretch">
                         <div className="flex-1 h-full bg-linear-to-br from-gray-50 to-gray-100">
                             {/* Top bar */}
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{
-                                    duration: 0.3,
-                                    delay: 0.1,
-                                    ease: "easeOut",
-                                }}
-                                className="flex items-center justify-between px-6 sm:px-8 py-4 border-b border-gray-200 bg-white/70"
-                            >
+                            <div className="flex items-center justify-between px-6 sm:px-8 py-4 border-b border-gray-200 bg-white/70">
                                 <h2 className="text-base sm:text-lg font-semibold text-gray-900">
                                     Hero design editor
                                 </h2>
@@ -362,21 +343,12 @@ export default function HeroPreviewModal({
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
-                            </motion.div>
+                            </div>
 
                             {/* Main area */}
                             <div className="h-[calc(100%-64px)] sm:h-[calc(100%-72px)] grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 p-4 sm:p-6">
                                 {/* Selector panel (left on desktop, top on mobile) */}
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{
-                                        duration: 0.4,
-                                        delay: 0.2,
-                                        ease: "easeOut",
-                                    }}
-                                    className="lg:col-span-4 order-2 lg:order-1 overflow-y-auto"
-                                >
+                                <div className="lg:col-span-4 order-2 lg:order-1 overflow-y-auto">
                                     <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm lg:h-[86vh] lg:pb-24 pb-40">
                                         <HeroTemplateSelector
                                             templates={templates}
@@ -402,15 +374,15 @@ export default function HeroPreviewModal({
                                             savedFont={savedFont}
                                         />
                                     </div>
-                                </motion.div>
+                                </div>
 
                                 {/* Preview panel */}
                                 <motion.div
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{
-                                        duration: 0.4,
-                                        delay: 0.2,
+                                        duration: 0.8,
+                                        delay: 0.7,
                                         ease: "easeOut",
                                     }}
                                     className="lg:col-span-7 order-1 lg:order-2 flex items-center justify-center"
@@ -573,7 +545,7 @@ export default function HeroPreviewModal({
                                 </motion.div>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </motion.div>
             )}
         </AnimatePresence>
