@@ -4,6 +4,8 @@ export interface HeroTemplateProps {
     title: string;
     description?: string;
     image?: string;
+    imagePositionX?: number;
+    imagePositionY?: number;
 }
 
 export interface HeroTemplateDefinition {

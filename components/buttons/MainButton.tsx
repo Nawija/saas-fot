@@ -19,22 +19,24 @@ interface MainButtonProps {
         | "success"
         | "orange"
         | "purple"
-        | "teal";
+        | "teal"
+        | "ghost";
     className?: string;
     target?: "_blank" | "_self" | "_parent" | "_top";
 }
 
 const variantStyles: Record<string, string> = {
     primary:
-        "bg-blue-50 hover:bg-blue-100 text-blue-800 hover:text-blue-600 border border-blue-300 hover:border-blue-200",
-    orange: "bg-orange-50 hover:bg-orange-100 text-orange-800 hover:text-orange-600 border border-orange-300 hover:border-orange-200",
-    purple: "bg-purple-50 hover:bg-purple-100 text-purple-800 hover:text-purple-600 border border-purple-300 hover:border-purple-200",
-    teal: "bg-teal-50 hover:bg-teal-100 text-teal-800 hover:text-teal-600 border border-teal-300 hover:border-teal-200",
-    success:
-        "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 hover:text-emerald-600 border border-emerald-300 hover:border-emerald-200",
+        "bg-gray-900 hover:bg-gray-800 text-white border border-gray-900 shadow-sm hover:shadow-md",
     secondary:
-        "bg-gray-50 hover:bg-gray-100 text-gray-800 hover:text-gray-600 border border-gray-300 hover:border-gray-200",
-    danger: "bg-red-50 hover:bg-red-100 text-red-800 hover:text-red-600 border border-red-300 hover:border-red-200",
+        "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm",
+    ghost: "bg-transparent hover:bg-gray-50 text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-200",
+    danger: "bg-white hover:bg-red-50 text-red-600 border border-gray-200 hover:border-red-200 shadow-sm",
+    success:
+        "bg-white hover:bg-green-50 text-gray-900 border border-gray-200 hover:border-green-200 shadow-sm",
+    orange: "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm",
+    purple: "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm",
+    teal: "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm",
 };
 
 const MainButton: React.FC<MainButtonProps> = ({
@@ -53,8 +55,8 @@ const MainButton: React.FC<MainButtonProps> = ({
     const isDisabled = disabled || loading;
 
     const baseClasses = `
-    inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg font-medium transition-all
-    focus:outline-none
+    inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300
+    focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2
     ${variantStyles[variant] || variantStyles.primary}
     ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
     ${className}

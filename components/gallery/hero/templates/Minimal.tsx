@@ -20,6 +20,8 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                         alt={data.name}
                         className="object-cover"
                         priority
+                        positionX={data.imagePositionX}
+                        positionY={data.imagePositionY}
                     />
                     {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-linear-120 from-black/30 to-black/10" />

@@ -21,6 +21,8 @@ export const FullscreenTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                         alt={data.name}
                         className="object-cover"
                         priority
+                        positionX={data.imagePositionX}
+                        positionY={data.imagePositionY}
                     />
                     {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-linear-to-b from-black/40 via-black/50 to-black/70" />

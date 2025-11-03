@@ -5,6 +5,8 @@ export interface GalleryHeroData {
     description?: string;
     image?: string;
     imageMobile?: string;
+    imagePositionX?: number;
+    imagePositionY?: number;
 }
 
 export interface GalleryHeroElements {

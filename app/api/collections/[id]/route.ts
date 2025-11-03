@@ -102,9 +102,18 @@ export const PATCH = withMiddleware(
         }
 
         const body = await req.json();
+
+        // Debug logging
+        console.log(
+            "[PATCH Collection] Body received:",
+            JSON.stringify(body, null, 2)
+        );
+
         const {
             hero_image,
             hero_image_mobile,
+            hero_image_position_x,
+            hero_image_position_y,
             name,
             description,
             password,
@@ -134,6 +143,40 @@ export const PATCH = withMiddleware(
         if (hero_image_mobile !== undefined) {
             updates.push(`hero_image_mobile = $${paramCount++}`);
             values.push(hero_image_mobile);
+        }
+        if (hero_image_position_x !== undefined) {
+            const posX = parseFloat(hero_image_position_x);
+            console.log(
+                "[PATCH Collection] Position X - raw:",
+                hero_image_position_x,
+                "parsed:",
+                posX
+            );
+            if (isNaN(posX) || posX < 0 || posX > 100) {
+                return createErrorResponse(
+                    "hero_image_position_x must be between 0 and 100",
+                    400
+                );
+            }
+            updates.push(`hero_image_position_x = $${paramCount++}`);
+            values.push(posX);
+        }
+        if (hero_image_position_y !== undefined) {
+            const posY = parseFloat(hero_image_position_y);
+            console.log(
+                "[PATCH Collection] Position Y - raw:",
+                hero_image_position_y,
+                "parsed:",
+                posY
+            );
+            if (isNaN(posY) || posY < 0 || posY > 100) {
+                return createErrorResponse(
+                    "hero_image_position_y must be between 0 and 100",
+                    400
+                );
+            }
+            updates.push(`hero_image_position_y = $${paramCount++}`);
+            values.push(posY);
         }
         if (name !== undefined) {
             updates.push(`name = $${paramCount++}`);
@@ -257,21 +300,45 @@ export const PATCH = withMiddleware(
 
         values.push(params.id, user!.id);
 
-        const result = await query(
-            `UPDATE collections 
+        const sqlQuery = `UPDATE collections 
              SET ${updates.join(", ")}
              WHERE id = $${paramCount++} AND user_id = $${paramCount}
-             RETURNING *`,
-            values
-        );
+             RETURNING *`;
+
+        console.log("[PATCH Collection] SQL Query:", sqlQuery);
+        console.log("[PATCH Collection] Values:", values);
+
+        const result = await query(sqlQuery, values);
 
         if (result.rows.length === 0) {
             return createErrorResponse("Collection not found", 404);
         }
 
+        console.log("[PATCH Collection] Updated collection:", result.rows[0]);
+
+        const updatedCollection = result.rows[0];
+
+        // Konwertuj DECIMAL na number
+        if (
+            updatedCollection.hero_image_position_x !== null &&
+            updatedCollection.hero_image_position_x !== undefined
+        ) {
+            updatedCollection.hero_image_position_x = parseFloat(
+                updatedCollection.hero_image_position_x
+            );
+        }
+        if (
+            updatedCollection.hero_image_position_y !== null &&
+            updatedCollection.hero_image_position_y !== undefined
+        ) {
+            updatedCollection.hero_image_position_y = parseFloat(
+                updatedCollection.hero_image_position_y
+            );
+        }
+
         return NextResponse.json({
             ok: true,
-            collection: result.rows[0],
+            collection: updatedCollection,
         });
     },
     { requireAuth: true, requiredParams: ["id"] }

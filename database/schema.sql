@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS collections (
     slug VARCHAR(255) NOT NULL,
     description TEXT,
     hero_image TEXT,
+    hero_image_position_x DECIMAL(5,2) DEFAULT 50.00,
+    hero_image_position_y DECIMAL(5,2) DEFAULT 50.00,
     subdomain VARCHAR(63),
     password_hash TEXT,
     password_plain TEXT,

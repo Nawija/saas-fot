@@ -108,7 +108,7 @@ export default function PhotoUploadSection({
     };
 
     return (
-        <div className="bg-white rounded-2xl p-2 mb-2">
+        <div className="bg-white p-2 mb-2">
             <input
                 ref={fileInputRef}
                 type="file"
@@ -126,7 +126,7 @@ export default function PhotoUploadSection({
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed z-10 rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
+                className={`border-2 rounded-2xl border-dashed z-10 p-8 text-center cursor-pointer transition-all duration-200 ${
                     uploading
                         ? "border-blue-300 bg-blue-50"
                         : isDragging

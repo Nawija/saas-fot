@@ -2,11 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import {
-    Copy,
-    Link as LinkIcon,
-    CheckCircle,
-} from "lucide-react";
+import { Copy, Link as LinkIcon, CheckCircle } from "lucide-react";
 
 interface CopyLinkButtonProps {
     url: string;
@@ -93,10 +89,10 @@ export default function CopyLinkButton({
         <div className="flex items-center flex-col sm:flex-row gap-2">
             {showUrl && (
                 <div
-                    className={`relative flex w-full items-center gap-2 px-3 py-2 rounded-xl bg-white border-2 border-gray-200`}
+                    className={`relative flex w-full items-center gap-2 px-3 py-2 bg-white rounded border border-gray-200`}
                 >
                     {copied && (
-                        <div className="absolute inset-0 rounded-xl pointer-events-none animate-border-shimmer" />
+                        <div className="absolute inset-0 pointer-events-none animate-border-shimmer rounded" />
                     )}
                     <LinkIcon className="w-4 h-4 text-gray-400 shrink-0 relative z-10" />
                     <p className="text-base text-gray-800 flex-1 truncate relative z-10">
@@ -107,7 +103,7 @@ export default function CopyLinkButton({
             <button
                 ref={buttonRef}
                 onClick={copyToClipboard}
-                className={`relative flex items-center justify-center min-w-[140px] px-4 py-2.5 rounded-lg gap-2 text-sm font-medium transition-all duration-300 shadow-sm overflow-visible ${buttonClasses}`}
+                className={`relative flex items-center justify-center min-w-[140px] px-4 py-2.5 rounded gap-2 text-sm font-medium transition-all duration-300 shadow-sm overflow-visible ${buttonClasses}`}
             >
                 {/* Confetti */}
                 {confetti.map((conf) => (

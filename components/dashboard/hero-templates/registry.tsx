@@ -12,12 +12,24 @@ import { GalleryHeroTemplate } from "@/components/gallery/hero/types";
 // into the dashboard creator's expected Desktop/Mobile components.
 
 function wrapTemplate(tpl: GalleryHeroTemplate) {
-    const Desktop = ({ title, description, image }: HeroTemplateProps) => {
+    const Desktop = ({
+        title,
+        description,
+        image,
+        imagePositionX = 50,
+        imagePositionY = 50,
+    }: HeroTemplateProps) => {
         return (
             <>
                 <div className="hero-preview-scope relative w-full h-full overflow-hidden">
                     {tpl({
-                        data: { name: title, description, image },
+                        data: {
+                            name: title,
+                            description,
+                            image,
+                            imagePositionX,
+                            imagePositionY,
+                        },
                         elements: {},
                     })}
                 </div>
@@ -33,12 +45,24 @@ function wrapTemplate(tpl: GalleryHeroTemplate) {
             </>
         );
     };
-    const Mobile = ({ title, description, image }: HeroTemplateProps) => {
+    const Mobile = ({
+        title,
+        description,
+        image,
+        imagePositionX = 50,
+        imagePositionY = 50,
+    }: HeroTemplateProps) => {
         return (
             <>
                 <div className="hero-preview-scope relative w-full h-full overflow-hidden">
                     {tpl({
-                        data: { name: title, description, image },
+                        data: {
+                            name: title,
+                            description,
+                            image,
+                            imagePositionX,
+                            imagePositionY,
+                        },
                         elements: {},
                     })}
                 </div>

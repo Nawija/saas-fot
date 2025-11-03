@@ -129,7 +129,29 @@ export async function getCollectionForUser(
         [collectionId, userId]
     );
 
-    return result.rows[0] || null;
+    const collection = result.rows[0] || null;
+
+    // Konwertuj DECIMAL na number
+    if (collection) {
+        if (
+            collection.hero_image_position_x !== null &&
+            collection.hero_image_position_x !== undefined
+        ) {
+            collection.hero_image_position_x = parseFloat(
+                collection.hero_image_position_x
+            );
+        }
+        if (
+            collection.hero_image_position_y !== null &&
+            collection.hero_image_position_y !== undefined
+        ) {
+            collection.hero_image_position_y = parseFloat(
+                collection.hero_image_position_y
+            );
+        }
+    }
+
+    return collection;
 }
 
 /**

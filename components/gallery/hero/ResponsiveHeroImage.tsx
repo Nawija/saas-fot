@@ -7,6 +7,8 @@ interface ResponsiveHeroImageProps {
     alt: string;
     className?: string;
     priority?: boolean;
+    positionX?: number;
+    positionY?: number;
 }
 
 export default function ResponsiveHeroImage({
@@ -15,6 +17,8 @@ export default function ResponsiveHeroImage({
     alt,
     className = "",
     priority = true,
+    positionX = 50,
+    positionY = 50,
 }: ResponsiveHeroImageProps) {
     // Jeśli nie ma mobile version, użyj desktop dla wszystkich
     const mobileImage = mobile || desktop;
@@ -40,7 +44,7 @@ export default function ResponsiveHeroImage({
                 className={`w-full h-full ${className}`}
                 style={{
                     objectFit: "cover",
-                    objectPosition: "center",
+                    objectPosition: `${positionX}% ${positionY}%`,
                 }}
             />
         </picture>

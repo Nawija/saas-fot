@@ -29,7 +29,7 @@ function PhotoThumbnail({
     const [imageLoading, setImageLoading] = useState(true);
 
     return (
-        <div className="group relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+        <div className="group relative aspect-square overflow-hidden bg-gray-100">
             {/* Loading skeleton */}
             {imageLoading && (
                 <div className="absolute inset-0 bg-linear-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
@@ -89,7 +89,7 @@ export default function PhotosGrid({ photos, onDeletePhoto }: PhotosGridProps) {
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
                     {photos.map((photo) => (
                         <PhotoThumbnail
                             key={photo.id}

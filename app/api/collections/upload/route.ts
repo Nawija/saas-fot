@@ -21,7 +21,17 @@ export async function POST(req: NextRequest) {
         );
         const userPlan = userResult.rows[0]?.subscription_plan || "free";
 
-        const formData = await req.formData();
+        // Upewnij się, że formData jest odczytywane tylko raz
+        let formData;
+        try {
+            formData = await req.formData();
+        } catch (e) {
+            console.error("[Upload] FormData read error:", e);
+            return createErrorResponse(
+                "Nie można odczytać danych formularza",
+                400
+            );
+        }
         const file = formData.get("file") as File;
         const type = formData.get("type") as string; // "hero" or "photo"
         const collectionId = formData.get("collectionId") as string; // ID kolekcji
@@ -60,35 +70,32 @@ export async function POST(req: NextRequest) {
             // Przetwarzaj OBA obrazy RÓWNOLEGLE dla szybkości
             const [heroDesktopBuffer, heroMobileBuffer] = await Promise.all([
                 // Hero Desktop - 2560x1440 (2K) - Landscape 16:9
-                // Optymalne dla webowych wyświetlaczy, lżejsze niż 4K
-                // fit: 'inside' zachowuje proporcje bez przycinania
-                // position: 'centre' centruje obraz
+                // fit: 'inside' zachowuje CAŁE zdjęcie bez przycinania
+                // Pozycja focal point będzie kontrolowana przez CSS object-position
                 sharp(rotatedBuffer)
                     .resize(2560, 1440, {
-                        fit: originalAspect > 1.5 ? "inside" : "cover",
-                        position: "centre",
+                        fit: "inside", // Zawsze 'inside' - nie przycinamy!
                         withoutEnlargement: false,
-                        kernel: sharp.kernel.lanczos3, // Najlepsza jakość
+                        kernel: sharp.kernel.lanczos3,
                     })
                     .webp({
-                        quality: 90, // Świetna jakość z dobrą kompresją
+                        quality: 90,
                         effort: 4,
                         smartSubsample: true,
                     })
                     .toBuffer(),
 
-                // Hero Mobile - 1080x1920 - Portrait 9:16 dla pełnego ekranu
-                // Pionowa orientacja idealna dla telefonów w trybie portrait
-                // fit: 'cover' wypełnia cały obszar, przycinając minimalnie
+                // Hero Mobile - 1080x1920 - Portrait 9:16
+                // fit: 'inside' zachowuje CAŁE zdjęcie bez przycinania
+                // Pozycja focal point będzie kontrolowana przez CSS object-position
                 sharp(rotatedBuffer)
                     .resize(1080, 1920, {
-                        fit: originalAspect < 1 ? "inside" : "cover",
-                        position: "centre",
+                        fit: "inside", // Zawsze 'inside' - nie przycinamy!
                         withoutEnlargement: false,
                         kernel: sharp.kernel.lanczos3,
                     })
                     .webp({
-                        quality: 88, // Nieco niższa jakość dla mobile (mniejszy ekran)
+                        quality: 88,
                         effort: 4,
                         smartSubsample: true,
                     })
