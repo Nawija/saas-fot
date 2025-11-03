@@ -191,7 +191,10 @@ export default function GalleryLandingPage() {
 
     if (error || !collection) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-neutral-950 p-4">
+            <div
+                className="flex items-center justify-center bg-neutral-950 p-4"
+                style={{ minHeight: "100dvh" }}
+            >
                 <div className="text-center max-w-md mx-auto">
                     <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-10 md:p-12 shadow-2xl">
                         <div className="mb-6">
@@ -284,10 +287,8 @@ export default function GalleryLandingPage() {
                         onClick={handleViewGallery}
                         className="group relative inline-flex items-center justify-center gap-3 border border-white/90 text-white/90 hover:text-neutral-900 px-8 w-max py-3 font-semibold text-base overflow-hidden hover:bg-neutral-100 active:scale-[0.99] transition-all duration-300"
                     >
-                       
-                            <Eye size={20} strokeWidth={2} />
-                            <span>Zobacz jako gość</span>
-                  
+                        <Eye size={20} strokeWidth={2} />
+                        <span>Zobacz jako gość</span>
                     </button>
                 </div>
             </div>
@@ -312,8 +313,12 @@ export default function GalleryLandingPage() {
 
     return (
         <div
-            className="relative min-h-screen w-full flex items-center justify-center p-4"
-            style={getBackgroundStyle()}
+            className="relative w-full flex items-center justify-center p-4"
+            style={{
+                ...getBackgroundStyle(),
+                minHeight: "100dvh",
+                height: "100dvh",
+            }}
         >
             <div className="absolute inset-0 bg-black/80" />
             <div className="relative z-10 w-full py-12">

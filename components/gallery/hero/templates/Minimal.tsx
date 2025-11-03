@@ -7,7 +7,10 @@ import ResponsiveHeroImage from "../ResponsiveHeroImage";
 export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
     const Scroll = elements.ScrollIndicator;
     return (
-        <div className="relative h-screen w-full bg-black overflow-hidden">
+        <div
+            className="relative w-full bg-black overflow-hidden"
+            style={{ height: "100dvh" }}
+        >
             {/* Background Image */}
             {data.image ? (
                 <div className="absolute inset-0">

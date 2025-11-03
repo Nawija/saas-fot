@@ -485,7 +485,10 @@ export default function GalleryPhotosPage() {
 
     if (!collection)
         return (
-            <div className="min-h-screen flex items-center justify-center bg-black text-white">
+            <div
+                className="flex items-center justify-center bg-black text-white"
+                style={{ minHeight: "100dvh" }}
+            >
                 <div className="text-center">
                     <h1 className="text-2xl font-bold mb-4">Brak dostępu</h1>
                     <button
@@ -501,7 +504,10 @@ export default function GalleryPhotosPage() {
     // Single-photo mode view
     if (singleMode && singlePhoto) {
         return (
-            <div className="h-screen bg-gray-50 flex flex-col items-center justify-center">
+            <div
+                className="bg-gray-50 flex flex-col items-center justify-center"
+                style={{ height: "100dvh" }}
+            >
                 <div className="w-full bg-white border-b border-gray-200 p-2 flex items-center justify-start">
                     <MainButton
                         onClick={() => {
@@ -571,7 +577,10 @@ export default function GalleryPhotosPage() {
     return (
         <>
             <GalleryHero collection={collection} />
-            <div className="min-h-screen bg-white pb-12 px-2">
+            <div
+                className="bg-white pb-12 px-2"
+                style={{ minHeight: "100dvh" }}
+            >
                 <div className="">
                     <h2 className="text-base md:text-lg p-3 font-medium text-gray-600">
                         {collection.name}

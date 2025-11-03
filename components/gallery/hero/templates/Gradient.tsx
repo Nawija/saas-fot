@@ -48,7 +48,10 @@ export const GradientTemplate: GalleryHeroTemplate = ({ data, options }) => {
         : {};
 
     return (
-        <div className="relative h-screen w-full overflow-hidden bg-linear-to-br from-gray-900 via-slate-800 to-gray-700">
+        <div
+            className="relative w-full overflow-hidden bg-linear-to-br from-gray-900 via-slate-800 to-gray-700"
+            style={{ height: "100dvh" }}
+        >
             {/* Animated background glow */}
             <motion.div
                 className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 blur-3xl"

@@ -11,6 +11,42 @@ html {
     scroll-behavior: smooth;
 }
 
+/* Mobile viewport units for proper full-screen on mobile browsers */
+/* Handles address bar hiding/showing on mobile browsers */
+:root {
+    --vh-mobile: 100vh;
+    --dvh-fallback: 100vh;
+}
+
+@supports (height: 100dvh) {
+    :root {
+        --dvh-fallback: 100dvh;
+    }
+}
+
+/* Utility classes for mobile-friendly viewport heights */
+.min-h-screen-mobile {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.h-screen-mobile {
+    height: 100vh;
+    height: 100dvh;
+}
+
+/* Fix for mobile browsers - prevent content from jumping when address bar hides/shows */
+@supports (height: 100dvh) {
+    body {
+        min-height: 100dvh;
+    }
+}
+
+/* Prevent overscroll bounce on iOS for full-screen galleries */
+.gallery-container {
+    overscroll-behavior-y: none;
+}
+
 .anim-opacity {
     animation: anim-opacity 0.4s both 0.1s;
 }

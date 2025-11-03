@@ -83,7 +83,10 @@ export const CinematicTemplate: GalleryHeroTemplate = ({
         : {};
 
     return (
-        <div className="relative h-screen w-full bg-black overflow-hidden">
+        <div
+            className="relative w-full bg-black overflow-hidden"
+            style={{ height: "100dvh" }}
+        >
             {/* BACKGROUND IMAGE */}
             {data.image ? (
                 <motion.img

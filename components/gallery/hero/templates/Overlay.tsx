@@ -5,7 +5,10 @@ import { GalleryHeroTemplate } from "../types";
 
 export const OverlayTemplate: GalleryHeroTemplate = ({ data }) => {
     return (
-        <div className="relative h-screen w-full overflow-hidden">
+        <div
+            className="relative w-full overflow-hidden"
+            style={{ height: "100dvh" }}
+        >
             <div className="absolute inset-0">
                 {data.image ? (
                     <img

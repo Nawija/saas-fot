@@ -8,7 +8,10 @@ import ResponsiveHeroImage from "../ResponsiveHeroImage";
 
 export const FullscreenTemplate: GalleryHeroTemplate = ({ data, elements }) => {
     return (
-        <div className="relative h-screen w-full bg-neutral-950 overflow-hidden">
+        <div
+            className="relative w-full bg-neutral-950 overflow-hidden"
+            style={{ height: "100dvh" }}
+        >
             {/* Background Image */}
             {data.image ? (
                 <div className="absolute inset-0">

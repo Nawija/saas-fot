@@ -7,7 +7,10 @@ import { GalleryHeroTemplate } from "../types";
 export const EditorialTemplate: GalleryHeroTemplate = ({ data, elements }) => {
     const Scroll = elements.ScrollIndicator;
     return (
-        <div className="relative h-screen w-full overflow-hidden">
+        <div
+            className="relative w-full overflow-hidden"
+            style={{ height: "100dvh" }}
+        >
             {/* Background image */}
             {data.image ? (
                 <img

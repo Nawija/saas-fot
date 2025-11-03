@@ -61,7 +61,10 @@ export const SplitTemplate: GalleryHeroTemplate = ({ data, options }) => {
         : {};
 
     return (
-        <div className="relative h-screen w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden p-4 bg-zinc-200">
+        <div
+            className="relative w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden p-4 bg-zinc-200"
+            style={{ height: "100dvh" }}
+        >
             {/* TEKST */}
             <motion.div
                 {...leftPanelVariants}
