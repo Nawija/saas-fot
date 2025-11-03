@@ -11,6 +11,7 @@ const PUBLIC_PATHS = [
     "/api/auth/google",
     "/g/",
     "/api/gallery/",
+    "/api/webhooks/lemon-squeezy",
 ];
 
 export default function proxy(request: NextRequest) {
