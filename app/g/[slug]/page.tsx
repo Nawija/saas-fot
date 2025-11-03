@@ -32,6 +32,28 @@ const FONT_MAP: Record<string, { href: string; family: string }> = {
     },
 };
 
+// Helper function to get subdomain from hostname
+const getSubdomain = (): string | null => {
+    if (typeof window === "undefined") return null;
+    const hostname = window.location.hostname;
+    if (hostname === "localhost" || hostname.match(/^\d+\.\d+\.\d+\.\d+/))
+        return null;
+    if (hostname.includes("seovileo.pl") && hostname !== "seovileo.pl") {
+        return hostname.replace(".seovileo.pl", "");
+    }
+    return null;
+};
+
+// Helper function to build API URL - use main domain if on subdomain
+const getApiUrl = (path: string): string => {
+    if (typeof window === "undefined") return path;
+    const subdomain = getSubdomain();
+    if (subdomain) {
+        return `https://seovileo.pl${path}`;
+    }
+    return path;
+};
+
 export default function GalleryLandingPage() {
     const params = useParams<{ slug: string }>();
     const router = useRouter();
@@ -50,17 +72,18 @@ export default function GalleryLandingPage() {
             try {
                 setLoading(true);
 
-                // Sprawdź czy jest subdomena w parametrach URL
-                const subdomain = searchParams.get("subdomain");
-                console.log(
-                    "🔍 Loading collection, subdomain from params:",
-                    subdomain
-                );
+                // Get subdomain from URL params or detect from hostname
+                let subdomain = searchParams.get("subdomain");
+                if (!subdomain) {
+                    subdomain = getSubdomain();
+                }
+                console.log("🔍 Loading collection, subdomain:", subdomain);
 
-                const apiUrl = subdomain
+                const apiPath = subdomain
                     ? `/api/gallery/${slug}?subdomain=${subdomain}`
                     : `/api/gallery/${slug}`;
 
+                const apiUrl = getApiUrl(apiPath);
                 console.log("📡 API URL:", apiUrl);
 
                 const res = await fetch(apiUrl);
@@ -123,11 +146,17 @@ export default function GalleryLandingPage() {
         setError("");
 
         try {
-            // Include subdomain in verify request if present
-            const subdomain = searchParams.get("subdomain");
-            const verifyUrl = subdomain
-                ? `https://seovileo.pl/api/gallery/${slug}/verify`
+            // Get subdomain from URL params or detect from hostname
+            let subdomain = searchParams.get("subdomain");
+            if (!subdomain) {
+                subdomain = getSubdomain();
+            }
+
+            const verifyPath = subdomain
+                ? `/api/gallery/${slug}/verify?subdomain=${subdomain}`
                 : `/api/gallery/${slug}/verify`;
+
+            const verifyUrl = getApiUrl(verifyPath);
 
             console.log("🔐 Verifying password...", {
                 verifyUrl,
