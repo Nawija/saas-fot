@@ -6,13 +6,11 @@ import jwt from "jsonwebtoken";
 const PUBLIC_PATHS = [
     "/login",
     "/register",
-    "/api/auth/login",
-    "/api/auth/register",
-    "/api/auth/google",
+    "/api/auth/",
     "/g/",
     "/u/",
     "/api/gallery/",
-    "/api/webhooks/lemon-squeezy",
+    "/api/webhooks/",
 ];
 
 export default function proxy(request: NextRequest) {
