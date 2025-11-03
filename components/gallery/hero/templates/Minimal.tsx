@@ -22,7 +22,7 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                         priority
                     />
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-black/60" />
+                    <div className="absolute inset-0 bg-linear-120 from-black/30 to-black/10" />
                 </div>
             ) : (
                 <div className="absolute inset-0 bg-black" />
@@ -52,7 +52,7 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                     {/* CTA Button */}
                     <a
                         href="#gallery"
-                        className="group relative inline-flex items-center justify-center px-10 py-3 border border-gray-200 hover:bg-gray-300 text-gray-300 font-semibold text-base md:text-lg overflow-hidden hover:text-gray-800 transition-all duration-200"
+                        className="group relative inline-flex items-center text-sm justify-center px-8 py-3 border border-gray-200 hover:bg-gray-200 text-gray-600 bg-gray-50 font-semibold overflow-hidden hover:text-gray-800 transition-all duration-200"
                     >
                         <span className="relative z-10">Zobacz galerię</span>
                     </a>

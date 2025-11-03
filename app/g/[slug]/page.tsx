@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Eye, Lock } from "lucide-react";
 import LoadingGallery from "../loading";
+import ResponsiveHeroImage from "@/components/gallery/hero/ResponsiveHeroImage";
 
 interface Collection {
     id: number;
@@ -306,29 +307,16 @@ export default function GalleryLandingPage() {
         >
             {/* Background Image - responsive */}
             {collection.hero_image && (
-                <picture className="absolute inset-0">
-                    {/* Mobile Image - optymalizowana dla portrait */}
-                    {collection.hero_image_mobile && (
-                        <source
-                            media="(max-width: 767px)"
-                            srcSet={collection.hero_image_mobile}
-                            type="image/webp"
-                        />
-                    )}
-
-                    {/* Desktop Image - optymalizowana dla landscape */}
-                    <img
-                        src={collection.hero_image}
-                        alt={collection.name}
-                        loading="eager"
-                        decoding="async"
-                        fetchPriority="high"
-                        className="w-full h-full object-cover object-center"
-                    />
-                </picture>
+                <ResponsiveHeroImage
+                    desktop={collection.hero_image}
+                    mobile={collection.hero_image_mobile}
+                    alt={collection.name}
+                    className=""
+                    priority
+                />
             )}
 
-            <div className="absolute inset-0 bg-black/80" />
+            <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/50 backdrop-blur-md" />
             <div className="relative z-10 w-full py-12">
                 {showPasswordPrompt && collection.has_password
                     ? renderPasswordPrompt()
