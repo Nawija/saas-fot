@@ -106,19 +106,23 @@ export default function CollectionsPage() {
             <div className="container mx-auto px-6 py-6 max-w-[1500px]">
                 {/* Public Gallery Link */}
                 {username && (
-                    <div className="mb-8 bg-linear-to-br from-green-50/50 to-emerald-50/50 border-2 border-emerald-200/70 rounded-2xl p-4 transition-all duration-300">
+                    <div className="mb-8 bg-linear-to-br from-green-50/50 to-emerald-50/50 border-2 border-green-600/30 rounded-2xl p-4 transition-all duration-300">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:justify-between">
                             <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
                                 <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl flex items-center justify-center shadow">
                                     <Globe className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <h3 className="font-bold text-green-800 text-base md:text-lg mb-1">
+                                    <h3 className="font-bold text-green-800 text-base md:text-lg">
                                         Your Public Gallery
                                     </h3>
-                                    <p className="text-xs md:text-sm text-orange-900 font-medium truncate">
+                                    <Link
+                                        href={`https://${username}.seovileo.pl`}
+                                        target="_blank"
+                                        className="text-xs md:text-sm text-green-600 font-medium truncate hover:underline"
+                                    >
                                         https://{username}.seovileo.pl
-                                    </p>
+                                    </Link>
                                 </div>
                             </div>
                             <MainButton
@@ -126,7 +130,7 @@ export default function CollectionsPage() {
                                 target="_blank"
                                 icon={<ExternalLink className="w-4 h-4" />}
                                 label="Visit Gallery"
-                                variant="orange"
+                                variant="success"
                                 className="w-full sm:w-auto whitespace-nowrap"
                             />
                         </div>
