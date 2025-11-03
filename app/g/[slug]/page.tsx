@@ -32,47 +32,6 @@ const FONT_MAP: Record<string, { href: string; family: string }> = {
     },
 };
 
-// Funkcja do wykrywania subdomeny z hostname
-function getSubdomainFromHostname(): string | null {
-    if (typeof window === "undefined") return null;
-
-    const hostname = window.location.hostname;
-    const baseDomain = "seovileo.pl";
-
-    // Localhost lub IP - brak subdomeny
-    if (hostname === "localhost" || hostname.match(/^\d+\.\d+\.\d+\.\d+/)) {
-        return null;
-    }
-
-    // Usuń port jeśli jest
-    const cleanHostname = hostname.replace(/:\d+$/, "");
-
-    // Sprawdź czy to subdomena
-    if (cleanHostname.endsWith(`.${baseDomain}`)) {
-        const subdomain = cleanHostname.replace(`.${baseDomain}`, "");
-        return subdomain !== "www" ? subdomain : null;
-    }
-
-    return null;
-}
-
-// Funkcja do budowania URL API - zawsze używa głównej domeny
-function getApiUrl(path: string, subdomain: string | null): string {
-    if (typeof window === "undefined") return path;
-
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol;
-    const baseDomain = "seovileo.pl";
-
-    // Jeśli jesteśmy na subdomenie, użyj głównej domeny
-    if (hostname.includes(baseDomain) && hostname !== baseDomain) {
-        return `${protocol}//${baseDomain}${path}`;
-    }
-
-    // W przeciwnym razie użyj relatywnej ścieżki
-    return path;
-}
-
 export default function GalleryLandingPage() {
     const params = useParams<{ slug: string }>();
     const router = useRouter();
@@ -91,18 +50,16 @@ export default function GalleryLandingPage() {
             try {
                 setLoading(true);
 
-                // Sprawdź czy jest subdomena w parametrach URL lub wykryj z hostname
-                let subdomain = searchParams.get("subdomain");
-                if (!subdomain) {
-                    subdomain = getSubdomainFromHostname();
-                }
-                console.log("🔍 Loading collection, subdomain:", subdomain);
+                // Sprawdź czy jest subdomena w parametrach URL
+                const subdomain = searchParams.get("subdomain");
+                console.log(
+                    "🔍 Loading collection, subdomain from params:",
+                    subdomain
+                );
 
-                const apiPath = subdomain
-                    ? `/api/gallery/${slug}?subdomain=${subdomain}`
-                    : `/api/gallery/${slug}`;
-
-                const apiUrl = getApiUrl(apiPath, subdomain);
+                const apiUrl = subdomain
+                    ? `https://seovileo.pl/api/gallery/${slug}`
+                    : `https://seovileo.pl/api/gallery/${slug}`;
 
                 console.log("📡 API URL:", apiUrl);
 
@@ -166,16 +123,11 @@ export default function GalleryLandingPage() {
         setError("");
 
         try {
-            // Include subdomain in verify request if present or detect from hostname
-            let subdomain = searchParams.get("subdomain");
-            if (!subdomain) {
-                subdomain = getSubdomainFromHostname();
-            }
-            const verifyPath = subdomain
-                ? `/api/gallery/${slug}/verify?subdomain=${subdomain}`
-                : `/api/gallery/${slug}/verify`;
-
-            const verifyUrl = getApiUrl(verifyPath, subdomain);
+            // Include subdomain in verify request if present
+            const subdomain = searchParams.get("subdomain");
+            const verifyUrl = subdomain
+                ? `https://seovileo.pl/api/gallery/${slug}/verify`
+                : `https://seovileo.pl/api/gallery/${slug}/verify`;
 
             console.log("🔐 Verifying password...", {
                 verifyUrl,
