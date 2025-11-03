@@ -60,9 +60,19 @@ export default function proxy(request: NextRequest) {
 
             // /g/slug - konkretna galeria użytkownika
             if (pathname.startsWith("/g/")) {
-                const slug = pathname.replace("/g/", "");
                 url.searchParams.set("subdomain", subdomain);
-                console.log(`  → subdomain gallery: ${subdomain}/g/${slug}`);
+                console.log(
+                    `  → subdomain gallery: ${subdomain}, path: ${pathname}`
+                );
+                return NextResponse.rewrite(url);
+            }
+
+            // /api/gallery - API galerii z subdomeną
+            if (pathname.startsWith("/api/gallery/")) {
+                url.searchParams.set("subdomain", subdomain);
+                console.log(
+                    `  → subdomain API: ${subdomain}, path: ${pathname}`
+                );
                 return NextResponse.rewrite(url);
             }
 

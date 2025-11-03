@@ -44,16 +44,6 @@ const getSubdomain = (): string | null => {
     return null;
 };
 
-// Helper function to build API URL - use main domain if on subdomain
-const getApiUrl = (path: string): string => {
-    if (typeof window === "undefined") return path;
-    const subdomain = getSubdomain();
-    if (subdomain) {
-        return `https://seovileo.pl${path}`;
-    }
-    return path;
-};
-
 export default function GalleryLandingPage() {
     const params = useParams<{ slug: string }>();
     const router = useRouter();
@@ -79,11 +69,10 @@ export default function GalleryLandingPage() {
                 }
                 console.log("🔍 Loading collection, subdomain:", subdomain);
 
-                const apiPath = subdomain
+                const apiUrl = subdomain
                     ? `/api/gallery/${slug}?subdomain=${subdomain}`
                     : `/api/gallery/${slug}`;
 
-                const apiUrl = getApiUrl(apiPath);
                 console.log("📡 API URL:", apiUrl);
 
                 const res = await fetch(apiUrl);
@@ -152,11 +141,9 @@ export default function GalleryLandingPage() {
                 subdomain = getSubdomain();
             }
 
-            const verifyPath = subdomain
+            const verifyUrl = subdomain
                 ? `/api/gallery/${slug}/verify?subdomain=${subdomain}`
                 : `/api/gallery/${slug}/verify`;
-
-            const verifyUrl = getApiUrl(verifyPath);
 
             console.log("🔐 Verifying password...", {
                 verifyUrl,
