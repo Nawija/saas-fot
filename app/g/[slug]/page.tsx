@@ -56,6 +56,23 @@ function getSubdomainFromHostname(): string | null {
     return null;
 }
 
+// Funkcja do budowania URL API - zawsze używa głównej domeny
+function getApiUrl(path: string, subdomain: string | null): string {
+    if (typeof window === "undefined") return path;
+
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    const baseDomain = "seovileo.pl";
+
+    // Jeśli jesteśmy na subdomenie, użyj głównej domeny
+    if (hostname.includes(baseDomain) && hostname !== baseDomain) {
+        return `${protocol}//${baseDomain}${path}`;
+    }
+
+    // W przeciwnym razie użyj relatywnej ścieżki
+    return path;
+}
+
 export default function GalleryLandingPage() {
     const params = useParams<{ slug: string }>();
     const router = useRouter();
@@ -81,9 +98,11 @@ export default function GalleryLandingPage() {
                 }
                 console.log("🔍 Loading collection, subdomain:", subdomain);
 
-                const apiUrl = subdomain
+                const apiPath = subdomain
                     ? `/api/gallery/${slug}?subdomain=${subdomain}`
                     : `/api/gallery/${slug}`;
+
+                const apiUrl = getApiUrl(apiPath, subdomain);
 
                 console.log("📡 API URL:", apiUrl);
 
@@ -152,9 +171,11 @@ export default function GalleryLandingPage() {
             if (!subdomain) {
                 subdomain = getSubdomainFromHostname();
             }
-            const verifyUrl = subdomain
+            const verifyPath = subdomain
                 ? `/api/gallery/${slug}/verify?subdomain=${subdomain}`
                 : `/api/gallery/${slug}/verify`;
+
+            const verifyUrl = getApiUrl(verifyPath, subdomain);
 
             console.log("🔐 Verifying password...", {
                 verifyUrl,
@@ -204,13 +225,28 @@ export default function GalleryLandingPage() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-neutral-950 p-4">
                 <div className="text-center max-w-md mx-auto">
-                    <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-10 md:p-12 shadow-2xl">
-                        <h1 className="text-3xl md:text-4xl font-medium mb-4 text-white">
-                            {error || "Nie znaleziono galerii"}
-                        </h1>
-                        <p className="text-white/70">
-                            Sprawdź poprawność linku
-                        </p>
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-10 md:p-12 shadow-2xl">
+                        <div className="mb-6">
+                            <div className="w-16 h-16 mx-auto bg-red-500/10 rounded-full flex items-center justify-center mb-4">
+                                <Lock
+                                    className="w-8 h-8 text-red-400"
+                                    strokeWidth={1.5}
+                                />
+                            </div>
+                            <h1 className="text-2xl md:text-3xl font-semibold mb-3 text-white">
+                                {error || "Nie znaleziono galerii"}
+                            </h1>
+                            <p className="text-white/60 text-sm leading-relaxed">
+                                Sprawdź poprawność linku lub spróbuj ponownie
+                                później
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => router.back()}
+                            className="w-full px-6 py-3 bg-white/10 hover:bg-white/15 border border-white/20 text-white rounded-lg font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                            Powrót
+                        </button>
                     </div>
                 </div>
             </div>
