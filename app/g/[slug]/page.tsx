@@ -278,22 +278,16 @@ export default function GalleryLandingPage() {
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white leading-tight tracking-tight">
                         {collection.name}
                     </h1>
-                    {collection.description && (
-                        <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
-                            {collection.description}
-                        </p>
-                    )}
                 </div>
                 <div>
                     <button
                         onClick={handleViewGallery}
                         className="group relative inline-flex items-center justify-center gap-3 border border-white/90 text-white/90 hover:text-neutral-900 px-8 w-max py-3 font-semibold text-base overflow-hidden hover:bg-neutral-100 active:scale-[0.99] transition-all duration-300"
                     >
-                        <span className="relative z-10 flex items-center gap-3 text-sm lg:text-base">
-                            <Eye size={22} strokeWidth={2} />
-                            <span>Zobacz galerię</span>
-                        </span>
-                        <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+                       
+                            <Eye size={20} strokeWidth={2} />
+                            <span>Zobacz jako gość</span>
+                  
                     </button>
                 </div>
             </div>

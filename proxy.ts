@@ -21,12 +21,9 @@ export default function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
 
     // === SUBDOMAIN HANDLING ===
-    // Development - skip for plain localhost and IPs, but allow subdomain.localhost
-    const isPlainLocalhost =
-        hostname === "localhost:3000" || hostname === "localhost";
     const isIP = hostname.match(/^\d+\.\d+\.\d+\.\d+/);
 
-    if (!isPlainLocalhost && !isIP) {
+    if (!isIP) {
         // For localhost development: wesele.localhost
         // For production: wesele.seovileo.pl
         let baseDomain = "localhost";
@@ -81,6 +78,42 @@ export default function proxy(request: NextRequest) {
                 url.searchParams.set("subdomain", subdomain);
                 console.log(`  → subdomain detected: ${subdomain}, add param`);
                 return NextResponse.rewrite(url);
+            }
+        }
+    }
+
+    // === SUBDOMAIN RESTRICTIONS ===
+    // Jeśli jesteśmy na subdomenie, blokuj dostęp do chronionych ścieżek
+    if (!isIP) {
+        const parts = hostname.replace(":3000", "").split(".");
+        let baseDomain = "localhost";
+        if (!hostname.includes("localhost")) {
+            const baseHost =
+                process.env.NEXT_PUBLIC_BASE_URL?.replace(/https?:\/\//, "") ||
+                "seovileo.pl:3000";
+            baseDomain = baseHost.split(":")[0];
+        }
+        const domainParts = baseDomain.split(".");
+        let subdomain = "";
+        if (parts.length > domainParts.length) {
+            subdomain = parts
+                .slice(0, parts.length - domainParts.length)
+                .join(".");
+        }
+
+        // Jeśli jest subdomena (nie www), pozwól tylko na root "/" i galerie "/g/*"
+        if (subdomain && subdomain !== "www") {
+            const isAllowed = pathname === "/" || pathname.startsWith("/g/");
+
+            if (!isAllowed) {
+                const mainDomain = hostname.includes("localhost")
+                    ? "http://localhost:3000"
+                    : process.env.NEXT_PUBLIC_BASE_URL || "https://seovileo.pl";
+
+                console.log(
+                    `  → subdomain ${subdomain} redirecting ${pathname} to main domain`
+                );
+                return NextResponse.redirect(new URL(mainDomain));
             }
         }
     }

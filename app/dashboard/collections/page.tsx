@@ -15,6 +15,7 @@ import {
     Lock,
 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
+import ResponsiveHeroImage from "@/components/gallery/hero/ResponsiveHeroImage";
 
 interface Collection {
     id: number;
@@ -22,6 +23,7 @@ interface Collection {
     slug: string;
     description?: string;
     hero_image?: string;
+    hero_image_mobile?: string;
     is_public: boolean;
     password_plain?: string;
     photo_count?: number;
@@ -157,14 +159,19 @@ export default function CollectionsPage() {
                                     <div className="relative h-48 bg-linear-to-br from-blue-50 to-blue-100 overflow-hidden">
                                         {collection.hero_image ? (
                                             <>
-                                                <img
-                                                    src={collection.hero_image}
+                                                <ResponsiveHeroImage
+                                                    desktop={
+                                                        collection.hero_image
+                                                    }
+                                                    mobile={
+                                                        collection.hero_image_mobile
+                                                    }
                                                     alt={collection.name}
-                                                    loading="lazy"
-                                                    decoding="async"
                                                     className="w-full h-full object-cover transition-transform duration-300"
+                                                    priority
                                                 />
-                                                <div className="absolute inset-0 bg-linear-to-t from-white/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                                                <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                             </>
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">
