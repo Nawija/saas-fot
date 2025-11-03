@@ -34,15 +34,27 @@ export async function POST(req: NextRequest) {
             [eventName, payload]
         );
 
-        // Pobierz user_id z custom_data
-        const userId = payload.meta.custom_data?.user_id;
+        const data = payload.data.attributes;
 
-        if (!userId) {
-            console.error("No user_id in webhook payload");
+        // Pobierz user_id na podstawie customer_id z Lemon Squeezy
+        const customerId = data.customer_id?.toString();
+
+        if (!customerId) {
+            console.error("No customer_id in webhook payload");
             return NextResponse.json({ received: true });
         }
 
-        const data = payload.data.attributes;
+        const userResult = await query(
+            `SELECT id FROM users WHERE lemon_squeezy_customer_id = $1`,
+            [customerId]
+        );
+
+        if (userResult.rows.length === 0) {
+            console.error(`No user found for customer_id: ${customerId}`);
+            return NextResponse.json({ received: true });
+        }
+
+        const userId = userResult.rows[0].id;
         const subscriptionId = payload.data.id; // ID subskrypcji jest tutaj, nie w attributes
 
         console.log(
