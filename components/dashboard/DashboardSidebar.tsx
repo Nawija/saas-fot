@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Images, CreditCard, LifeBuoy } from "lucide-react";
+import { Images, CreditCard } from "lucide-react";
 import LogoutButton from "../buttons/LogoutButton";
 
 const menuItems = [
@@ -16,11 +16,6 @@ const menuItems = [
         label: "Billing",
         href: "/dashboard/billing",
         icon: CreditCard,
-    },
-    {
-        label: "Support",
-        href: "/support",
-        icon: LifeBuoy,
     },
 ];
 

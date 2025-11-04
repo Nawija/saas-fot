@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardMenuButton from "@/components/navbar/DashboardMenuButton";
 import SetUsernameModal from "@/components/auth/SetUsernameModal";
@@ -18,8 +18,6 @@ export default function DashboardLayoutClient({
     const [menuSlot, setMenuSlot] = useState<HTMLElement | null>(null);
     const [showUsernameModal, setShowUsernameModal] = useState(false);
     const pathname = usePathname();
-    const router = useRouter();
-
     const isCollectionDetails = /^\/dashboard\/collections\/[^/]+$/.test(
         pathname ?? ""
     );
