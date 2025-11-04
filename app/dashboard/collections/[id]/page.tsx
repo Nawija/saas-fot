@@ -222,50 +222,56 @@ export default function CollectionDetailPage({
         }
     }
 
-    // 🔥 Helper: Skompresuj plik jeśli jest za duży
+    // 🔥 Helper: ZAWSZE kompresuj pliki po stronie klienta (FIX dla Vercel 4.5MB limit)
     async function compressIfNeeded(file: File): Promise<File> {
         const fileSizeMB = file.size / 1024 / 1024;
 
-        // Vercel limit: 4.5MB, ale dajemy margines bezpieczeństwa
-        if (file.size <= 3.8 * 1024 * 1024) {
-            return file; // Plik bezpieczny - OK
+        // Kompresuj WSZYSTKIE pliki >1MB dla bezpieczeństwa
+        if (file.size <= 1 * 1024 * 1024) {
+            console.log(
+                `✅ ${file.name}: ${fileSizeMB.toFixed(2)}MB - OK (small)`
+            );
+            return file;
         }
 
-        // Toast że kompresujemy
-        toast.loading(
-            `Compressing ${file.name}... (${fileSizeMB.toFixed(1)}MB)`,
-            {
-                id: `compress-${file.name}`,
-            }
+        console.log(
+            `🔄 Compressing ${file.name}: ${fileSizeMB.toFixed(2)}MB...`
         );
 
         try {
             const imageCompression = (await import("browser-image-compression"))
                 .default;
 
-            // Bardziej agresywna kompresja
+            // ULTRA agresywna kompresja - maksymalnie 2MB!
             const options = {
-                maxSizeMB: 3.2, // Bardzo bezpieczny limit
-                maxWidthOrHeight: 3840, // 4K max
+                maxSizeMB: 2.0, // Bardzo bezpieczny limit (połowa Vercel)
+                maxWidthOrHeight: 2560, // Zmniejszamy rozdzielczość
                 useWebWorker: true,
-                initialQuality: 0.8, // Lekko niższa jakość
+                initialQuality: 0.7, // Niższa jakość
+                alwaysKeepResolution: false,
             };
 
             const compressed = await imageCompression(file, options);
             const compressedSizeMB = compressed.size / 1024 / 1024;
-
-            toast.success(
-                `Compressed ${file.name}: ${fileSizeMB.toFixed(
-                    1
-                )}MB → ${compressedSizeMB.toFixed(1)}MB`,
-                { id: `compress-${file.name}`, duration: 2000 }
-            );
+            const reduction = (
+                (1 - compressedSizeMB / fileSizeMB) *
+                100
+            ).toFixed(0);
 
             console.log(
-                `📦 Compressed ${file.name}: ${fileSizeMB.toFixed(
+                `✅ ${file.name}: ${fileSizeMB.toFixed(
                     2
-                )}MB → ${compressedSizeMB.toFixed(2)}MB`
+                )}MB → ${compressedSizeMB.toFixed(2)}MB (-${reduction}%)`
             );
+
+            // Jeśli NADAL za duże (>3MB), rzuć błąd
+            if (compressed.size > 3 * 1024 * 1024) {
+                throw new Error(
+                    `Still too large after compression: ${compressedSizeMB.toFixed(
+                        2
+                    )}MB`
+                );
+            }
 
             return compressed;
         } catch (error) {
