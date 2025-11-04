@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ChangeAvatar from "@/components/buttons/ChangeAvatar";
 import SubscriptionSection from "@/components/dashboard/SubscriptionSection";
 import DeleteAccountButton from "@/components/buttons/DeleteAccountButton";
+import EditProfileSheet from "@/components/dashboard/EditProfileSheet";
 
 export default async function ProfilePage() {
     const user = await getUser();
@@ -44,9 +45,15 @@ export default async function ProfilePage() {
 
                     {/* Profile Info */}
                     <div>
-                        <h2 className="text-xl font-semibold mb-4">
-                            Profile information
-                        </h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-semibold">
+                                Profile information
+                            </h2>
+                            <EditProfileSheet
+                                currentName={user.name}
+                                currentBio={user.bio}
+                            />
+                        </div>
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -54,6 +61,14 @@ export default async function ProfilePage() {
                                 </label>
                                 <p className="text-gray-900">
                                     {user.name || "Not set"}
+                                </p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Bio
+                                </label>
+                                <p className="text-gray-900">
+                                    {user.bio || "Photo galleries & portfolio"}
                                 </p>
                             </div>
                             <div>

@@ -21,6 +21,7 @@ interface UserInfo {
     username: string;
     name?: string;
     avatar?: string;
+    bio?: string;
 }
 
 export default function UserGalleriesPage() {
@@ -111,7 +112,7 @@ export default function UserGalleriesPage() {
                             </div>
                         </div>
                         <p className="text-xl text-gray-600 font-light leading-relaxed">
-                            Photo galleries & portfolio
+                            {userInfo.bio || "Photo galleries & portfolio"}
                         </p>
                     </div>
                 </div>

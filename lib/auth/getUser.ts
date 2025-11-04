@@ -21,7 +21,8 @@ export async function getUser() {
                 lemon_squeezy_subscription_id,
                 subscription_ends_at,
                 username,
-                is_username_set
+                is_username_set,
+                bio
             FROM users 
             WHERE id = $1`,
             [payload.sub]

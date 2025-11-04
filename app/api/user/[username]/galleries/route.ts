@@ -17,7 +17,7 @@ export async function GET(
 
         // Find user by username
         const userRes = await query(
-            `SELECT id, email, name, avatar, username
+            `SELECT id, email, name, avatar, username, bio
              FROM users 
              WHERE username = $1`,
             [username]
@@ -58,6 +58,7 @@ export async function GET(
                 username: user.username,
                 name: user.name,
                 avatar: user.avatar,
+                bio: user.bio || "Photo galleries & portfolio",
             },
             collections: collectionsRes.rows.map((row) => ({
                 ...row,
