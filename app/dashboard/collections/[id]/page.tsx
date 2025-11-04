@@ -239,19 +239,23 @@ export default function CollectionDetailPage({
         );
 
         try {
+            console.log(`[COMPRESS] Loading browser-image-compression...`);
             const imageCompression = (await import("browser-image-compression"))
                 .default;
+            console.log(`[COMPRESS] Loaded! Starting compression...`);
 
-            // ULTRA agresywna kompresja - maksymalnie 2MB!
+            // ULTRA agresywna kompresja - maksymalnie 1.5MB dla bezpieczeństwa!
             const options = {
-                maxSizeMB: 2.0, // Bardzo bezpieczny limit (połowa Vercel)
-                maxWidthOrHeight: 2560, // Zmniejszamy rozdzielczość
-                useWebWorker: true,
-                initialQuality: 0.7, // Niższa jakość
+                maxSizeMB: 1.5, // Bardzo bezpieczny limit (3x mniej niż Vercel limit)
+                maxWidthOrHeight: 2048, // Niższa rozdzielczość
+                useWebWorker: false, // ❌ WYŁĄCZ - może nie działać na produkcji!
+                initialQuality: 0.6, // Jeszcze niższa jakość dla mniejszych plików
                 alwaysKeepResolution: false,
             };
 
+            console.log(`[COMPRESS] Options:`, options);
             const compressed = await imageCompression(file, options);
+            console.log(`[COMPRESS] Compression complete!`);
             const compressedSizeMB = compressed.size / 1024 / 1024;
             const reduction = (
                 (1 - compressedSizeMB / fileSizeMB) *
@@ -311,8 +315,21 @@ export default function CollectionDetailPage({
         }> = [];
 
         const uploadSingle = async (file: File) => {
+            const originalSizeMB = file.size / 1024 / 1024;
+            console.log(`[UPLOAD] Original: ${file.name} - ${originalSizeMB.toFixed(2)}MB`);
+            
             // Skompresuj jeśli potrzeba
             const fileToUpload = await compressIfNeeded(file);
+            const compressedSizeMB = fileToUpload.size / 1024 / 1024;
+            
+            console.log(`[UPLOAD] Compressed: ${fileToUpload.name} - ${compressedSizeMB.toFixed(2)}MB`);
+            
+            // 🚨 KRYTYCZNE: Vercel ma TWARDY limit 4.5MB - sprawdź PRZED wysłaniem!
+            if (fileToUpload.size > 4 * 1024 * 1024) {
+                const errorMsg = `File ${file.name} is still too large after compression (${compressedSizeMB.toFixed(2)}MB). Original: ${originalSizeMB.toFixed(2)}MB. Vercel limit is 4.5MB.`;
+                console.error(`[UPLOAD] BLOCKED:`, errorMsg);
+                throw new Error(errorMsg);
+            }
 
             const formData = new FormData();
             formData.append("file", fileToUpload); // ✅ Użyj skompresowanego pliku!
