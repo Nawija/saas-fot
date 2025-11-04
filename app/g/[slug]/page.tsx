@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Eye, Lock } from "lucide-react";
-import LoadingGallery from "../loading";
+import { Lock } from "lucide-react";
+import LoadingGallery from "./loading";
 import ResponsiveHeroImage from "@/components/gallery/hero/ResponsiveHeroImage";
 
 interface Collection {
@@ -85,7 +85,22 @@ export default function GalleryLandingPage() {
                     if (data.collection.has_password) {
                         setShowPasswordPrompt(true);
                     } else {
+                        // Redirect immediately if no password
                         setShowPasswordPrompt(false);
+                        const photoParam = searchParams.get("photo");
+                        let targetUrl = `/g/${slug}/p`;
+                        if (subdomain) {
+                            targetUrl += `?subdomain=${subdomain}`;
+                            if (photoParam) targetUrl += `&photo=${photoParam}`;
+                        } else if (photoParam) {
+                            targetUrl += `?photo=${photoParam}`;
+                        }
+                        console.log(
+                            "✅ No password required, redirecting to:",
+                            targetUrl
+                        );
+                        router.push(targetUrl);
+                        return;
                     }
                     setError("");
                 } else {
@@ -102,7 +117,7 @@ export default function GalleryLandingPage() {
         };
 
         void loadCollection();
-    }, [slug, searchParams]);
+    }, [slug, searchParams, router]);
 
     useEffect(() => {
         if (!collection?.hero_font) return;
@@ -118,19 +133,6 @@ export default function GalleryLandingPage() {
         }
         link.href = font.href;
     }, [collection?.hero_font]);
-
-    const handleViewGallery = () => {
-        if (collection?.has_password && !showPasswordPrompt) {
-            setShowPasswordPrompt(true);
-        } else {
-            // Preserve photo parameter if present
-            const photoParam = searchParams.get("photo");
-            const targetUrl = photoParam
-                ? `/g/${slug}/p?photo=${photoParam}`
-                : `/g/${slug}/p`;
-            router.push(targetUrl);
-        }
-    };
 
     const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -276,51 +278,31 @@ export default function GalleryLandingPage() {
         </div>
     );
 
-    const renderViewButton = () => (
-        <div className="w-full max-w-2xl mx-auto text-center px-4">
-            <div className="space-y-12" style={{ fontFamily }}>
-                <div className="space-y-4">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white leading-tight tracking-tight">
-                        {collection.name}
-                    </h1>
-                </div>
-                <div>
-                    <button
-                        onClick={handleViewGallery}
-                        className="group relative inline-flex items-center justify-center gap-3 border border-white/90 text-white/90 hover:text-neutral-900 px-8 w-max py-3 font-semibold text-base overflow-hidden hover:bg-neutral-100 active:scale-[0.99] transition-all duration-300"
-                    >
-                        <Eye size={20} strokeWidth={2} />
-                        <span>Zobacz jako gość</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-
     return (
         <div
-            className="relative w-full flex items-center justify-center p-4 bg-black"
+            className="relative w-full flex items-center justify-center bg-black"
             style={{
                 minHeight: "100dvh",
                 height: "100dvh",
             }}
         >
-            {/* Background Image - responsive */}
-            {collection.hero_image && (
-                <ResponsiveHeroImage
-                    desktop={collection.hero_image}
-                    mobile={collection.hero_image_mobile}
-                    alt={collection.name}
-                    className=""
-                    priority
-                />
-            )}
+            <div className="absolute inset-0 z-10 h-full w-full overflow-hidden p-4">
+                {/* Background Image - responsive */}
+                {collection.hero_image && (
+                    <ResponsiveHeroImage
+                        desktop={collection.hero_image}
+                        mobile={collection.hero_image_mobile}
+                        alt={collection.name}
+                        priority
+                    />
+                )}
+            </div>
 
-            <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/50 backdrop-blur-md" />
-            <div className="relative z-10 w-full py-12">
-                {showPasswordPrompt && collection.has_password
-                    ? renderPasswordPrompt()
-                    : renderViewButton()}
+            <div className="absolute inset-0 bg-linear-to-b z-20 from-black/20 via-black/40 backdrop-blur-md" />
+            <div className="relative z-30 w-full py-12">
+                {showPasswordPrompt &&
+                    collection.has_password &&
+                    renderPasswordPrompt()}
             </div>
         </div>
     );
