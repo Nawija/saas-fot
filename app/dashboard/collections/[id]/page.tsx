@@ -222,6 +222,39 @@ export default function CollectionDetailPage({
         }
     }
 
+    // 🔥 Helper: Skompresuj plik jeśli jest za duży
+    async function compressIfNeeded(file: File): Promise<File> {
+        if (file.size <= 4 * 1024 * 1024) {
+            return file; // Plik mniejszy niż 4MB - OK
+        }
+
+        try {
+            const imageCompression = (await import("browser-image-compression"))
+                .default;
+            const options = {
+                maxSizeMB: 3.5, // Bezpieczny limit przed 4MB Vercel
+                maxWidthOrHeight: 4096,
+                useWebWorker: true,
+                fileType: file.type,
+            };
+
+            const compressed = await imageCompression(file, options);
+            console.log(
+                `📦 Compressed ${file.name}: ${(
+                    file.size /
+                    1024 /
+                    1024
+                ).toFixed(2)}MB → ${(compressed.size / 1024 / 1024).toFixed(
+                    2
+                )}MB`
+            );
+            return compressed;
+        } catch (error) {
+            console.warn("Compression failed, using original:", error);
+            return file;
+        }
+    }
+
     async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
         if (!collectionId) return;
         const files = e.target.files;
@@ -243,6 +276,8 @@ export default function CollectionDetailPage({
         }> = [];
 
         const uploadSingle = async (file: File) => {
+            // Skompresuj jeśli potrzeba
+            const fileToUpload = await compressIfNeeded(file);
             const formData = new FormData();
             formData.append("file", file);
             formData.append("type", "photo");
@@ -374,8 +409,11 @@ export default function CollectionDetailPage({
         }> = [];
 
         const uploadSingle = async (file: File) => {
+            // Skompresuj jeśli potrzeba
+            const fileToUpload = await compressIfNeeded(file);
+
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append("file", fileToUpload);
             formData.append("type", "photo");
             formData.append("collectionId", collectionId);
 

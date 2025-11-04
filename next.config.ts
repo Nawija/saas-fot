@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         // Loader configuration
         loader: "default",
     },
+    // Zwiększ limit body size do 50MB (dla dużych zdjęć)
+    experimental: {
+        serverActions: {
+            bodySizeLimit: "50mb",
+        },
+    },
 };
 
 export default nextConfig;

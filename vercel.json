@@ -10,5 +10,11 @@
                 }
             ]
         }
-    ]
+    ],
+    "functions": {
+        "app/api/collections/upload/route.ts": {
+            "maxDuration": 60,
+            "memory": 3008
+        }
+    }
 }
