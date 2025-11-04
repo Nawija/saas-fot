@@ -224,34 +224,63 @@ export default function CollectionDetailPage({
 
     // 🔥 Helper: Skompresuj plik jeśli jest za duży
     async function compressIfNeeded(file: File): Promise<File> {
-        if (file.size <= 4 * 1024 * 1024) {
-            return file; // Plik mniejszy niż 4MB - OK
+        const fileSizeMB = file.size / 1024 / 1024;
+
+        // Vercel limit: 4.5MB, ale dajemy margines bezpieczeństwa
+        if (file.size <= 3.8 * 1024 * 1024) {
+            return file; // Plik bezpieczny - OK
         }
+
+        // Toast że kompresujemy
+        toast.loading(
+            `Compressing ${file.name}... (${fileSizeMB.toFixed(1)}MB)`,
+            {
+                id: `compress-${file.name}`,
+            }
+        );
 
         try {
             const imageCompression = (await import("browser-image-compression"))
                 .default;
+
+            // Bardziej agresywna kompresja
             const options = {
-                maxSizeMB: 3.5, // Bezpieczny limit przed 4MB Vercel
-                maxWidthOrHeight: 4096,
+                maxSizeMB: 3.2, // Bardzo bezpieczny limit
+                maxWidthOrHeight: 3840, // 4K max
                 useWebWorker: true,
-                fileType: file.type,
+                initialQuality: 0.8, // Lekko niższa jakość
             };
 
             const compressed = await imageCompression(file, options);
-            console.log(
-                `📦 Compressed ${file.name}: ${(
-                    file.size /
-                    1024 /
-                    1024
-                ).toFixed(2)}MB → ${(compressed.size / 1024 / 1024).toFixed(
-                    2
-                )}MB`
+            const compressedSizeMB = compressed.size / 1024 / 1024;
+
+            toast.success(
+                `Compressed ${file.name}: ${fileSizeMB.toFixed(
+                    1
+                )}MB → ${compressedSizeMB.toFixed(1)}MB`,
+                { id: `compress-${file.name}`, duration: 2000 }
             );
+
+            console.log(
+                `📦 Compressed ${file.name}: ${fileSizeMB.toFixed(
+                    2
+                )}MB → ${compressedSizeMB.toFixed(2)}MB`
+            );
+
             return compressed;
         } catch (error) {
-            console.warn("Compression failed, using original:", error);
-            return file;
+            console.error("❌ Compression failed:", error);
+            toast.error(`Compression failed for ${file.name}`, {
+                id: `compress-${file.name}`,
+                description: "File may be too large to upload.",
+            });
+
+            // Zwróć null zamiast oryginału - nie uploadujemy plików które są za duże
+            throw new Error(
+                `File ${file.name} is too large (${fileSizeMB.toFixed(
+                    1
+                )}MB) and compression failed`
+            );
         }
     }
 
@@ -278,8 +307,9 @@ export default function CollectionDetailPage({
         const uploadSingle = async (file: File) => {
             // Skompresuj jeśli potrzeba
             const fileToUpload = await compressIfNeeded(file);
+
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append("file", fileToUpload); // ✅ Użyj skompresowanego pliku!
             formData.append("type", "photo");
             formData.append("collectionId", collectionId);
 
