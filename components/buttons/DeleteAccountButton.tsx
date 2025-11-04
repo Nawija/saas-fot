@@ -65,14 +65,14 @@ export default function DeleteAccountButton() {
 
     return (
         <>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <div className="bg-red-50/60 border border-red-200 rounded-lg p-6">
                 <div className="flex items-start gap-4">
                     <div className="shrink-0">
                         <AlertTriangle className="w-6 h-6 text-red-600" />
                     </div>
                     <div className="flex-1">
                         <h3 className="text-lg font-semibold text-red-900 mb-2">
-                            Strefa niebezpieczna
+                            UWAGA
                         </h3>
                         <p className="text-sm text-red-700 mb-4">
                             Usunięcie konta jest{" "}
@@ -87,14 +87,17 @@ export default function DeleteAccountButton() {
                             <li>Dane profilu i avatar</li>
                         </ul>
 
-                        <MainButton
-                            icon={<Trash2 className="w-4 h-4" />}
-                            onClick={() => setConfirmDelete(true)}
-                            loading={loading}
-                            loadingText="Usuwanie..."
-                            variant="danger"
-                            label="Usuń konto na zawsze"
-                        />
+                        <div className="text-right w-full">
+                            <MainButton
+                                icon={<Trash2 className="w-4 h-4" />}
+                                onClick={() => setConfirmDelete(true)}
+                                loading={loading}
+                                loadingText="Usuwanie..."
+                                variant="danger"
+                                label="Usuń konto"
+                                className="bg-red-600 text-white hover:bg-red-700 hover:text-white"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

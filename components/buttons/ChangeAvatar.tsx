@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Upload, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import MainButton from "./MainButton";
 
 interface ChangeAvatarProps {
     currentAvatar?: string | null;
@@ -99,45 +100,23 @@ export default function ChangeAvatar({ currentAvatar }: ChangeAvatarProps) {
         <>
             <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                    <button
+                    <MainButton
+                        icon={<Upload size={16} />}
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading || isDeleting}
-                        className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                    >
-                        {isUploading ? (
-                            <>
-                                <Loader2 size={16} className="animate-spin" />
-                                <span>Przesyłanie...</span>
-                            </>
-                        ) : (
-                            <>
-                                <Upload size={16} />
-                                <span>Zmień avatar</span>
-                            </>
-                        )}
-                    </button>
+                        loading={isUploading}
+                        loadingText="Przesyłanie..."
+                        label="Zmień avatar"
+                    />
 
                     {currentAvatar && (
-                        <button
+                        <MainButton
+                            icon={<Trash2 size={16} />}
                             onClick={() => setConfirmOpen(true)}
-                            disabled={isUploading || isDeleting}
-                            className="flex items-center gap-2 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                        >
-                            {isDeleting ? (
-                                <>
-                                    <Loader2
-                                        size={16}
-                                        className="animate-spin"
-                                    />
-                                    <span>Usuwanie...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Trash2 size={16} />
-                                    <span>Usuń</span>
-                                </>
-                            )}
-                        </button>
+                            loading={isDeleting}
+                            loadingText="Usuwanie..."
+                            variant="danger"
+                            label="Usuń"
+                        />
                     )}
                 </div>
 
