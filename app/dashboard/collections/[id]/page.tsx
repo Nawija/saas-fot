@@ -87,6 +87,12 @@ export default function CollectionDetailPage({
         description: "",
         feature: "",
     });
+    const [uploadErrors, setUploadErrors] = useState<Array<{
+        fileName: string;
+        originalSize: string;
+        compressedSize?: string;
+        reason: string;
+    }>>([]);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -301,11 +307,18 @@ export default function CollectionDetailPage({
 
         setUploading(true);
         setUploadProgress(0);
+        setUploadErrors([]); // 🔥 Wyczyść poprzednie błędy
 
         const fileArray = Array.from(files);
         const totalFiles = fileArray.length;
         let uploaded = 0;
         let quotaErrorRedirected = false;
+        const errors: Array<{
+            fileName: string;
+            originalSize: string;
+            compressedSize?: string;
+            reason: string;
+        }> = [];
         const uploadedPhotos: Array<{
             file_name: string;
             file_path: string;
@@ -316,68 +329,104 @@ export default function CollectionDetailPage({
 
         const uploadSingle = async (file: File) => {
             const originalSizeMB = file.size / 1024 / 1024;
-            console.log(`[UPLOAD] Original: ${file.name} - ${originalSizeMB.toFixed(2)}MB`);
-            
-            // Skompresuj jeśli potrzeba
-            const fileToUpload = await compressIfNeeded(file);
-            const compressedSizeMB = fileToUpload.size / 1024 / 1024;
-            
-            console.log(`[UPLOAD] Compressed: ${fileToUpload.name} - ${compressedSizeMB.toFixed(2)}MB`);
-            
-            // 🚨 KRYTYCZNE: Vercel ma TWARDY limit 4.5MB - sprawdź PRZED wysłaniem!
-            if (fileToUpload.size > 4 * 1024 * 1024) {
-                const errorMsg = `File ${file.name} is still too large after compression (${compressedSizeMB.toFixed(2)}MB). Original: ${originalSizeMB.toFixed(2)}MB. Vercel limit is 4.5MB.`;
-                console.error(`[UPLOAD] BLOCKED:`, errorMsg);
-                throw new Error(errorMsg);
-            }
+            const originalSizeFormatted = `${originalSizeMB.toFixed(2)} MB`;
+            console.log(`[UPLOAD] Original: ${file.name} - ${originalSizeFormatted}`);
 
-            const formData = new FormData();
-            formData.append("file", fileToUpload); // ✅ Użyj skompresowanego pliku!
-            formData.append("type", "photo");
-            formData.append("collectionId", collectionId);
+            try {
+                // Skompresuj jeśli potrzeba
+                const fileToUpload = await compressIfNeeded(file);
+                const compressedSizeMB = fileToUpload.size / 1024 / 1024;
+                const compressedSizeFormatted = `${compressedSizeMB.toFixed(2)} MB`;
 
-            // Upload tylko do R2 (bez zapisu w bazie - zrobimy batch!)
-            const uploadRes = await fetch("/api/collections/upload", {
-                method: "POST",
-                body: formData,
-            });
+                console.log(`[UPLOAD] Compressed: ${fileToUpload.name} - ${compressedSizeFormatted}`);
 
-            if (!uploadRes.ok) {
-                let errorData: any = {};
-                try {
-                    errorData = await uploadRes.json();
-                } catch {}
-                if (
-                    uploadRes.status === 413 &&
-                    (errorData?.upgradeRequired || errorData?.message)
-                ) {
-                    if (!quotaErrorRedirected) {
-                        quotaErrorRedirected = true;
-                        toast.error("Out of space", {
-                            description:
-                                errorData.message ||
-                                "Storage limit exceeded. Redirecting to upgrade...",
-                        });
-                        router.push("/dashboard/billing");
-                    }
-                    throw new Error("Storage limit reached");
+                // 🚨 KRYTYCZNE: Vercel ma TWARDY limit 4.5MB - sprawdź PRZED wysłaniem!
+                if (fileToUpload.size > 4 * 1024 * 1024) {
+                    errors.push({
+                        fileName: file.name,
+                        originalSize: originalSizeFormatted,
+                        compressedSize: compressedSizeFormatted,
+                        reason: `Plik za duży nawet po kompresji. Maksymalny rozmiar: 4 MB.`
+                    });
+                    throw new Error(`File too large: ${compressedSizeFormatted}`);
                 }
-                throw new Error(`Failed to upload ${file.name}`);
+
+                const formData = new FormData();
+                formData.append("file", fileToUpload); // ✅ Użyj skompresowanego pliku!
+                formData.append("type", "photo");
+                formData.append("collectionId", collectionId);
+
+                // Upload tylko do R2 (bez zapisu w bazie - zrobimy batch!)
+                const uploadRes = await fetch("/api/collections/upload", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!uploadRes.ok) {
+                    let errorData: any = {};
+                    try {
+                        errorData = await uploadRes.json();
+                    } catch {}
+                    
+                    if (uploadRes.status === 413) {
+                        if (errorData?.upgradeRequired || errorData?.message) {
+                            if (!quotaErrorRedirected) {
+                                quotaErrorRedirected = true;
+                                toast.error("Out of space", {
+                                    description: errorData.message || "Storage limit exceeded. Redirecting to upgrade...",
+                                });
+                                router.push("/dashboard/billing");
+                            }
+                            errors.push({
+                                fileName: file.name,
+                                originalSize: originalSizeFormatted,
+                                compressedSize: compressedSizeFormatted,
+                                reason: "Przekroczono limit miejsca na dysku."
+                            });
+                        } else {
+                            errors.push({
+                                fileName: file.name,
+                                originalSize: originalSizeFormatted,
+                                compressedSize: compressedSizeFormatted,
+                                reason: "Plik za duży (błąd 413 z serwera)."
+                            });
+                        }
+                        throw new Error("Upload failed: 413");
+                    }
+                    
+                    errors.push({
+                        fileName: file.name,
+                        originalSize: originalSizeFormatted,
+                        compressedSize: compressedSizeFormatted,
+                        reason: `Błąd serwera (${uploadRes.status}).`
+                    });
+                    throw new Error(`Failed to upload ${file.name}`);
+                }
+
+                const { url, size, width, height } = await uploadRes.json();
+
+                // Dodaj do listy do batch insert
+                uploadedPhotos.push({
+                    file_name: file.name,
+                    file_path: url,
+                    file_size: size,
+                    width,
+                    height,
+                });
+
+                uploaded++;
+                setUploadProgress(Math.round((uploaded / totalFiles) * 100));
+            } catch (err: any) {
+                // Jeśli błąd nie został już dodany do listy
+                if (!errors.some(e => e.fileName === file.name)) {
+                    errors.push({
+                        fileName: file.name,
+                        originalSize: originalSizeFormatted,
+                        reason: err.message || "Nieznany błąd podczas uploadu."
+                    });
+                }
+                console.error(`[UPLOAD] Error for ${file.name}:`, err);
             }
-
-            const { url, size, width, height } = await uploadRes.json();
-
-            // Dodaj do listy do batch insert
-            uploadedPhotos.push({
-                file_name: file.name,
-                file_path: url,
-                file_size: size,
-                width,
-                height,
-            });
-
-            uploaded++;
-            setUploadProgress(Math.round((uploaded / totalFiles) * 100));
         };
 
         try {
@@ -432,10 +481,23 @@ export default function CollectionDetailPage({
             await fetchPhotos();
             await fetchCollection();
 
-            toast.success(`Uploaded ${uploaded} of ${totalFiles} photos`);
+            // Pokaż wyniki
+            if (errors.length > 0) {
+                setUploadErrors(errors);
+                toast.error(`${errors.length} zdjęć się nie dodało`, {
+                    description: "Zobacz listę błędów poniżej.",
+                    duration: 10000,
+                });
+            }
+            
+            if (uploaded > 0) {
+                toast.success(`Dodano ${uploaded} z ${totalFiles} zdjęć`);
+            } else if (errors.length === 0) {
+                toast.error("Nie udało się dodać żadnego zdjęcia");
+            }
         } catch (error) {
             console.error("Upload error:", error);
-            toast.error("Error uploading photos");
+            toast.error("Błąd podczas uploadu zdjęć");
         } finally {
             setUploading(false);
             setUploadProgress(0);
@@ -987,6 +1049,68 @@ export default function CollectionDetailPage({
                                 />
                             </div>
                         </div>
+
+                        {/* Upload Errors - czerwona lista błędów */}
+                        {uploadErrors.length > 0 && (
+                            <div className="bg-red-50 border-2 border-red-200 rounded-2xl overflow-hidden">
+                                <div className="bg-red-100 border-b-2 border-red-200 px-5 py-4">
+                                    <h3 className="text-base font-semibold text-red-900 flex items-center gap-2">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {uploadErrors.length} {uploadErrors.length === 1 ? 'zdjęcie' : 'zdjęć'} nie zostało dodanych
+                                    </h3>
+                                    <p className="text-sm text-red-700 mt-1">
+                                        Sprawdź poniższą listę aby dowiedzieć się dlaczego
+                                    </p>
+                                </div>
+                                <div className="p-5 space-y-3 max-h-[400px] overflow-y-auto">
+                                    {uploadErrors.map((error, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="bg-white border-2 border-red-200 rounded-lg p-4 hover:border-red-300 transition-colors"
+                                        >
+                                            <div className="flex items-start gap-3">
+                                                <div className="shrink-0 w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="text-sm font-semibold text-gray-900 truncate" title={error.fileName}>
+                                                        {error.fileName}
+                                                    </h4>
+                                                    <p className="text-sm text-red-700 mt-1 font-medium">
+                                                        {error.reason}
+                                                    </p>
+                                                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
+                                                        <span>
+                                                            <span className="font-medium">Rozmiar oryginalny:</span> {error.originalSize}
+                                                        </span>
+                                                        {error.compressedSize && (
+                                                            <span>
+                                                                <span className="font-medium">Po kompresji:</span> {error.compressedSize}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="bg-red-100 border-t-2 border-red-200 px-5 py-3 flex items-center justify-between">
+                                    <p className="text-xs text-red-800">
+                                        💡 <strong>Wskazówka:</strong> Skompresuj zdjęcia przed dodaniem lub usuń zbyt duże pliki.
+                                    </p>
+                                    <button
+                                        onClick={() => setUploadErrors([])}
+                                        className="text-xs font-medium text-red-700 hover:text-red-900 underline"
+                                    >
+                                        Zamknij listę
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Gallery Section */}
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
