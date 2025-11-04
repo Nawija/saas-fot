@@ -32,7 +32,9 @@ async function runMigration() {
 
         for (let i = 0; i < statements.length; i++) {
             const stmt = statements[i];
-            console.log(`\n⚡ Wykonuję zapytanie ${i + 1}/${statements.length}...`);
+            console.log(
+                `\n⚡ Wykonuję zapytanie ${i + 1}/${statements.length}...`
+            );
             console.log(stmt.substring(0, 100) + "...");
             await pool.query(stmt);
             console.log("✅ Sukces");

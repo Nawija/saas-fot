@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
+import MainButton from "../buttons/MainButton";
 
 interface EditProfileSheetProps {
     currentName?: string;
@@ -67,10 +67,10 @@ export default function EditProfileSheet({
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-                <Button variant="outline" size="sm">
-                    <Pencil className="w-4 h-4 mr-2" />
-                    Edit Profile
-                </Button>
+                <MainButton
+                    icon={<Pencil className="w-4 h-4" />}
+                    label="Edit Profile"
+                />
             </SheetTrigger>
             <SheetContent className="px-6">
                 <form onSubmit={handleSubmit}>
@@ -82,7 +82,7 @@ export default function EditProfileSheet({
                         </SheetDescription>
                     </SheetHeader>
 
-                    <div className="space-y-6 py-6">
+                    <div className="space-y-6 py-6 px-3">
                         {error && (
                             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
                                 {error}
@@ -116,19 +116,22 @@ export default function EditProfileSheet({
                         </div>
                     </div>
 
-                    <SheetFooter>
+                    <SheetFooter >
                         <SheetClose asChild>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                disabled={loading}
-                            >
-                                Cancel
-                            </Button>
+                            <MainButton
+                                loading={loading}
+                                label="Cancel"
+                                variant="secondary"
+                            />
                         </SheetClose>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? "Saving..." : "Save Changes"}
-                        </Button>
+
+                        <MainButton
+                            type="submit"
+                            loading={loading}
+                            loadingText="Saving"
+                            label="Save Changes"
+                     
+                        />
                     </SheetFooter>
                 </form>
             </SheetContent>

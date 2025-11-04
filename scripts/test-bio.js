@@ -8,7 +8,7 @@ async function addBioColumn() {
 
     try {
         console.log("🚀 Dodawanie kolumny bio...");
-        
+
         await pool.query(`
             ALTER TABLE users 
             ADD COLUMN IF NOT EXISTS bio TEXT 
@@ -31,7 +31,6 @@ async function addBioColumn() {
         `);
         console.log("\n📋 Przykładowi użytkownicy:");
         console.table(result.rows);
-
     } catch (error) {
         console.error("❌ Błąd:", error.message);
     } finally {
