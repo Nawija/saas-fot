@@ -90,7 +90,7 @@ export default function GalleryLandingPage() {
                         const photoParam = searchParams.get("photo");
                         let targetUrl = `/g/${slug}/p`;
                         if (subdomain) {
-                            targetUrl += `?subdomain=${subdomain}`;
+                            targetUrl;
                             if (photoParam) targetUrl += `&photo=${photoParam}`;
                         } else if (photoParam) {
                             targetUrl += `?photo=${photoParam}`;
@@ -286,17 +286,18 @@ export default function GalleryLandingPage() {
                 height: "100dvh",
             }}
         >
-            <div className="absolute inset-0 z-10 h-full w-full overflow-hidden p-4">
-                {/* Background Image - responsive */}
-                {collection.hero_image && (
-                    <ResponsiveHeroImage
-                        desktop={collection.hero_image}
-                        mobile={collection.hero_image_mobile}
-                        alt={collection.name}
-                        priority
-                    />
-                )}
-            </div>
+            {showPasswordPrompt && collection.has_password && (
+                <div className="absolute inset-0 z-10 h-full w-full overflow-hidden p-4">
+                    {collection.hero_image && (
+                        <ResponsiveHeroImage
+                            desktop={collection.hero_image}
+                            mobile={collection.hero_image_mobile}
+                            alt={collection.name}
+                            priority
+                        />
+                    )}
+                </div>
+            )}
 
             <div className="absolute inset-0 bg-linear-to-b z-20 from-black/20 via-black/40 backdrop-blur-md" />
             <div className="relative z-30 w-full py-12">

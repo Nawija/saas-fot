@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
         const type = formData.get("type") as string; // "hero" or "photo"
         const collectionId = formData.get("collectionId") as string; // ID kolekcji
         const photoId = formData.get("photoId") as string; // ID zdjęcia (dla photos)
+        const saveToDb = formData.get("saveToDb") as string; // "true" jeśli chcemy zapisać od razu w bazie
 
         if (!file) {
             return createErrorResponse("Brak pliku", 400);
@@ -247,11 +248,16 @@ export async function POST(req: NextRequest) {
 
         // Upload do R2
         const url = await uploadToR2(processedBuffer, key, contentType);
+        const size = processedBuffer.length;
 
+        // Dla saveToDb === "true" zwróć tylko dane, a zapis w bazie zrób batch'em po stronie klienta
+        // To oszczędza database queries (taniej dla SaaS!)
+
+        // Standardowa odpowiedź dla hero images lub gdy saveToDb !== "true"
         return NextResponse.json({
             ok: true,
             url,
-            size: processedBuffer.length,
+            size,
             width,
             height,
         });

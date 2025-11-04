@@ -234,6 +234,13 @@ export default function CollectionDetailPage({
         const totalFiles = fileArray.length;
         let uploaded = 0;
         let quotaErrorRedirected = false;
+        const uploadedPhotos: Array<{
+            file_name: string;
+            file_path: string;
+            file_size: number;
+            width: number;
+            height: number;
+        }> = [];
 
         const uploadSingle = async (file: File) => {
             const formData = new FormData();
@@ -241,7 +248,7 @@ export default function CollectionDetailPage({
             formData.append("type", "photo");
             formData.append("collectionId", collectionId);
 
-            // Upload do R2
+            // Upload tylko do R2 (bez zapisu w bazie - zrobimy batch!)
             const uploadRes = await fetch("/api/collections/upload", {
                 method: "POST",
                 body: formData,
@@ -272,53 +279,22 @@ export default function CollectionDetailPage({
 
             const { url, size, width, height } = await uploadRes.json();
 
-            // Zapisz w bazie
-            const saveRes = await fetch(
-                `/api/collections/${collectionId}/photos`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        file_name: file.name,
-                        file_path: url,
-                        file_size: size,
-                        width,
-                        height,
-                    }),
-                }
-            );
+            // Dodaj do listy do batch insert
+            uploadedPhotos.push({
+                file_name: file.name,
+                file_path: url,
+                file_size: size,
+                width,
+                height,
+            });
 
-            if (!saveRes.ok) {
-                let errorData: any = {};
-                try {
-                    errorData = await saveRes.json();
-                } catch {}
-                if (
-                    saveRes.status === 413 &&
-                    (errorData?.upgradeRequired || errorData?.message)
-                ) {
-                    if (!quotaErrorRedirected) {
-                        quotaErrorRedirected = true;
-                        toast.error("Out of space", {
-                            description:
-                                errorData.message ||
-                                "Storage limit exceeded. Redirecting to upgrade...",
-                        });
-                        router.push("/dashboard/billing");
-                    }
-                    throw new Error("Storage limit reached");
-                }
-                throw new Error(`Failed to save ${file.name}`);
-            }
-
-            // Progress po zakończeniu pojedynczego pliku
             uploaded++;
             setUploadProgress(Math.round((uploaded / totalFiles) * 100));
         };
 
         try {
-            // Prosty pulpit współbieżności (limit równoległych uploadów)
-            const CONCURRENCY = 4; // rozsądna równoległość
+            // Zwiększmy współbieżność dla szybszego uploadu
+            const CONCURRENCY = 22; // ⚡ 22 równoległych uploadów
             let index = 0;
 
             const worker = async () => {
@@ -328,7 +304,6 @@ export default function CollectionDetailPage({
                     try {
                         await uploadSingle(file);
                     } catch (err) {
-                        // Błąd pojedynczego pliku — log i kontynuacja pozostałych
                         console.error("Upload failed for", file.name, err);
                     }
                 }
@@ -339,6 +314,31 @@ export default function CollectionDetailPage({
                 () => worker()
             );
             await Promise.all(workers);
+
+            // 💰 BATCH INSERT - zapisz wszystkie zdjęcia jednym zapytaniem (taniej!)
+            if (uploadedPhotos.length > 0) {
+                const saveRes = await fetch(
+                    `/api/collections/${collectionId}/photos/batch`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ photos: uploadedPhotos }),
+                    }
+                );
+
+                if (!saveRes.ok) {
+                    const errorData = await saveRes.json().catch(() => ({}));
+                    if (saveRes.status === 413 && errorData?.upgradeRequired) {
+                        toast.error("Out of space", {
+                            description:
+                                errorData.message || "Storage limit exceeded.",
+                        });
+                        router.push("/dashboard/billing");
+                        return;
+                    }
+                    throw new Error("Failed to save photos to database");
+                }
+            }
 
             // Odśwież listę zdjęć
             await fetchPhotos();
@@ -365,6 +365,13 @@ export default function CollectionDetailPage({
         const totalFiles = fileArray.length;
         let uploaded = 0;
         let quotaErrorRedirected = false;
+        const uploadedPhotos: Array<{
+            file_name: string;
+            file_path: string;
+            file_size: number;
+            width: number;
+            height: number;
+        }> = [];
 
         const uploadSingle = async (file: File) => {
             const formData = new FormData();
@@ -372,7 +379,7 @@ export default function CollectionDetailPage({
             formData.append("type", "photo");
             formData.append("collectionId", collectionId);
 
-            // Upload do R2
+            // Upload tylko do R2 (bez zapisu w bazie - zrobimy batch!)
             const uploadRes = await fetch("/api/collections/upload", {
                 method: "POST",
                 body: formData,
@@ -403,53 +410,22 @@ export default function CollectionDetailPage({
 
             const { url, size, width, height } = await uploadRes.json();
 
-            // Zapisz w bazie
-            const saveRes = await fetch(
-                `/api/collections/${collectionId}/photos`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        file_name: file.name,
-                        file_path: url,
-                        file_size: size,
-                        width,
-                        height,
-                    }),
-                }
-            );
+            // Dodaj do listy do batch insert
+            uploadedPhotos.push({
+                file_name: file.name,
+                file_path: url,
+                file_size: size,
+                width,
+                height,
+            });
 
-            if (!saveRes.ok) {
-                let errorData: any = {};
-                try {
-                    errorData = await saveRes.json();
-                } catch {}
-                if (
-                    saveRes.status === 413 &&
-                    (errorData?.upgradeRequired || errorData?.message)
-                ) {
-                    if (!quotaErrorRedirected) {
-                        quotaErrorRedirected = true;
-                        toast.error("Out of space", {
-                            description:
-                                errorData.message ||
-                                "Storage limit exceeded. Redirecting to upgrade...",
-                        });
-                        router.push("/dashboard/billing");
-                    }
-                    throw new Error("Storage limit reached");
-                }
-                throw new Error(`Failed to save ${file.name}`);
-            }
-
-            // Progress po zakończeniu pojedynczego pliku
             uploaded++;
             setUploadProgress(Math.round((uploaded / totalFiles) * 100));
         };
 
         try {
-            // Prosty pulpit współbieżności (limit równoległych uploadów)
-            const CONCURRENCY = 4;
+            // Zwiększmy współbieżność dla szybszego uploadu
+            const CONCURRENCY = 30; // ⚡ 30 równoległych uploadów
             let index = 0;
 
             const worker = async () => {
@@ -469,6 +445,31 @@ export default function CollectionDetailPage({
                 () => worker()
             );
             await Promise.all(workers);
+
+            // 💰 BATCH INSERT - zapisz wszystkie zdjęcia jednym zapytaniem (taniej!)
+            if (uploadedPhotos.length > 0) {
+                const saveRes = await fetch(
+                    `/api/collections/${collectionId}/photos/batch`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ photos: uploadedPhotos }),
+                    }
+                );
+
+                if (!saveRes.ok) {
+                    const errorData = await saveRes.json().catch(() => ({}));
+                    if (saveRes.status === 413 && errorData?.upgradeRequired) {
+                        toast.error("Out of space", {
+                            description:
+                                errorData.message || "Storage limit exceeded.",
+                        });
+                        router.push("/dashboard/billing");
+                        return;
+                    }
+                    throw new Error("Failed to save photos to database");
+                }
+            }
 
             // Odśwież listę zdjęć
             await fetchPhotos();
