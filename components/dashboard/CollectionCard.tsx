@@ -9,7 +9,8 @@ import {
 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 import ResponsiveHeroImage from "@/components/gallery/hero/ResponsiveHeroImage";
-import type { Collection } from "@/types/collection";
+import { Collection } from "@/types/collection";
+
 
 interface CollectionCardProps {
     collection: Collection;
