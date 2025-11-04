@@ -118,96 +118,100 @@ export default function UserGalleriesPage() {
             </div>
 
             {/* Galleries Grid */}
-            <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 md:py-20">
-                {collections.length === 0 ? (
-                    <div className="text-center py-32">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-50 rounded-2xl mb-6">
-                            <ImageIcon className="w-8 h-8 text-gray-300" />
-                        </div>
-                        <h2 className="text-2xl font-light text-gray-900 mb-3">
-                            No galleries yet
-                        </h2>
-                        <p className="text-gray-400 text-sm">
-                            Check back soon for new content
-                        </p>
-                    </div>
-                ) : (
-                    <>
-                        <div className="mb-12">
-                            <h2 className="text-3xl font-light text-gray-900 mb-2">
-                                Galleries
+            <div className="bg-gray-50/30">
+                <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 md:py-20">
+                    {collections.length === 0 ? (
+                        <div className="text-center py-32">
+                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-50 rounded-2xl mb-6">
+                                <ImageIcon className="w-8 h-8 text-gray-300" />
+                            </div>
+                            <h2 className="text-2xl font-light text-gray-900 mb-3">
+                                No galleries yet
                             </h2>
-                            <div className="w-12 h-0.5 bg-gray-900"></div>
+                            <p className="text-gray-400 text-sm">
+                                Check back soon for new content
+                            </p>
                         </div>
+                    ) : (
+                        <>
+                            <div className="mb-12">
+                                <h2 className="text-3xl font-light text-gray-900 mb-2">
+                                    Galleries
+                                </h2>
+                                <div className="w-12 h-0.5 bg-gray-900"></div>
+                            </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-                            {collections.map((collection) => (
-                                <Link
-                                    key={collection.id}
-                                    href={`https://${username}.seovileo.pl/g/${collection.slug}`}
-                                    className="group block"
-                                >
-                                    <div className="bg-white overflow-hidden transition-all duration-500">
-                                        {/* Hero Image */}
-                                        <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden mb-5">
-                                            {collection.hero_image ? (
-                                                <img
-                                                    src={collection.hero_image}
-                                                    alt={collection.name}
-                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <ImageIcon className="w-12 h-12 text-gray-200" />
-                                                </div>
-                                            )}
-
-                                            {/* Minimal Badge */}
-                                            {collection.has_password && (
-                                                <div className="absolute top-4 right-4">
-                                                    <div className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-                                                        <Lock className="w-3 h-3 text-gray-600" />
-                                                        <span className="text-xs font-medium text-gray-600">
-                                                            Private
-                                                        </span>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+                                {collections.map((collection) => (
+                                    <Link
+                                        key={collection.id}
+                                        href={`https://${username}.seovileo.pl/g/${collection.slug}`}
+                                        className="group block"
+                                    >
+                                        <div className="bg-white overflow-hidden transition-all duration-500">
+                                            {/* Hero Image */}
+                                            <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden mb-5">
+                                                {collection.hero_image ? (
+                                                    <img
+                                                        src={
+                                                            collection.hero_image
+                                                        }
+                                                        alt={collection.name}
+                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <ImageIcon className="w-12 h-12 text-gray-200" />
                                                     </div>
+                                                )}
+
+                                                {/* Minimal Badge */}
+                                                {collection.has_password && (
+                                                    <div className="absolute top-4 right-4">
+                                                        <div className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                                                            <Lock className="w-3 h-3 text-gray-600" />
+                                                            <span className="text-xs font-medium text-gray-600">
+                                                                Private
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Hover Overlay */}
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="space-y-3">
+                                                <h3 className="text-xl font-light text-gray-900 line-clamp-1 group-hover:text-gray-600 transition-colors">
+                                                    {collection.name}
+                                                </h3>
+
+                                                {collection.description && (
+                                                    <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
+                                                        {collection.description}
+                                                    </p>
+                                                )}
+
+                                                <div className="flex items-center text-xs text-gray-400 font-medium pt-2 border-t border-gray-100">
+                                                    <ImageIcon className="w-3.5 h-3.5 mr-1.5" />
+                                                    <span>
+                                                        {collection.photo_count ||
+                                                            0}{" "}
+                                                        {collection.photo_count ===
+                                                        1
+                                                            ? "photo"
+                                                            : "photos"}
+                                                    </span>
                                                 </div>
-                                            )}
-
-                                            {/* Hover Overlay */}
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
-                                        </div>
-
-                                        {/* Content */}
-                                        <div className="space-y-3">
-                                            <h3 className="text-xl font-light text-gray-900 line-clamp-1 group-hover:text-gray-600 transition-colors">
-                                                {collection.name}
-                                            </h3>
-
-                                            {collection.description && (
-                                                <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
-                                                    {collection.description}
-                                                </p>
-                                            )}
-
-                                            <div className="flex items-center text-xs text-gray-400 font-medium pt-2 border-t border-gray-100">
-                                                <ImageIcon className="w-3.5 h-3.5 mr-1.5" />
-                                                <span>
-                                                    {collection.photo_count ||
-                                                        0}{" "}
-                                                    {collection.photo_count ===
-                                                    1
-                                                        ? "photo"
-                                                        : "photos"}
-                                                </span>
                                             </div>
                                         </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </>
-                )}
+                                    </Link>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
