@@ -294,7 +294,6 @@ export async function POST(req: NextRequest) {
                     // SVG tła z zaokrągleniami i przezroczystą czernią
                     const bgSvg = Buffer.from(
                         `<svg width="${bgW}" height="${bgH}" viewBox="0 0 ${bgW} ${bgH}" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="${bgW}" height="${bgH}" rx="5" ry="5" fill="rgba(0,0,0,0.1)"/>
                     </svg>`
                     );
 
