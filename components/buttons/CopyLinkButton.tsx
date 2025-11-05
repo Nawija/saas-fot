@@ -90,7 +90,7 @@ export default function CopyLinkButton({
         : "bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-300 hover:border-orange-200";
 
     return (
-        <div className="flex items-center flex-col sm:flex-row gap-2">
+        <div className="flex items-center gap-2">
             {showUrl && (
                 <div
                     className={`relative flex w-full items-center gap-2 px-3 py-2 rounded-xl bg-white border-2 border-gray-200`}
@@ -99,7 +99,7 @@ export default function CopyLinkButton({
                         <div className="absolute inset-0 rounded-xl pointer-events-none animate-border-shimmer" />
                     )}
                     <LinkIcon className="w-4 h-4 text-gray-400 shrink-0 relative z-10" />
-                    <p className="text-base text-gray-800 flex-1 truncate relative z-10">
+                    <p className="text-base text-gray-800 w-22 flex-1 truncate relative z-10">
                         {url}
                     </p>
                 </div>
