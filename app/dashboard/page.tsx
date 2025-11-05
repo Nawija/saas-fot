@@ -76,7 +76,7 @@ export default function DashboardPage() {
         },
         {
             icon: Palette,
-            title: "7 hero styles",
+            title: "7 hero styles ",
             description:
                 "Choose from ready-made templates — from minimal to cinematic.",
         },
