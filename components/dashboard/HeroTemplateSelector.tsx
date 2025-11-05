@@ -192,8 +192,8 @@ export default function HeroTemplateSelector({
                     return (
                         <motion.button
                             key={tpl.key}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0}}
+                            animate={{ opacity: 1 }}
                             transition={{
                                 duration: 0.3,
                                 delay: index * 0.1,

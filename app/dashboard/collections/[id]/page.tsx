@@ -972,23 +972,7 @@ export default function CollectionDetailPage({
                                             }
                                             icon={<ImagePlus size={22} />}
                                             variant="secondary"
-                                        />
-                                        <MainButton
-                                            href={
-                                                username
-                                                    ? `https://${username}.seovileo.pl/g/${collection.slug}`
-                                                    : `${origin}/g/${collection.slug}`
-                                            }
-                                            target="_blank"
-                                            icon={<Eye size={22} />}
-                                            variant="secondary"
-                                        />
-                                        <MainButton
-                                            onClick={handleDownloadAllPhotos}
-                                            icon={<Download size={22} />}
-                                            variant="secondary"
-                                            disabled={photos.length === 0}
-                                        />
+                                        />{" "}
                                         <MainButton
                                             onClick={() =>
                                                 setSettingsModalOpen(true)
@@ -1000,6 +984,22 @@ export default function CollectionDetailPage({
                                                     <Lock size={22} />
                                                 )
                                             }
+                                            variant="secondary"
+                                        />
+                                        <MainButton
+                                            onClick={handleDownloadAllPhotos}
+                                            icon={<Download size={22} />}
+                                            variant="secondary"
+                                            disabled={photos.length === 0}
+                                        />
+                                        <MainButton
+                                            href={
+                                                username
+                                                    ? `https://${username}.seovileo.pl/g/${collection.slug}`
+                                                    : `${origin}/g/${collection.slug}`
+                                            }
+                                            target="_blank"
+                                            icon={<Eye size={22} />}
                                             variant="secondary"
                                         />
                                     </div>
