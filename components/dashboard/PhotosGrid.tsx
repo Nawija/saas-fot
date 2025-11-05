@@ -64,10 +64,10 @@ function PhotoThumbnail({
             )}
 
             {/* Delete button overlay */}
-            <div className="absolute inset-0 lg:bg-linear-to-t lg:from-white/60 lg:bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-start justify-end lg:opacity-0 group-hover:opacity-100">
+            <div className="absolute inset-0 lg:bg-linear-to-t lg:from-black/30 lg:bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-start justify-end lg:opacity-0 group-hover:opacity-100">
                 <button
                     onClick={onDelete}
-                    className="p-1 m-1 text-red-500 hover:text-red-600 rounded-full bg-white transition-colors shadow-sm hover:shadow-md"
+                    className="p-1 m-1 text-red-500 hover:text-red-600 rounded-md bg-white/50 transition-colors shadow-sm hover:shadow-md"
                     aria-label={`Delete ${photo.file_name}`}
                 >
                     <X size={22} />
