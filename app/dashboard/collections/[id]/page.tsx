@@ -16,7 +16,16 @@ import CollectionSettingsModal from "@/components/dashboard/CollectionSettingsMo
 import HeroImageEditModal from "@/components/dashboard/HeroImageEditModal";
 import CopyLinkButton from "@/components/buttons/CopyLinkButton";
 import UpgradeDialog from "@/components/ui/UpgradeDialog";
-import { Eye, Trash2, Download, Globe, Lock, ImagePlus } from "lucide-react";
+import {
+    Eye,
+    Trash2,
+    Download,
+    Globe,
+    Lock,
+    ImagePlus,
+    Paintbrush,
+    SquarePen,
+} from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 
 interface Collection {
@@ -870,35 +879,64 @@ export default function CollectionDetailPage({
                                 <div className="space-y-4">
                                     {/* Template Preview */}
                                     {currentTemplate && (
-                                        <div className="relative bg-gray-900 rounded-xl overflow-hidden border border-gray-200">
-                                            <div className="absolute top-0 right-0 z-10 bg-white/5 w-full h-full" />
-                                            <div className="w-full overflow-hidden aspect-video">
-                                                <div
-                                                    className="origin-top-left"
-                                                    style={{
-                                                        transform: "scale(0.2)",
-                                                        width: "500%",
-                                                        height: "500%",
-                                                        fontFamily:
-                                                            (collection?.hero_font ===
-                                                                "playfair" &&
-                                                                "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif") ||
-                                                            (collection?.hero_font ===
-                                                                "poppins" &&
-                                                                "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif") ||
-                                                            "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
-                                                    }}
-                                                >
-                                                    <currentTemplate.Desktop
-                                                        title={collection.name}
-                                                        description={
-                                                            collection.description
-                                                        }
-                                                        image={
-                                                            collection.hero_image
-                                                        }
-                                                    />
-                                                </div>
+                                        // <div className="relative bg-gray-900 rounded-xl overflow-hidden border border-gray-200">
+                                        //     <div className="absolute top-0 right-0 z-10 bg-white/5 w-full h-full" />
+                                        //     <div className="w-full overflow-hidden aspect-video">
+                                        //         <div
+                                        //             className="origin-top-left"
+                                        //             style={{
+                                        //                 transform: "scale(0.2)",
+                                        //                 width: "500%",
+                                        //                 height: "500%",
+                                        //                 fontFamily:
+                                        //                     (collection?.hero_font ===
+                                        //                         "playfair" &&
+                                        //                         "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif") ||
+                                        //                     (collection?.hero_font ===
+                                        //                         "poppins" &&
+                                        //                         "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif") ||
+                                        //                     "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
+                                        //             }}
+                                        //         >
+                                        //             <currentTemplate.Desktop
+                                        //                 title={collection.name}
+                                        //                 description={
+                                        //                     collection.description
+                                        //                 }
+                                        //                 image={
+                                        //                     collection.hero_image
+                                        //                 }
+                                        //             />
+                                        //         </div>
+                                        //     </div>
+                                        // </div>
+                                        <div className="relative group">
+                                            <img
+                                                src={collection.hero_image}
+                                                alt={collection.name}
+                                                className="w-full h-auto"
+                                            />
+                                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 justify-center h-full w-full bg-black/10 gap-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                                <MainButton
+                                                    onClick={() =>
+                                                        setHeroImageEditModalOpen(
+                                                            true
+                                                        )
+                                                    }
+                                                    icon={
+                                                        <SquarePen size={20} />
+                                                    }
+                                                    variant="secondary"
+                                                />
+                                                <MainButton
+                                                    onClick={() =>
+                                                        setHeroModalOpen(true)
+                                                    }
+                                                    icon={
+                                                        <Paintbrush size={20} />
+                                                    }
+                                                    variant="secondary"
+                                                />
                                             </div>
                                         </div>
                                     )}
@@ -909,77 +947,63 @@ export default function CollectionDetailPage({
                                             <span className="text-xs font-medium text-gray-600">
                                                 Active template
                                             </span>
-                                            <span className="text-sm font-semibold text-gray-900">
-                                                {currentTemplate?.label ||
-                                                    "Minimal"}
-                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                                <span className="text-sm font-semibold text-gray-900">
+                                                    {currentTemplate?.label ||
+                                                        "Minimal"}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Edit Buttons */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        <MainButton
-                                            onClick={() =>
-                                                setHeroImageEditModalOpen(true)
-                                            }
-                                            icon={<ImagePlus size={15} />}
-                                            label="Edit Image"
-                                            variant="orange"
-                                            className="w-full"
-                                        />
+                                    <div className="grid grid-cols-5 gap-2">
                                         <MainButton
                                             onClick={() =>
                                                 setHeroModalOpen(true)
                                             }
-                                            label="Template"
-                                            variant="purple"
-                                            className="w-full"
+                                            icon={<Paintbrush size={22} />}
+                                            variant="secondary"
+                                        />
+                                        <MainButton
+                                            onClick={() =>
+                                                setHeroImageEditModalOpen(true)
+                                            }
+                                            icon={<ImagePlus size={22} />}
+                                            variant="secondary"
+                                        />
+                                        <MainButton
+                                            href={
+                                                username
+                                                    ? `https://${username}.seovileo.pl/g/${collection.slug}`
+                                                    : `${origin}/g/${collection.slug}`
+                                            }
+                                            target="_blank"
+                                            icon={<Eye size={22} />}
+                                            variant="secondary"
+                                        />
+                                        <MainButton
+                                            onClick={handleDownloadAllPhotos}
+                                            icon={<Download size={22} />}
+                                            variant="secondary"
+                                            disabled={photos.length === 0}
+                                        />
+                                        <MainButton
+                                            onClick={() =>
+                                                setSettingsModalOpen(true)
+                                            }
+                                            icon={
+                                                collection.is_public ? (
+                                                    <Globe size={22} />
+                                                ) : (
+                                                    <Lock size={22} />
+                                                )
+                                            }
+                                            variant="secondary"
                                         />
                                     </div>
-                                    <MainButton
-                                        href={
-                                            username
-                                                ? `https://${username}.seovileo.pl/g/${collection.slug}`
-                                                : `${origin}/g/${collection.slug}`
-                                        }
-                                        target="_blank"
-                                        icon={<Eye size={15} />}
-                                        label="View Gallery"
-                                        className="w-full"
-                                    />
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Actions Card */}
-                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                            <div className="border-b border-gray-200 px-5 py-4">
-                                <h2 className="text-base font-semibold">
-                                    Manage collection
-                                </h2>
-                            </div>
-                            <div className="p-5 space-y-3">
-                                <MainButton
-                                    onClick={handleDownloadAllPhotos}
-                                    icon={<Download size={16} />}
-                                    label="Download as ZIP"
-                                    variant="orange"
-                                    className="w-full"
-                                    disabled={photos.length === 0}
-                                />
-                                <MainButton
-                                    onClick={() => setSettingsModalOpen(true)}
-                                    icon={
-                                        collection.is_public ? (
-                                            <Globe size={16} />
-                                        ) : (
-                                            <Lock size={16} />
-                                        )
-                                    }
-                                    label="Collection settings"
-                                    variant="success"
-                                    className="w-full"
-                                />
                             </div>
                         </div>
 
