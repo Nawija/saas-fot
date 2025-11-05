@@ -3,7 +3,6 @@
 
 import { useState, useRef } from "react";
 import { Loader, Upload } from "lucide-react";
-import Loading from "../ui/Loading";
 
 interface PhotoUploadSectionProps {
     uploading: boolean;

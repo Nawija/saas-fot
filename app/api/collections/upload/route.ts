@@ -66,8 +66,6 @@ export async function POST(req: NextRequest) {
 
             // Przetwarzaj OBA obrazy RÓWNOLEGLE dla szybkości
             const [heroDesktopBuffer, heroMobileBuffer] = await Promise.all([
-                // Hero Desktop - 2560x1440 (2K) - Landscape 16:9
-                // Optymalne dla webowych wyświetlaczy, lżejsze niż 4K
                 // fit: 'inside' zachowuje proporcje bez przycinania
                 // position: 'centre' centruje obraz
                 sharp(rotatedBuffer)
@@ -75,18 +73,15 @@ export async function POST(req: NextRequest) {
                         fit: originalAspect > 1.5 ? "inside" : "cover",
                         position: "centre",
                         withoutEnlargement: false,
-                        kernel: sharp.kernel.lanczos3, // Najlepsza jakość
+                        kernel: sharp.kernel.lanczos3,
                     })
                     .webp({
-                        quality: 90, // Świetna jakość z dobrą kompresją
+                        quality: 90,
                         effort: 4,
                         smartSubsample: true,
                     })
                     .toBuffer(),
 
-                // Hero Mobile - 1080x1920 - Portrait 9:16 dla pełnego ekranu
-                // Pionowa orientacja idealna dla telefonów w trybie portrait
-                // fit: 'cover' wypełnia cały obszar, przycinając minimalnie
                 sharp(rotatedBuffer)
                     .resize(1080, 1920, {
                         fit: originalAspect < 1 ? "inside" : "cover",
@@ -95,7 +90,7 @@ export async function POST(req: NextRequest) {
                         kernel: sharp.kernel.lanczos3,
                     })
                     .webp({
-                        quality: 88, // Nieco niższa jakość dla mobile (mniejszy ekran)
+                        quality: 88,
                         effort: 4,
                         smartSubsample: true,
                     })
@@ -152,92 +147,210 @@ export async function POST(req: NextRequest) {
             });
         } else {
             // Regular photo - 1300px szerokości (optymalne dla web)
+            console.log("[PHOTO UPLOAD] Starting regular photo processing");
             const targetMaxWidth = 1300;
 
-            // Najpierw rotate() aby uzyskać poprawne wymiary po korekcie orientacji
-            const rotatedBuffer = await sharp(buffer).rotate().toBuffer();
-            const inputMeta = await sharp(rotatedBuffer).metadata();
+            // Najpierw konwertuj na PNG (uniwersalny format), potem rotate
+            // To rozwiązuje problemy z HEIF/HEIC i innymi egzotycznymi formatami
+            let rotatedBuffer: Buffer;
+            let canProcessWithSharp = true;
 
-            const inW = inputMeta.width || targetMaxWidth;
-            const inH = inputMeta.height || Math.round(targetMaxWidth * 0.75);
-            const targetW = Math.min(inW, targetMaxWidth);
-            const scale = targetW / inW;
-            const targetH = Math.max(1, Math.round(inH * scale));
-
-            let composed = sharp(rotatedBuffer).resize(targetMaxWidth, null, {
-                fit: "inside",
-                withoutEnlargement: true,
-                kernel: sharp.kernel.lanczos3, // Szybszy kernel
-            });
-
-            // Dla planu FREE dodaj watermark z pliku public/watermark.svg
-            if (userPlan === "free") {
-                const watermarkPath = path.join(
-                    process.cwd(),
-                    "public",
-                    "watermark.svg"
-                );
-                const svgBuffer = await fs.readFile(watermarkPath);
-
-                // Skala watermarku ~16% szerokości, z bezpiecznymi limitami
-                const overlayW = Math.max(
-                    60,
-                    Math.min(
-                        Math.floor(targetW * 0.4),
-                        Math.round(targetW * 0.16)
-                    )
-                );
-                const wmPng = await sharp(svgBuffer)
-                    .resize({ width: overlayW })
-                    .png()
+            try {
+                rotatedBuffer = await sharp(buffer, {
+                    failOn: "none", // Ignoruj drobne błędy w HEIF
+                    limitInputPixels: false,
+                })
+                    .png() // Konwertuj na PNG najpierw
+                    .rotate()
                     .toBuffer();
-                const wmMeta = await sharp(wmPng).metadata();
-                const wmW = wmMeta.width || overlayW;
-                const wmH = wmMeta.height || Math.round(overlayW * 0.3);
-
-                // Tło pod watermark (dla widoczności na jasnym tle)
-                let edge = Math.max(
-                    8,
-                    Math.min(32, Math.round(targetW * 0.015))
-                ); // od krawędzi zdjęcia
-                let pad = Math.max(6, Math.min(18, Math.round(targetW * 0.01))); // wewnętrzny padding tła
-                let bgW = wmW + pad * 2;
-                let bgH = wmH + pad * 2;
-
-                // SVG tła z zaokrągleniami i przezroczystą czernią
-                const bgSvg = Buffer.from(
-                    `<svg width="${bgW}" height="${bgH}" viewBox="0 0 ${bgW} ${bgH}" xmlns="http://www.w3.org/2000/svg">
-                    </svg>`
+            } catch (heifError: any) {
+                console.log(
+                    "[PHOTO UPLOAD] HEIF decode error, trying simpler approach:",
+                    heifError.message
                 );
-
-                // Pozycja w prawym-dolnym rogu z marginesem
-                let top = targetH - bgH - edge;
-                let left = targetW - bgW - edge;
-                if (top < 0 || left < 0) {
-                    // Dla bardzo małych zdjęć – zredukuj padding i sklej do krawędzi
-                    edge = Math.max(4, edge);
-                    pad = Math.max(4, pad);
-                    bgW = wmW + pad * 2;
-                    bgH = wmH + pad * 2;
-                    top = Math.max(0, targetH - bgH - edge);
-                    left = Math.max(0, targetW - bgW - edge);
+                // Fallback: tylko konwersja do PNG bez rotate
+                try {
+                    rotatedBuffer = await sharp(buffer, {
+                        failOn: "none",
+                        limitInputPixels: false,
+                    })
+                        .png()
+                        .toBuffer();
+                } catch (finalError: any) {
+                    console.log(
+                        "[PHOTO UPLOAD] Cannot process with Sharp, uploading original:",
+                        finalError.message
+                    );
+                    // Ostateczny fallback: użyj oryginalnego buffera bez przetwarzania
+                    rotatedBuffer = buffer;
+                    canProcessWithSharp = false;
+                    contentType = file.type; // Zachowaj oryginalny typ MIME
                 }
-
-                composed = composed.composite([
-                    { input: bgSvg, top, left },
-                    { input: wmPng, top: top + pad, left: left + pad },
-                ]);
             }
 
-            processedBuffer = await composed
-                .webp({
-                    quality: 85,
-                    effort: 3, // Szybsze przetwarzanie dla zwykłych zdjęć
-                })
-                .toBuffer();
+            let inputMeta: any = { width: 0, height: 0 };
+            if (canProcessWithSharp) {
+                inputMeta = await sharp(rotatedBuffer).metadata();
+            }
+            console.log(
+                "[PHOTO UPLOAD] Input metadata:",
+                inputMeta.width,
+                "x",
+                inputMeta.height
+            );
+
+            let resizedBuffer: Buffer;
+            let actualWidth: number;
+            let actualHeight: number;
+
+            if (!canProcessWithSharp) {
+                // Nie możemy przetworzyć - użyj oryginału
+                console.log(
+                    "[PHOTO UPLOAD] Using original buffer without processing"
+                );
+                resizedBuffer = rotatedBuffer;
+                actualWidth = inputMeta.width || 1300;
+                actualHeight = inputMeta.height || 1000;
+            } else {
+                const inW = inputMeta.width || targetMaxWidth;
+                const inH =
+                    inputMeta.height || Math.round(targetMaxWidth * 0.75);
+                const targetW = Math.min(inW, targetMaxWidth);
+                const scale = targetW / inW;
+                const targetH = Math.max(1, Math.round(inH * scale));
+
+                // Najpierw resize, potem pobierz rzeczywiste wymiary
+                resizedBuffer = await sharp(rotatedBuffer)
+                    .resize(targetMaxWidth, null, {
+                        fit: "inside",
+                        withoutEnlargement: true,
+                        kernel: sharp.kernel.lanczos3,
+                    })
+                    .toBuffer();
+
+                const resizedMeta = await sharp(resizedBuffer).metadata();
+                actualWidth = resizedMeta.width || targetW;
+                actualHeight = resizedMeta.height || targetH;
+            }
+
+            console.log(
+                "[PHOTO UPLOAD] Resized to:",
+                actualWidth,
+                "x",
+                actualHeight
+            );
+            console.log("[PHOTO UPLOAD] User plan:", userPlan);
+
+            let composed = canProcessWithSharp ? sharp(resizedBuffer) : null;
+
+            // Dla planu FREE dodaj watermark z pliku public/watermark.svg (tylko jeśli możemy używać Sharp)
+            if (userPlan === "free" && canProcessWithSharp && composed) {
+                try {
+                    console.log(
+                        "[PHOTO UPLOAD] Adding watermark for FREE plan"
+                    );
+                    const watermarkPath = path.join(
+                        process.cwd(),
+                        "public",
+                        "watermark.svg"
+                    );
+                    const svgBuffer = await fs.readFile(watermarkPath);
+
+                    // Skala watermarku ~16% szerokości, z bezpiecznymi limitami
+                    const overlayW = Math.max(
+                        60,
+                        Math.min(
+                            Math.floor(actualWidth * 0.4),
+                            Math.round(actualWidth * 0.16)
+                        )
+                    );
+                    const wmPng = await sharp(svgBuffer)
+                        .resize({ width: overlayW })
+                        .png()
+                        .toBuffer();
+                    const wmMeta = await sharp(wmPng).metadata();
+                    const wmW = wmMeta.width || overlayW;
+                    const wmH = wmMeta.height || Math.round(overlayW * 0.3);
+
+                    console.log(
+                        "[PHOTO UPLOAD] Watermark size:",
+                        wmW,
+                        "x",
+                        wmH
+                    );
+
+                    // Tło pod watermark (dla widoczności na jasnym tle)
+                    let edge = Math.max(
+                        8,
+                        Math.min(32, Math.round(actualWidth * 0.015))
+                    ); // od krawędzi zdjęcia
+                    let pad = Math.max(
+                        6,
+                        Math.min(18, Math.round(actualWidth * 0.01))
+                    ); // wewnętrzny padding tła
+                    let bgW = wmW + pad * 2;
+                    let bgH = wmH + pad * 2;
+
+                    // SVG tła z zaokrągleniami i przezroczystą czernią
+                    const bgSvg = Buffer.from(
+                        `<svg width="${bgW}" height="${bgH}" viewBox="0 0 ${bgW} ${bgH}" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="${bgW}" height="${bgH}" rx="5" ry="5" fill="rgba(0,0,0,0.1)"/>
+                    </svg>`
+                    );
+
+                    // Pozycja w prawym-dolnym rogu z marginesem
+                    let top = actualHeight - bgH - edge;
+                    let left = actualWidth - bgW - edge;
+
+                    console.log("[PHOTO UPLOAD] Watermark position:", {
+                        top,
+                        left,
+                        edge,
+                        pad,
+                    });
+
+                    if (top < 0 || left < 0) {
+                        console.log("[PHOTO UPLOAD] Adjusting for small image");
+                        // Dla bardzo małych zdjęć – zredukuj padding i sklej do krawędzi
+                        edge = Math.max(4, edge);
+                        pad = Math.max(4, pad);
+                        bgW = wmW + pad * 2;
+                        bgH = wmH + pad * 2;
+                        top = Math.max(0, actualHeight - bgH - edge);
+                        left = Math.max(0, actualWidth - bgW - edge);
+                    }
+
+                    composed = composed.composite([
+                        { input: bgSvg, top, left },
+                        { input: wmPng, top: top + pad, left: left + pad },
+                    ]);
+
+                    console.log("[PHOTO UPLOAD] Watermark added successfully");
+                } catch (watermarkError: any) {
+                    // Jeśli watermark się nie uda, po prostu kontynuuj bez niego
+                    console.log(
+                        "[PHOTO UPLOAD] Watermark failed, continuing without it:",
+                        watermarkError.message
+                    );
+                }
+            }
+
+            if (canProcessWithSharp && composed) {
+                processedBuffer = await composed
+                    .webp({
+                        quality: 85,
+                        effort: 3, // Szybsze przetwarzanie dla zwykłych zdjęć
+                    })
+                    .toBuffer();
+            } else {
+                // Użyj oryginalnego buffera bez konwersji
+                processedBuffer = resizedBuffer;
+            }
 
             // Użyj ID zdjęcia lub timestamp
-            const fileExt = "webp";
+            const fileExt = canProcessWithSharp
+                ? "webp"
+                : file.name.split(".").pop() || "jpg";
             const id = photoId || Date.now();
             key = R2Paths.collectionPhoto(
                 user.id,
@@ -270,8 +383,14 @@ export async function POST(req: NextRequest) {
     } catch (error: any) {
         // Log error in development, silently fail in production
         if (process.env.NODE_ENV === "development") {
-            console.error("Upload error:", error);
+            console.error("[UPLOAD API ERROR]:", error);
+            console.error("Error stack:", error.stack);
         }
-        return createErrorResponse("Błąd uploadu", 500);
+        return createErrorResponse(
+            process.env.NODE_ENV === "development"
+                ? `Błąd uploadu: ${error.message}`
+                : "Błąd uploadu",
+            500
+        );
     }
 }

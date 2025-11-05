@@ -126,7 +126,7 @@ export default function SetUsernameModal({
 
     return (
         <AlertDialog open={open}>
-            <AlertDialogContent className="max-w-md">
+            <AlertDialogContent className=" w-[95vw] max-w-md p-6">
                 <AlertDialogHeader>
                     <AlertDialogTitle>Choose your domain 🎉</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -149,7 +149,7 @@ export default function SetUsernameModal({
                                 placeholder="john"
                                 maxLength={63}
                                 autoFocus
-                                className="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                                className="flex-1 px-4 py-2 border-2 text-sm border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
                             />
                             <span className="text-sm text-gray-600 whitespace-nowrap">
                                 .seovileo.pl
@@ -178,7 +178,7 @@ export default function SetUsernameModal({
                             </li>
                             <li>Minimum 2 characters</li>
                             <li>Must be unique - nobody else can use it</li>
-                            <li>⚠️ Cannot be changed after creation</li>
+                            <li className="text-red-700">⚠️ Cannot be changed after creation ⚠️</li>
                         </ul>
                     </div>
                 </div>
