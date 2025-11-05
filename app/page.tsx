@@ -19,7 +19,7 @@ import { getUser } from "@/lib/auth/getUser";
 export const metadata: Metadata = {
     title: "Seovileo - Online photo galleries for photographers | Share, protect with password, deliver fast",
     description:
-        "Beautiful, fast photo galleries for photographers. Share with clients, protect with passwords, auto WebP, ZIP downloads and subscription management. Free plan with watermark.",
+        "Beautiful, fast photo galleries for photographers. Share with clients, protect with passwords, auto WebP, ZIP downloads and subscription management Free plan with watermark.",
     alternates: { canonical: "/" },
     openGraph: {
         title: "Seovileo - Online photo galleries for photographers",
