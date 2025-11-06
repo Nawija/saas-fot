@@ -22,7 +22,7 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                         priority
                     />
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-linear-120 from-black/30 to-black/10" />
+                    <div className="absolute inset-0 bg-black/10" />
                 </div>
             ) : (
                 <div className="absolute inset-0 bg-black" />
@@ -35,8 +35,8 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
             <div className="absolute bottom-6 right-6 w-0.5 h-20 md:h-32 bg-white/30 z-10" />
 
             {/* Content */}
-            <div className="absolute inset-0 flex items-center justify-center z-20 px-4 md:px-8">
-                <div className="text-center max-w-4xl w-full">
+            <div className="absolute inset-0 flex items-center justify-center z-20 px-8">
+                <div className="text-center max-w-xl w-full">
                     {/* Title */}
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium text-white mb-6 leading-tight tracking-tight">
                         {data.name}
@@ -44,7 +44,7 @@ export const MinimalTemplate: GalleryHeroTemplate = ({ data, elements }) => {
 
                     {/* Description */}
                     {data.description && (
-                        <p className="text-base md:text-lg lg:text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-base md:text-lg lg:text-xl text-white/90 mb-10 max-w-xl mx-auto leading-relaxed px-8">
                             {data.description}
                         </p>
                     )}

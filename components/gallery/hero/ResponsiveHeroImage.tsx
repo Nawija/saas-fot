@@ -20,7 +20,7 @@ export default function ResponsiveHeroImage({
     const mobileImage = mobile || desktop;
 
     return (
-        <picture className="absolute inset-0">
+        <picture className="absolute inset-0 w-full h-full -z-10">
             {/* Mobile Image - optymalizowana dla portrait */}
             {mobile && (
                 <source
@@ -37,7 +37,7 @@ export default function ResponsiveHeroImage({
                 loading={priority ? "eager" : "lazy"}
                 decoding="async"
                 fetchPriority={priority ? "high" : "auto"}
-                className={`w-full h-full ${className}`}
+                className={`w-full h-full -z-10 ${className}`}
                 style={{
                     objectFit: "cover",
                     objectPosition: "center",
