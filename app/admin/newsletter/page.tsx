@@ -21,6 +21,12 @@ import {
     XCircle,
     Loader2,
     Eye,
+    Bold,
+    Italic,
+    List,
+    ListOrdered,
+    Heading2,
+    Link as LinkIcon,
 } from "lucide-react";
 
 interface Newsletter {
@@ -50,6 +56,162 @@ export default function AdminNewsletterPage() {
         type: "success" | "error";
         text: string;
     } | null>(null);
+
+    // Funkcja do formatowania Markdown -> HTML (taka sama jak w API)
+    const formatContent = (content: string): string => {
+        let formatted = content;
+
+        // Headers
+        formatted = formatted.replace(
+            /^### (.+)$/gm,
+            '<h4 style="color: #333; font-size: 18px; font-weight: 600; margin: 20px 0 10px;">$1</h4>'
+        );
+        formatted = formatted.replace(
+            /^## (.+)$/gm,
+            '<h3 style="color: #333; font-size: 22px; font-weight: 600; margin: 25px 0 15px;">$1</h3>'
+        );
+
+        // Bold
+        formatted = formatted.replace(
+            /\*\*(.+?)\*\*/g,
+            '<strong style="color: #667eea; font-weight: 600;">$1</strong>'
+        );
+
+        // Italic
+        formatted = formatted.replace(/\*(.+?)\*/g, "<em>$1</em>");
+
+        // Lista punktowana
+        formatted = formatted.replace(
+            /^[•\-]\s+(.+)$/gm,
+            '<li style="margin: 8px 0; color: #333;">$1</li>'
+        );
+
+        // Owinięcie list w <ul>
+        if (formatted.includes("<li")) {
+            const listRegex = /(<li[^>]*>.*?<\/li>\s*)+/g;
+            formatted = formatted.replace(
+                listRegex,
+                '<ul style="margin: 15px 0; padding-left: 25px; list-style-type: disc;">$&</ul>'
+            );
+        }
+
+        // Numbered list
+        formatted = formatted.replace(
+            /^\d+\.\s+(.+)$/gm,
+            '<li style="margin: 8px 0; color: #333;">$1</li>'
+        );
+
+        // Emoji spacing
+        formatted = formatted.replace(
+            /([\u{1F300}-\u{1F9FF}])/gu,
+            '<span style="margin-right: 6px;">$1</span>'
+        );
+
+        // Paragrafy
+        const paragraphs = formatted.split("\n\n");
+        formatted = paragraphs
+            .map((p) => {
+                p = p.trim();
+                if (
+                    p.startsWith("<h") ||
+                    p.startsWith("<ul") ||
+                    p.startsWith("<ol")
+                ) {
+                    return p;
+                }
+                if (p.length > 0) {
+                    return `<p style="margin: 15px 0; color: #333; line-height: 1.8;">${p}</p>`;
+                }
+                return "";
+            })
+            .filter((p) => p.length > 0)
+            .join("\n");
+
+        // Single newlines -> <br>
+        formatted = formatted.replace(/(?<!>)\n(?!<)/g, "<br>");
+
+        return formatted;
+    };
+
+    // Funkcje formatowania tekstu
+    const insertFormatting = (before: string, after: string = "") => {
+        const textarea = document.getElementById(
+            "content"
+        ) as HTMLTextAreaElement;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = content.substring(start, end);
+        const newText =
+            content.substring(0, start) +
+            before +
+            (selectedText || "tekst") +
+            after +
+            content.substring(end);
+
+        setContent(newText);
+
+        // Ustaw focus i zaznaczenie
+        setTimeout(() => {
+            textarea.focus();
+            const newCursorPos =
+                start + before.length + (selectedText || "tekst").length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+        }, 0);
+    };
+
+    const insertHeading = () => insertFormatting("## ", "\n");
+    const insertBold = () => insertFormatting("**", "**");
+    const insertItalic = () => insertFormatting("*", "*");
+    const insertBulletList = () => {
+        const textarea = document.getElementById(
+            "content"
+        ) as HTMLTextAreaElement;
+        if (!textarea) return;
+        const start = textarea.selectionStart;
+        const beforeCursor = content.substring(0, start);
+        const afterCursor = content.substring(start);
+        const needsNewlineBefore =
+            beforeCursor.length > 0 && !beforeCursor.endsWith("\n");
+        const prefix = needsNewlineBefore ? "\n" : "";
+        const newText = beforeCursor + prefix + "- Punkt listy\n" + afterCursor;
+        setContent(newText);
+        setTimeout(() => {
+            textarea.focus();
+            const newPos = start + prefix.length + "- Punkt listy".length;
+            textarea.setSelectionRange(newPos, newPos);
+        }, 0);
+    };
+    const insertNumberedList = () => {
+        const textarea = document.getElementById(
+            "content"
+        ) as HTMLTextAreaElement;
+        if (!textarea) return;
+        const start = textarea.selectionStart;
+        const beforeCursor = content.substring(0, start);
+        const afterCursor = content.substring(start);
+        const needsNewlineBefore =
+            beforeCursor.length > 0 && !beforeCursor.endsWith("\n");
+        const prefix = needsNewlineBefore ? "\n" : "";
+        const newText =
+            beforeCursor +
+            prefix +
+            "1. Pierwszy punkt\n2. Drugi punkt\n" +
+            afterCursor;
+        setContent(newText);
+        setTimeout(() => {
+            textarea.focus();
+            const newPos = start + prefix.length + "1. Pierwszy punkt".length;
+            textarea.setSelectionRange(newPos, newPos);
+        }, 0);
+    };
+    const insertLink = () => {
+        const url = prompt("Wpisz URL:");
+        if (url) {
+            insertFormatting(`[`, `](${url})`);
+        }
+    };
 
     // Załaduj newsletter i subskrybentów
     useEffect(() => {
@@ -263,21 +425,82 @@ export default function AdminNewsletterPage() {
                                         htmlFor="content"
                                         className="block text-sm font-medium text-gray-700 mb-2"
                                     >
-                                        Content (HTML supported)
+                                        Content (Markdown & HTML wspierane)
                                     </label>
+
+                                    {/* Toolbar z przyciskami formatowania */}
+                                    <div className="flex flex-wrap gap-1 p-2 bg-gray-100 border border-gray-300 rounded-t-md">
+                                        <button
+                                            type="button"
+                                            onClick={insertHeading}
+                                            className="p-2 hover:bg-gray-200 rounded transition-colors"
+                                            title="Nagłówek (## )"
+                                        >
+                                            <Heading2 className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={insertBold}
+                                            className="p-2 hover:bg-gray-200 rounded transition-colors font-bold"
+                                            title="Pogrubienie (**tekst**)"
+                                        >
+                                            <Bold className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={insertItalic}
+                                            className="p-2 hover:bg-gray-200 rounded transition-colors italic"
+                                            title="Kursywa (*tekst*)"
+                                        >
+                                            <Italic className="h-4 w-4" />
+                                        </button>
+                                        <div className="w-px bg-gray-300 mx-1"></div>
+                                        <button
+                                            type="button"
+                                            onClick={insertBulletList}
+                                            className="p-2 hover:bg-gray-200 rounded transition-colors"
+                                            title="Lista punktowana (- )"
+                                        >
+                                            <List className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={insertNumberedList}
+                                            className="p-2 hover:bg-gray-200 rounded transition-colors"
+                                            title="Lista numerowana (1. )"
+                                        >
+                                            <ListOrdered className="h-4 w-4" />
+                                        </button>
+                                        <div className="w-px bg-gray-300 mx-1"></div>
+                                        <button
+                                            type="button"
+                                            onClick={insertLink}
+                                            className="p-2 hover:bg-gray-200 rounded transition-colors"
+                                            title="Link ([tekst](url))"
+                                        >
+                                            <LinkIcon className="h-4 w-4" />
+                                        </button>
+                                        <div className="ml-auto text-xs text-gray-600 flex items-center px-2">
+                                            {content.length} znaków
+                                        </div>
+                                    </div>
+
                                     <Textarea
                                         id="content"
                                         value={content}
                                         onChange={(e) =>
                                             setContent(e.target.value)
                                         }
-                                        placeholder="Enter newsletter content... You can use HTML tags for formatting."
+                                        placeholder="Wpisz treść newslettera... Możesz użyć Markdown:&#10;&#10;## Nagłówek&#10;**Pogrubiony tekst**&#10;- Punkt listy&#10;1. Numerowana lista&#10;✨ Emoji"
                                         rows={12}
-                                        className="w-full font-mono text-sm"
+                                        className="w-full font-mono text-sm rounded-t-none border-t-0"
                                     />
                                     <p className="text-xs text-gray-500 mt-2">
-                                        Tip: Use HTML tags like &lt;p&gt;,
-                                        &lt;strong&gt;, &lt;a&gt; for formatting
+                                        💡 Wsparcie: <strong>**tekst**</strong>{" "}
+                                        = pogrubiony,{" "}
+                                        <strong>## Nagłówek</strong> = duży
+                                        nagłówek, <strong>- Lista</strong> =
+                                        bullet points
                                     </p>
                                 </div>
 
@@ -341,25 +564,37 @@ export default function AdminNewsletterPage() {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <Eye className="h-5 w-5" />
-                                        Current Newsletter
+                                        Podgląd Newslettera
                                     </CardTitle>
+                                    <CardDescription>
+                                        Tak będzie wyglądał newsletter w emailu
+                                    </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                                        <h3 className="font-semibold text-lg mb-2">
+                                    <div className="bg-white p-6 rounded-lg border-2 border-gray-200 shadow-sm">
+                                        <h3 className="font-bold text-2xl mb-4 text-gray-900">
                                             {newsletter.title}
                                         </h3>
                                         <div
-                                            className="text-sm text-gray-700 prose prose-sm max-w-none"
+                                            className="text-sm text-gray-700"
                                             dangerouslySetInnerHTML={{
-                                                __html: newsletter.content,
+                                                __html: formatContent(
+                                                    newsletter.content
+                                                ),
                                             }}
                                         />
-                                        <div className="text-xs text-gray-500 mt-4 pt-4 border-t">
-                                            Last updated:{" "}
-                                            {new Date(
-                                                newsletter.updated_at
-                                            ).toLocaleString()}
+                                        <div className="text-xs text-gray-500 mt-6 pt-4 border-t">
+                                            <p className="mb-1">
+                                                📅 Ostatnia aktualizacja:{" "}
+                                                {new Date(
+                                                    newsletter.updated_at
+                                                ).toLocaleString("pl-PL")}
+                                            </p>
+                                            <p className="text-gray-400">
+                                                ℹ️ To tylko podgląd - w emailu
+                                                będą dodatkowe elementy
+                                                (przycisk CTA, footer)
+                                            </p>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -443,7 +678,7 @@ export default function AdminNewsletterPage() {
                         <div className="bg-white p-4 rounded border border-blue-200 font-mono text-xs">
                             <p className="mb-2">
                                 <strong>URL:</strong>{" "}
-                                https://your-domain.com/api/newsletter/send
+                                https://seovileo.pl/api/newsletter/send
                             </p>
                             <p className="mb-2">
                                 <strong>Method:</strong> POST
