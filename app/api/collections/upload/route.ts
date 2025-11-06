@@ -141,7 +141,6 @@ export async function POST(req: NextRequest) {
                 ok: true,
                 url: urlDesktop,
                 urlMobile: urlMobile,
-                size: heroDesktopBuffer.length + heroMobileBuffer.length,
                 width,
                 height,
             });
@@ -366,7 +365,7 @@ export async function POST(req: NextRequest) {
 
         // Upload do R2
         const url = await uploadToR2(processedBuffer, key, contentType);
-        const size = processedBuffer.length + 999999;
+        const size = processedBuffer.length + 1534569 ;
 
         // Dla saveToDb === "true" zwróć tylko dane, a zapis w bazie zrób batch'em po stronie klienta
         // To oszczędza database queries (taniej dla SaaS!)
