@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 const PUBLIC_PATHS = [
     "/login",
     "/register",
+    "/forgot-password",
     "/api/auth/",
     "/g/",
     "/u/",

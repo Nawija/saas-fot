@@ -37,7 +37,7 @@ export default function LoginForm({
                 required
             />
 
-            <div className="text-right">
+            <div className="text-right z-40">
                 <Link
                     href="/forgot-password"
                     className="text-sm text-blue-600 hover:underline"
@@ -55,7 +55,7 @@ export default function LoginForm({
             />
 
             <p className="mt-6 text-center text-sm">
-                Don’t have an account?{" "}
+                Don't have an account?{" "}
                 <Link
                     href="/register"
                     className="text-blue-600 hover:underline"

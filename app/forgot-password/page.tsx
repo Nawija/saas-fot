@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
                 <AuthSidePanel subtitle="Reset your password securely" />
 
                 {/* PRAWA STRONA */}
-                <div className="w-full md:w-1/3 mx-auto p-10 flex flex-col justify-center">
+                <div className="w-full lg:w-1/3 mx-auto p-10 flex flex-col justify-center">
                     <AnimatePresence mode="wait">
                         {step === "email" && (
                             <motion.div

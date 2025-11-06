@@ -91,7 +91,7 @@ export default function RegisterPage() {
                 <AuthSidePanel subtitle="We make it easy for you to manage your account" />
 
                 {/* PRAWA STRONA */}
-                <div className="w-full md:w-1/3 mx-auto p-10 flex flex-col justify-center relative overflow-hidden">
+                <div className="w-full lg:w-1/3 mx-auto p-10 flex flex-col justify-center relative overflow-hidden">
                     {/* ✨ Animacja sukcesu */}
                     <AnimatePresence>
                         {state.success && <SuccessAnimation />}

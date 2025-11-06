@@ -20,7 +20,7 @@ export default function AuthSidePanel({
 }: AuthSidePanelProps) {
     return (
         <div
-            className={`hidden md:flex h-screen flex-col justify-center items-center w-1/2 bg-linear-to-t from-blue-200 via-pink-50 to-blue-100 text-gray-600 p-10`}
+            className={`hidden lg:flex h-screen flex-col justify-center items-center w-1/2 bg-linear-to-t from-blue-200 via-pink-50 to-blue-100 text-gray-600 p-10`}
         >
             <div className="text-center">
                 <div className="bg-white border border-gray-200 p-3 rounded-full w-max mx-auto mb-4">

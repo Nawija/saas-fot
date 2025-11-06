@@ -46,12 +46,12 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="w-full bg-white overflow-hidden flex flex-col md:flex-row">
+            <div className="w-full bg-white overflow-hidden flex flex-col lg:flex-row">
                 {/* LEWA STRONA */}
                 <AuthSidePanel subtitle="We make it easy for you to manage your account" />
 
                 {/* PRAWA STRONA */}
-                <div className="w-full md:w-1/3 mx-auto p-10 flex flex-col justify-center">
+                <div className="w-full lg:w-1/3 mx-auto p-10 flex flex-col justify-center">
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -67,6 +67,19 @@ export default function LoginPage() {
 
                     <ErrorMessage message={state.error} />
 
+                    <GoogleLoginButton onClick={handleGoogleLogin} />
+
+                    <div className="relative w-full my-12">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white text-gray-500">
+                                or continue with
+                            </span>
+                        </div>
+                    </div>
+
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -80,10 +93,6 @@ export default function LoginPage() {
                             onPasswordChange={(v) => updateField("password", v)}
                             onSubmit={handleSubmit}
                         />
-
-                        <div className="my-4 text-center text-gray-400">or</div>
-
-                        <GoogleLoginButton onClick={handleGoogleLogin} />
                     </motion.div>
                 </div>
             </div>
