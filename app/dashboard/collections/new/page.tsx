@@ -288,7 +288,7 @@ export default function NewCollectionPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-semibold text-gray-900 mb-2">
+                            <label className="text-sm font-semibold text-gray-900 mb-2">
                                 URL (slug)
                             </label>
                             <div className="flex items-center gap-2">
@@ -308,7 +308,7 @@ export default function NewCollectionPage() {
                                         })
                                     }
                                     placeholder="anna-tom-wedding"
-                                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                                    className="flex-1 px-4 py-3 w-40 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                                 />
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
@@ -343,7 +343,7 @@ export default function NewCollectionPage() {
                             Privacy settings
                         </h3>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row items-center gap-4">
                             <button
                                 type="button"
                                 onClick={() =>
@@ -352,7 +352,7 @@ export default function NewCollectionPage() {
                                         is_public: true,
                                     })
                                 }
-                                className={`flex-1 flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                                className={`flex-1 flex items-center gap-3 p-4 w-full rounded-lg border-2 transition-all ${
                                     formData.is_public
                                         ? "border-blue-500 bg-blue-50"
                                         : "border-gray-200 hover:border-gray-300"
@@ -386,7 +386,7 @@ export default function NewCollectionPage() {
                                     });
                                 }}
                                 disabled={userPlan === "free"}
-                                className={`flex-1 flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                                className={`flex-1 flex w-full items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                                     !formData.is_public
                                         ? "border-blue-500 bg-blue-50"
                                         : userPlan === "free"
@@ -406,7 +406,7 @@ export default function NewCollectionPage() {
                                             </span>
                                         )}
                                     </div>
-                                    <div className="text-xs text-gray-500">
+                                    <div className="text-xs text-gray-500 w-full">
                                         {userPlan === "free"
                                             ? "Available starting from Basic"
                                             : "Requires an access password"}
@@ -416,8 +416,8 @@ export default function NewCollectionPage() {
                         </div>
 
                         {!formData.is_public && (
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                            <div className="w-full">
+                                <label className="block text-sm w-full font-semibold text-gray-900 mb-2">
                                     Access password
                                 </label>
                                 <input
@@ -443,7 +443,6 @@ export default function NewCollectionPage() {
                     <div className="flex items-center gap-4">
                         <MainButton
                             type="submit"
-                            disabled={loading}
                             loading={loading}
                             loadingText="Creating..."
                             label="Create gallery"
