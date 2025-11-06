@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { getUser } from "@/lib/auth/getUser";
 import { canUploadFile } from "@/lib/storage";
+import { checkAndSendStorageAlert } from "@/lib/services/storageAlerts";
 
 interface PhotoData {
     file_name: string;
@@ -97,6 +98,12 @@ export async function POST(
         await query(
             "UPDATE users SET storage_used = storage_used + $1 WHERE id = $2",
             [totalSize, user.id]
+        );
+
+        // Sprawdź i wyślij alert jeśli przekroczono 70% storage
+        // Wywołanie asynchroniczne - nie blokuje response
+        checkAndSendStorageAlert(user.id).catch((error) =>
+            console.error("Storage alert error:", error)
         );
 
         return NextResponse.json({

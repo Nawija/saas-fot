@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
                 });
 
                 await transporter.sendMail({
-                    from: `"Your SaaS" <${
+                    from: `"Seovileo" <${
                         process.env.SMTP_FROM || process.env.SMTP_USER
                     }>`,
                     to: subscriber.email,

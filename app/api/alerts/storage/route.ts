@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Pobierz użytkowników z zajętością ≥70% storage
+        // Pobierz użytkowników z zajętością 70-73% storage
         const usersResult = await query(`
       SELECT 
         id, 
@@ -63,14 +63,15 @@ export async function POST(request: NextRequest) {
       FROM users
       WHERE 
         storage_limit > 0 
-        AND (storage_used::numeric / storage_limit::numeric) >= 0.7
+        AND (storage_used::numeric / storage_limit::numeric) >= 0.80
+        AND (storage_used::numeric / storage_limit::numeric) <= 0.81
         AND email IS NOT NULL
         AND email != ''
     `);
 
         if (usersResult.rows.length === 0) {
             return NextResponse.json({
-                message: "No users found with storage usage ≥70%",
+                message: "No users found with storage usage 80-81%",
                 sent: 0,
             });
         }

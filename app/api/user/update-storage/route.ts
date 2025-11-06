@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { query } from "@/lib/db";
 import { canUploadFile } from "@/lib/storage";
+import { checkAndSendStorageAlert } from "@/lib/services/storageAlerts";
 
 export async function POST(req: NextRequest) {
     try {
@@ -40,6 +41,12 @@ export async function POST(req: NextRequest) {
         await query(
             "UPDATE users SET storage_used = storage_used + $1 WHERE id = $2",
             [size, user.id]
+        );
+
+        // Sprawdź i wyślij alert jeśli przekroczono 70% storage
+        // Wywołanie asynchroniczne - nie blokuje response
+        checkAndSendStorageAlert(user.id).catch((error) =>
+            console.error("Storage alert error:", error)
         );
 
         return NextResponse.json({
