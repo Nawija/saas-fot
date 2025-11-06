@@ -5,7 +5,7 @@ import { LifeBuoy } from "lucide-react";
 
 export default function FooterDashboard() {
     return (
-        <footer className="bg-white border-t mt-12 border-gray-200 py-3 px-4 z-30">
+        <footer className="bg-white border-t mt-12 border-gray-200 py-24 px-4 z-30">
             <div className="max-w-7xl mx-auto flex items-center justify-center">
                 <Link
                     href="/support"

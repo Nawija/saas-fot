@@ -7,7 +7,7 @@ import {
     Images,
     CreditCard,
     LayoutDashboard,
-    ExternalLink,
+    Globe,
 } from "lucide-react";
 import LogoutButton from "../buttons/LogoutButton";
 import Logo from "../navbar/Logo";
@@ -124,7 +124,7 @@ export default function DashboardSidebar({
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="p-1.5 rounded-md bg-white shadow-sm">
-                                        <ExternalLink className="w-4 h-4 text-blue-600" />
+                                        <Globe className="w-4 h-4 text-blue-600" />
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-sm font-medium text-gray-900">
