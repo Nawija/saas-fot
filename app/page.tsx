@@ -1,5 +1,6 @@
 ﻿import MainButton from "@/components/buttons/MainButton";
 import Logo from "@/components/navbar/Logo";
+import NewsletterSection from "@/components/NewsletterSection";
 import {
     Camera,
     Lock,
@@ -354,6 +355,9 @@ export default async function Home() {
                     />
                 </div>
             </section>
+
+            {/* NEWSLETTER */}
+            <NewsletterSection />
 
             {/* FOOTER */}
             <footer className="bg-stone-200 text-slate-900 py-16 px-4 sm:px-6">
