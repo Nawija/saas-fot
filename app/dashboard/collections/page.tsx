@@ -38,8 +38,6 @@ export default function CollectionsPage() {
     return (
         <div className="min-h-screen">
             <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-16">
-                {/* Public Gallery Banner */}
-                {username && <PublicGalleryBanner username={username} />}
 
                 {/* Page Header */}
                 <PageHeader

@@ -10,7 +10,7 @@ import ErrorMessage from "@/components/auth/ErrorMessage";
 import CountdownTimer from "@/components/CountdownTimer";
 import MainButton from "@/components/buttons/MainButton";
 import { useRedirectIfAuthenticated } from "@/hooks/useRedirectIfAuthenticated";
-import LoadingScreen from "@/components/ui/LoadingScreen";
+import Loading from "@/components/ui/Loading";
 
 export default function ForgotPasswordPage() {
     const router = useRouter();
@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
     const { checking } = useRedirectIfAuthenticated();
 
     if (checking) {
-        return <LoadingScreen message="Sprawdzanie sesji..." />;
+        return <Loading />;
     }
 
     const handleSendCode = async (e: React.FormEvent) => {

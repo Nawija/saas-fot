@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthUser } from "./useAuthUser";
 
 /**
  * Hook do przekierowania zalogowanych użytkowników
@@ -7,24 +8,13 @@ import { useRouter } from "next/navigation";
  */
 export function useRedirectIfAuthenticated(redirectTo: string = "/dashboard") {
     const router = useRouter();
-    const [checking, setChecking] = useState(true);
+    const { isAuthenticated, loading } = useAuthUser();
 
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const res = await fetch("/api/user/me");
-                if (res.ok) {
-                    router.push(redirectTo);
-                }
-            } catch (error) {
-                // User not logged in, that's fine
-            } finally {
-                setChecking(false);
-            }
-        };
+        if (!loading && isAuthenticated) {
+            router.push(redirectTo);
+        }
+    }, [loading, isAuthenticated, router, redirectTo]);
 
-        void checkAuth();
-    }, [router, redirectTo]);
-
-    return { checking };
+    return { checking: loading };
 }

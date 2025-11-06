@@ -13,7 +13,7 @@ import EmailPasswordForm from "@/components/auth/EmailPasswordForm";
 import VerificationForm from "@/components/auth/VerificationForm";
 import AuthSidePanel from "@/components/auth/AuthSidePanel";
 import { useRedirectIfAuthenticated } from "@/hooks/useRedirectIfAuthenticated";
-import LoadingScreen from "@/components/ui/LoadingScreen";
+import Loading from "@/components/ui/Loading";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -29,7 +29,7 @@ export default function RegisterPage() {
     const { checking } = useRedirectIfAuthenticated();
 
     if (checking) {
-        return <LoadingScreen message="Sprawdzanie sesji..." />;
+        return <Loading />;
     }
 
     // 🔹 Etap 1 — wysłanie kodu

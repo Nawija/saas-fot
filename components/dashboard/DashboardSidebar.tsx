@@ -3,10 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Images, CreditCard } from "lucide-react";
+import {
+    Images,
+    CreditCard,
+    LayoutDashboard,
+    ExternalLink,
+} from "lucide-react";
 import LogoutButton from "../buttons/LogoutButton";
+import Logo from "../navbar/Logo";
 
 const menuItems = [
+    {
+        label: "Dashboard",
+        href: "/dashboard",
+        icon: LayoutDashboard,
+    },
     {
         label: "Galleries",
         href: "/dashboard/collections",
@@ -23,14 +34,21 @@ interface DashboardSidebarProps {
     isOpen: boolean;
     onClose: () => void;
     className?: string;
+    username?: string;
 }
 
 export default function DashboardSidebar({
     isOpen,
     onClose,
     className = "",
+    username,
 }: DashboardSidebarProps) {
     const pathname = usePathname();
+
+    // Generate public gallery URL
+    const publicGalleryUrl = username
+        ? `https://${username}.seovileo.pl`
+        : null;
 
     return (
         <div className={className}>
@@ -59,11 +77,15 @@ export default function DashboardSidebar({
                         className="flex-1 p-4 overflow-y-auto"
                         style={{ height: "calc(100vh - 73px)" }}
                     >
+                        <div className="px-4 mb-6 lg:hidden">
+                            <Logo href="/dashboard" />
+                        </div>
                         <ul className="space-y-2">
                             {menuItems.map((item) => {
                                 const isActive =
-                                    pathname === item.href ||
-                                    pathname?.startsWith(item.href + "/");
+                                    item.href === "/dashboard"
+                                        ? pathname === item.href
+                                        : pathname?.startsWith(item.href);
                                 const Icon = item.icon;
 
                                 return (
@@ -92,8 +114,36 @@ export default function DashboardSidebar({
                         </ul>
                     </nav>
 
-                    {/* Logout Button */}
-                    <div className="p-4 border-t border-gray-200">
+                    <div className="px-4 py-3">
+                        {publicGalleryUrl && (
+                            <a
+                                href={publicGalleryUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex items-center justify-between px-4 py-3 rounded-lg bg-linear-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 transition-all duration-200"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="p-1.5 rounded-md bg-white shadow-sm">
+                                        <ExternalLink className="w-4 h-4 text-blue-600" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-medium text-gray-900">
+                                            Public Gallery
+                                        </span>
+                                        <span className="text-xs text-gray-500">
+                                            {username}.seovileo.pl
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="text-blue-600 group-hover:translate-x-0.5 transition-transform">
+                                    →
+                                </div>
+                            </a>
+                        )}
+                    </div>
+
+                    {/* Public Gallery Link & Logout Button */}
+                    <div className="p-4 border-t border-gray-200 space-y-2">
                         <LogoutButton />
                     </div>
                 </div>

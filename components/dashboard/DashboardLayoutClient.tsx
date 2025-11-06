@@ -7,17 +7,29 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardMenuButton from "@/components/navbar/DashboardMenuButton";
 import SetUsernameModal from "@/components/auth/SetUsernameModal";
 
+interface User {
+    id: string;
+    email: string;
+    username?: string;
+    is_username_set: boolean;
+}
+
 export default function DashboardLayoutClient({
     children,
     header,
+    user,
 }: {
     children: React.ReactNode;
     header: React.ReactNode;
+    user: User | null;
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [menuSlot, setMenuSlot] = useState<HTMLElement | null>(null);
-    const [showUsernameModal, setShowUsernameModal] = useState(false);
     const pathname = usePathname();
+
+    // Show modal ONLY if user is loaded and is_username_set is NOT true
+    const showUsernameModal = user !== null && user.is_username_set !== true;
+
     const isCollectionDetails = /^\/dashboard\/collections\/[^/]+$/.test(
         pathname ?? ""
     );
@@ -28,35 +40,7 @@ export default function DashboardLayoutClient({
         setMenuSlot(slot);
     }, []);
 
-    useEffect(() => {
-        // Check if user has set username - ONLY ONCE on mount
-        const checkUsername = async () => {
-            try {
-                const res = await fetch("/api/user/me", {
-                    cache: "no-store",
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    const user = data.user;
-
-                    // Show modal ONLY if is_username_set is NOT true
-                    // getUser() already fetches this from database via JWT token
-                    if (user.is_username_set !== true) {
-                        setShowUsernameModal(true);
-                    }
-                }
-            } catch (error) {
-                console.error("Error checking username:", error);
-            }
-        };
-
-        checkUsername();
-    }, []); // Run only once on mount
-
     const handleUsernameSet = (username: string) => {
-        // Close modal
-        setShowUsernameModal(false);
-
         // Reload page to refresh JWT token with updated user data
         window.location.reload();
     };
@@ -81,6 +65,7 @@ export default function DashboardLayoutClient({
                         className={`transition-transform duration-300 ease-in-out ${
                             isCollectionDetails ? "lg:-translate-x-full" : ""
                         }`}
+                        username={user?.username}
                     />
                     <div
                         className={`flex-1 overflow-x-hidden h-full w-full border pb-24 border-gray-200 transition-all duration-300 ease-in-out ${

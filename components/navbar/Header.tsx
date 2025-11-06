@@ -12,7 +12,6 @@ export default async function Header() {
 
                 {user ? (
                     <div className="flex items-center justify-center text-sm text-gray-500 gap-3">
-                        {/* Slot for menu button - injected by DashboardLayoutClient */}
                         <UserDropdown
                             name={user.name}
                             email={user.email}

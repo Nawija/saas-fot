@@ -9,7 +9,7 @@ import LoginForm from "@/components/auth/LoginForm";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 import AuthSidePanel from "@/components/auth/AuthSidePanel";
 import { useRedirectIfAuthenticated } from "@/hooks/useRedirectIfAuthenticated";
-import LoadingScreen from "@/components/ui/LoadingScreen";
+import Loading from "@/components/ui/Loading";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -17,7 +17,7 @@ export default function LoginPage() {
     const { checking } = useRedirectIfAuthenticated();
 
     if (checking) {
-        return <LoadingScreen message="Sprawdzanie sesji..." />;
+        return <Loading />;
     }
 
     const handleSubmit = async (e: React.FormEvent) => {

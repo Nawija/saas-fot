@@ -1,6 +1,7 @@
 // hooks/index.ts
 
 // Authentication & Forms
+export { useAuthUser } from "./useAuthUser";
 export { useLoginForm } from "./useLoginForm";
 export { useRegisterForm, usePasswordValidation } from "./useRegisterForm";
 export { useRedirectIfAuthenticated } from "./useRedirectIfAuthenticated";
