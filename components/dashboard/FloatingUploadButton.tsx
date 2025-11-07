@@ -76,7 +76,11 @@ export default function FloatingUploadButton({
                                             key="success"
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
-                                            transition={{ type: "spring", damping: 10, stiffness: 200 }}
+                                            transition={{
+                                                type: "spring",
+                                                damping: 10,
+                                                stiffness: 200,
+                                            }}
                                         >
                                             <CheckCircle2 className="h-5 w-5 text-green-600" />
                                         </motion.div>
@@ -85,7 +89,11 @@ export default function FloatingUploadButton({
                                             key="error"
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
-                                            transition={{ type: "spring", damping: 10, stiffness: 200 }}
+                                            transition={{
+                                                type: "spring",
+                                                damping: 10,
+                                                stiffness: 200,
+                                            }}
                                         >
                                             <AlertCircle className="h-5 w-5 text-red-600" />
                                         </motion.div>
@@ -114,8 +122,13 @@ export default function FloatingUploadButton({
                                     <motion.div
                                         className="bg-blue-600 h-2 rounded-full"
                                         initial={{ width: 0 }}
-                                        animate={{ width: `${uploadProgress}%` }}
-                                        transition={{ duration: 0.3, ease: "easeOut" }}
+                                        animate={{
+                                            width: `${uploadProgress}%`,
+                                        }}
+                                        transition={{
+                                            duration: 0.3,
+                                            ease: "easeOut",
+                                        }}
                                     />
                                 </motion.div>
                             )}
@@ -140,12 +153,17 @@ export default function FloatingUploadButton({
                                 />
                                 <motion.div
                                     className="flex items-center justify-center gap-2 bg-blue-600 text-white rounded-lg py-3 px-4"
-                                    whileHover={{ scale: 1.02, backgroundColor: "#2563eb" }}
+                                    whileHover={{
+                                        scale: 1.02,
+                                        backgroundColor: "#2563eb",
+                                    }}
                                     whileTap={{ scale: 0.98 }}
                                     transition={{ duration: 0.15 }}
                                 >
                                     <Upload className="h-5 w-5" />
-                                    <span className="font-medium">Upload Photos</span>
+                                    <span className="font-medium">
+                                        Upload Photos
+                                    </span>
                                 </motion.div>
                             </label>
                         </motion.div>
@@ -162,7 +180,11 @@ export default function FloatingUploadButton({
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            transition={{ type: "spring", damping: 20, stiffness: 200 }}
+                            transition={{
+                                type: "spring",
+                                damping: 20,
+                                stiffness: 200,
+                            }}
                             className="bg-white rounded-lg shadow-xl border w-80 p-4"
                         >
                             <div className="flex items-center gap-2 mb-2">
@@ -181,7 +203,11 @@ export default function FloatingUploadButton({
                                             key="success"
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
-                                            transition={{ type: "spring", damping: 10, stiffness: 200 }}
+                                            transition={{
+                                                type: "spring",
+                                                damping: 10,
+                                                stiffness: 200,
+                                            }}
                                         >
                                             <CheckCircle2 className="h-5 w-5 text-green-600" />
                                         </motion.div>
@@ -190,7 +216,11 @@ export default function FloatingUploadButton({
                                             key="error"
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
-                                            transition={{ type: "spring", damping: 10, stiffness: 200 }}
+                                            transition={{
+                                                type: "spring",
+                                                damping: 10,
+                                                stiffness: 200,
+                                            }}
                                         >
                                             <AlertCircle className="h-5 w-5 text-red-600" />
                                         </motion.div>
@@ -236,8 +266,13 @@ export default function FloatingUploadButton({
                                         <motion.div
                                             className="bg-blue-600 h-2 rounded-full"
                                             initial={{ width: 0 }}
-                                            animate={{ width: `${uploadProgress}%` }}
-                                            transition={{ duration: 0.3, ease: "easeOut" }}
+                                            animate={{
+                                                width: `${uploadProgress}%`,
+                                            }}
+                                            transition={{
+                                                duration: 0.3,
+                                                ease: "easeOut",
+                                            }}
                                         />
                                     </motion.div>
                                 </motion.div>
@@ -249,7 +284,11 @@ export default function FloatingUploadButton({
                             initial={{ scale: 0, rotate: -180 }}
                             animate={{ scale: 1, rotate: 0 }}
                             exit={{ scale: 0, rotate: 180 }}
-                            transition={{ type: "spring", damping: 15, stiffness: 200 }}
+                            transition={{
+                                type: "spring",
+                                damping: 15,
+                                stiffness: 200,
+                            }}
                             className="block cursor-pointer group"
                         >
                             <input
@@ -265,7 +304,8 @@ export default function FloatingUploadButton({
                                 whileHover={{
                                     scale: 1.1,
                                     backgroundColor: "#2563eb",
-                                    boxShadow: "0 20px 25px -5px rgb(37 99 235 / 0.3)"
+                                    boxShadow:
+                                        "0 20px 25px -5px rgb(37 99 235 / 0.3)",
                                 }}
                                 whileTap={{ scale: 0.95 }}
                                 transition={{ duration: 0.15 }}
