@@ -68,7 +68,7 @@ export default function AdminNewsletterPage() {
     const [aiTopic, setAiTopic] = useState("");
     const [aiStyle, setAiStyle] = useState("professional");
     const [aiLength, setAiLength] = useState("medium");
-    const [aiGenerateTitle, setAiGenerateTitle] = useState(true);
+    const [aiGenerateTitle, setAiGenerateTitle] = useState(false);
     const [message, setMessage] = useState<{
         type: "success" | "error";
         text: string;
@@ -797,29 +797,48 @@ export default function AdminNewsletterPage() {
                     </AlertDialogHeader>
 
                     <div className="space-y-4 py-4">
+                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                            <input
+                                type="checkbox"
+                                id="generateTitle"
+                                checked={aiGenerateTitle}
+                                onChange={(e) =>
+                                    setAiGenerateTitle(e.target.checked)
+                                }
+                                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            />
+                            <label
+                                htmlFor="generateTitle"
+                                className="text-sm text-gray-700 cursor-pointer"
+                            >
+                                Generate title automatically
+                            </label>
+                        </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Topic / Subject{" "}
-                                {aiGenerateTitle && (
-                                    <span className="text-gray-400 font-normal">
-                                        (optional)
-                                    </span>
-                                )}
                                 {!aiGenerateTitle && (
-                                    <span className="text-red-500 font-normal">
+                                    <span className="text-gray-500 font-normal">
                                         (required)
                                     </span>
                                 )}
+                                {aiGenerateTitle && (
+                                    <span className="text-gray-400 font-normal">
+                                        (AI will choose)
+                                    </span>
+                                )}
                             </label>
+
                             <Input
                                 value={aiTopic}
                                 onChange={(e) => setAiTopic(e.target.value)}
                                 placeholder={
                                     aiGenerateTitle
-                                        ? "e.g., Photography tips for beginners... (leave empty for AI to choose)"
+                                        ? "AI will choose a topic automatically..."
                                         : "e.g., Photography tips for beginners, New features..."
                                 }
                                 className="w-full"
+                                disabled={aiGenerateTitle}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" && !generating) {
                                         handleGenerateWithAI();
@@ -865,24 +884,6 @@ export default function AdminNewsletterPage() {
                                     Long (700-1000 words)
                                 </option>
                             </select>
-                        </div>
-
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md border border-gray-200">
-                            <input
-                                type="checkbox"
-                                id="generateTitle"
-                                checked={aiGenerateTitle}
-                                onChange={(e) =>
-                                    setAiGenerateTitle(e.target.checked)
-                                }
-                                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                            />
-                            <label
-                                htmlFor="generateTitle"
-                                className="text-sm text-gray-700 cursor-pointer"
-                            >
-                                Generate title automatically
-                            </label>
                         </div>
 
                         <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-md">
