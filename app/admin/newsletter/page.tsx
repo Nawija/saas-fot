@@ -13,6 +13,15 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import {
     Send,
     Save,
     Mail,
@@ -27,6 +36,8 @@ import {
     ListOrdered,
     Heading2,
     Link as LinkIcon,
+    Sparkles,
+    Wand2,
 } from "lucide-react";
 
 interface Newsletter {
@@ -52,6 +63,12 @@ export default function AdminNewsletterPage() {
     const [stats, setStats] = useState({ total: 0, active: 0 });
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [generating, setGenerating] = useState(false);
+    const [showAIDialog, setShowAIDialog] = useState(false);
+    const [aiTopic, setAiTopic] = useState("");
+    const [aiStyle, setAiStyle] = useState("professional");
+    const [aiLength, setAiLength] = useState("medium");
+    const [aiGenerateTitle, setAiGenerateTitle] = useState(true);
     const [message, setMessage] = useState<{
         type: "success" | "error";
         text: string;
@@ -69,6 +86,12 @@ export default function AdminNewsletterPage() {
         formatted = formatted.replace(
             /^## (.+)$/gm,
             '<h3 style="color: #333; font-size: 22px; font-weight: 600; margin: 25px 0 15px;">$1</h3>'
+        );
+
+        // Links [text](url) - MUSI BYĆ PRZED Bold/Italic aby nie konfliktowało z **
+        formatted = formatted.replace(
+            /\[([^\]]+)\]\(([^)]+)\)/g,
+            '<a href="$2" style="color: #667eea; text-decoration: underline; font-weight: 500;">$1</a>'
         );
 
         // Bold
@@ -321,6 +344,50 @@ export default function AdminNewsletterPage() {
         }
     };
 
+    const handleGenerateWithAI = async () => {
+        setGenerating(true);
+        setMessage(null);
+
+        try {
+            const response = await fetch("/api/admin/newsletter/generate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    topic: aiTopic.trim() || "photography and online galleries",
+                    style: aiStyle,
+                    length: aiLength,
+                    generateTitle: aiGenerateTitle,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (aiGenerateTitle) {
+                    setTitle(data.title);
+                }
+                setContent(data.content);
+                setShowAIDialog(false);
+                setAiTopic("");
+                setMessage({
+                    type: "success",
+                    text: `Newsletter generated! (${data.metadata.tokens} tokens used)`,
+                });
+            } else {
+                setMessage({ type: "error", text: data.error });
+            }
+        } catch (error) {
+            setMessage({
+                type: "error",
+                text: "Failed to generate newsletter with AI",
+            });
+        } finally {
+            setGenerating(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 p-8">
             <div className="max-w-7xl mx-auto space-y-8">
@@ -402,6 +469,29 @@ export default function AdminNewsletterPage() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
+                                {/* AI Generator Button */}
+                                <div className="flex items-center gap-3 p-4 bg-linear-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+                                    <Sparkles className="h-5 w-5 text-purple-600" />
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium text-gray-900">
+                                            Generate with AI
+                                        </p>
+                                        <p className="text-xs text-gray-600">
+                                            Let AI create newsletter content for
+                                            you
+                                        </p>
+                                    </div>
+                                    <Button
+                                        onClick={() => setShowAIDialog(true)}
+                                        variant="outline"
+                                        size="sm"
+                                        className="bg-white"
+                                    >
+                                        <Wand2 className="h-4 w-4 mr-2" />
+                                        Generate
+                                    </Button>
+                                </div>
+
                                 <div>
                                     <label
                                         htmlFor="title"
@@ -691,6 +781,151 @@ export default function AdminNewsletterPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* AI Generation Dialog */}
+            <AlertDialog open={showAIDialog} onOpenChange={setShowAIDialog}>
+                <AlertDialogContent className="max-w-lg">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-purple-600" />
+                            Generate Newsletter with AI
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Describe what you want the newsletter to be about
+                            and AI will create it for you
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className="space-y-4 py-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Topic / Subject{" "}
+                                {aiGenerateTitle && (
+                                    <span className="text-gray-400 font-normal">
+                                        (optional)
+                                    </span>
+                                )}
+                                {!aiGenerateTitle && (
+                                    <span className="text-red-500 font-normal">
+                                        (required)
+                                    </span>
+                                )}
+                            </label>
+                            <Input
+                                value={aiTopic}
+                                onChange={(e) => setAiTopic(e.target.value)}
+                                placeholder={
+                                    aiGenerateTitle
+                                        ? "e.g., Photography tips for beginners... (leave empty for AI to choose)"
+                                        : "e.g., Photography tips for beginners, New features..."
+                                }
+                                className="w-full"
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !generating) {
+                                        handleGenerateWithAI();
+                                    }
+                                }}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Style
+                            </label>
+                            <select
+                                value={aiStyle}
+                                onChange={(e) => setAiStyle(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            >
+                                <option value="professional">
+                                    Professional
+                                </option>
+                                <option value="casual">Casual</option>
+                                <option value="educational">Educational</option>
+                                <option value="promotional">Promotional</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Length
+                            </label>
+                            <select
+                                value={aiLength}
+                                onChange={(e) => setAiLength(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            >
+                                <option value="short">
+                                    Short (200-300 words)
+                                </option>
+                                <option value="medium">
+                                    Medium (400-600 words)
+                                </option>
+                                <option value="long">
+                                    Long (700-1000 words)
+                                </option>
+                            </select>
+                        </div>
+
+                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                            <input
+                                type="checkbox"
+                                id="generateTitle"
+                                checked={aiGenerateTitle}
+                                onChange={(e) =>
+                                    setAiGenerateTitle(e.target.checked)
+                                }
+                                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            />
+                            <label
+                                htmlFor="generateTitle"
+                                className="text-sm text-gray-700 cursor-pointer"
+                            >
+                                Generate title automatically
+                            </label>
+                        </div>
+
+                        <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-md">
+                            💡 <strong>Tip:</strong> Be specific about what you
+                            want. For example: "Photography composition rules
+                            with examples" or "How to use watermarks in photo
+                            galleries"
+                        </div>
+                    </div>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            onClick={() => {
+                                setShowAIDialog(false);
+                                setAiTopic("");
+                            }}
+                            disabled={generating}
+                        >
+                            Cancel
+                        </AlertDialogCancel>
+                        <Button
+                            onClick={handleGenerateWithAI}
+                            disabled={
+                                generating ||
+                                (!aiGenerateTitle && !aiTopic.trim())
+                            }
+                            className="bg-purple-600 hover:bg-purple-700"
+                        >
+                            {generating ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Generating...
+                                </>
+                            ) : (
+                                <>
+                                    <Wand2 className="mr-2 h-4 w-4" />
+                                    Generate Newsletter
+                                </>
+                            )}
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

@@ -39,6 +39,12 @@ function formatContent(content: string): string {
         '<h3 style="color: #333; font-size: 22px; font-weight: 600; margin: 25px 0 15px;">$1</h3>'
     );
 
+    // Links [text](url) - MUSI BYĆ PRZED Bold/Italic aby nie konfliktowało z **
+    formatted = formatted.replace(
+        /\[([^\]]+)\]\(([^)]+)\)/g,
+        '<a href="$2" style="color: #667eea; text-decoration: underline; font-weight: 500;">$1</a>'
+    );
+
     // Bold (**text** -> <strong>)
     formatted = formatted.replace(
         /\*\*(.+?)\*\*/g,
