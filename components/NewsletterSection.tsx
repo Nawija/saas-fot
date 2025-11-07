@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EmailInput } from "@/components/ui/email-input";
 import { Mail, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 export default function NewsletterSection() {
@@ -62,14 +63,13 @@ export default function NewsletterSection() {
 
                 <form onSubmit={handleSubscribe} className="max-w-xl mx-auto">
                     <div className="flex flex-col sm:flex-row gap-3">
-                        <input
-                            type="email"
+                        <EmailInput
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email address"
                             required
                             disabled={status === "loading"}
-                            className="flex-1 px-6 py-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 h-14"
                         />
                         <button
                             type="submit"

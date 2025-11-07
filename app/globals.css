@@ -103,6 +103,15 @@ picture {
     animation: pulse-slow 3s ease-in-out infinite;
 }
 
+/* Animation delays for staggered effects */
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+
 @keyframes confetti-pop {
     0% {
         transform: translate(-50%, -50%) scale(0) rotate(0deg);
@@ -290,13 +299,13 @@ picture {
 
 .section-gradient::before {
     content: "";
-    @apply absolute inset-0 -z-10 bg-gradient-to-br from-indigo-50 via-white to-pink-50;
+    @apply absolute inset-0 -z-10 bg-linear-to-br from-indigo-50 via-white to-pink-50;
 }
 
 .section-gradient::after {
     content: "";
     @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[800px]
-    bg-gradient-to-tr from-blue-200 via-pink-100 to-teal-200 blur-3xl opacity-40 -z-10;
+    bg-linear-to-tr from-blue-200 via-pink-100 to-teal-200 blur-3xl opacity-40 -z-10;
 }
 
 /* scrollbar visible only on hover */
