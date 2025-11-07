@@ -29,7 +29,7 @@ function PhotoThumbnail({
     const [imageLoading, setImageLoading] = useState(true);
 
     return (
-        <div className="group relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+        <div className="group relative aspect-square rounded-sm overflow-hidden bg-gray-100">
             {/* Loading skeleton */}
             {imageLoading && (
                 <div className="absolute inset-0 bg-linear-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
