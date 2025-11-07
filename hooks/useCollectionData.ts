@@ -12,6 +12,7 @@ export function useCollectionData(collectionId: string | null) {
     const [collection, setCollection] = useState<Collection | null>(null);
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deletingAll, setDeletingAll] = useState(false);
     const [userPlan, setUserPlan] = useState<string>("free");
     const [username, setUsername] = useState<string>("");
 
@@ -76,6 +77,9 @@ export function useCollectionData(collectionId: string | null) {
     async function deleteAllPhotos() {
         if (!collectionId || photos.length === 0) return;
 
+        setDeletingAll(true);
+        toast.info(`Deleting ${photos.length} photos...`);
+
         try {
             const deletePromises = photos.map((photo) =>
                 fetch(`/api/collections/${collectionId}/photos/${photo.id}`, {
@@ -97,6 +101,8 @@ export function useCollectionData(collectionId: string | null) {
         } catch (error) {
             console.error("Error deleting all photos:", error);
             toast.error("Error deleting photos");
+        } finally {
+            setDeletingAll(false);
         }
     }
 
@@ -141,6 +147,7 @@ export function useCollectionData(collectionId: string | null) {
         collection,
         photos,
         loading,
+        deletingAll,
         userPlan,
         username,
         setCollection,

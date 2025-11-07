@@ -52,6 +52,7 @@ export default function CollectionDetailPage({
         collection,
         photos,
         loading,
+        deletingAll,
         userPlan,
         username,
         setCollection,
@@ -284,6 +285,7 @@ export default function CollectionDetailPage({
                         {/* Gallery Section */}
                         <CollectionGallerySection
                             photos={photos}
+                            deletingAll={deletingAll}
                             onDeletePhoto={handleDeletePhotoClick}
                             onDeleteAll={() => setConfirmDeleteAllOpen(true)}
                         />
