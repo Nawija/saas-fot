@@ -13,6 +13,7 @@ import CollectionSettingsModal from "@/components/dashboard/CollectionSettingsMo
 import HeroImageEditModal from "@/components/dashboard/HeroImageEditModal";
 import CopyLinkButton from "@/components/buttons/CopyLinkButton";
 import UpgradeDialog from "@/components/ui/UpgradeDialog";
+import FloatingUploadButton from "@/components/dashboard/FloatingUploadButton";
 import {
     CollectionSidebar,
     CollectionGallerySection,
@@ -68,6 +69,9 @@ export default function CollectionDetailPage({
         setUploadErrors,
         uploadPhotos,
     } = usePhotoUpload(collectionId);
+
+    const [uploadedCount, setUploadedCount] = useState(0);
+    const [totalUploadCount, setTotalUploadCount] = useState(0);
 
     const { saving, savingHeroImage, updateHeroSettings, saveHeroImage } =
         useHeroSettings(
@@ -147,17 +151,27 @@ export default function CollectionDetailPage({
     async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const files = e.target.files;
         if (!files || files.length === 0) return;
+
+        setTotalUploadCount(files.length);
+        setUploadedCount(0);
+
         await uploadPhotos(files, async () => {
             await fetchPhotos();
             await fetchCollection();
+            setUploadedCount(files.length);
         });
     }
 
     async function handleDrop(files: FileList) {
         if (files.length === 0) return;
+
+        setTotalUploadCount(files.length);
+        setUploadedCount(0);
+
         await uploadPhotos(files, async () => {
             await fetchPhotos();
             await fetchCollection();
+            setUploadedCount(files.length);
         });
     }
 
@@ -241,8 +255,8 @@ export default function CollectionDetailPage({
                             />
                         </div>
 
-                        {/* Upload Section */}
-                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                        {/* Upload Section - Desktop Only */}
+                        <div className="hidden lg:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
                             <div className="border-b border-gray-200 px-5 py-4">
                                 <h2 className="text-lg font-semibold text-gray-800 tracking-tight">
                                     Add photos
@@ -362,6 +376,15 @@ export default function CollectionDetailPage({
                 title={upgradeContext.title}
                 description={upgradeContext.description}
                 feature={upgradeContext.feature}
+            />
+
+            {/* Floating Upload Button */}
+            <FloatingUploadButton
+                uploading={uploading}
+                uploadProgress={uploadProgress}
+                onUpload={handleUpload}
+                uploadedCount={uploadedCount}
+                totalCount={totalUploadCount}
             />
         </div>
     );

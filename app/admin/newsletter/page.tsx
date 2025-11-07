@@ -389,7 +389,7 @@ export default function AdminNewsletterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+        <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
                 {/* Header */}
                 <div className="text-center sm:text-left">
@@ -479,7 +479,7 @@ export default function AdminNewsletterPage() {
                                 subscribers.map((subscriber) => (
                                     <div
                                         key={subscriber.id}
-                                        className="flex items-center justify-between p-3 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all"
+                                        className="flex items-center justify-between p-3 bg-linear-to-br from-gray-50 to-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all"
                                     >
                                         <div className="flex-1 min-w-0 pr-2">
                                             <p className="font-medium text-xs sm:text-sm text-gray-900 truncate">
