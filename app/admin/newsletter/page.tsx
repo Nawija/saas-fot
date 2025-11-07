@@ -402,7 +402,7 @@ export default function AdminNewsletterPage() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-4 gap-6">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">
@@ -453,8 +453,62 @@ export default function AdminNewsletterPage() {
                             </p>
                         </CardContent>
                     </Card>
+
+                    {/* Subscribers List Card */}
+                    <Card className="md:col-span-4">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Users className="h-5 w-5" />
+                                Subscribers ({subscribers.length})
+                            </CardTitle>
+                            <CardDescription>
+                                List of all newsletter subscribers
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[400px] overflow-y-auto">
+                                {subscribers.length === 0 ? (
+                                    <div className="col-span-full text-center py-12 text-gray-500">
+                                        <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                                        <p>No subscribers yet</p>
+                                    </div>
+                                ) : (
+                                    subscribers.map((subscriber) => (
+                                        <div
+                                            key={subscriber.id}
+                                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                                        >
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium text-sm text-gray-900 truncate">
+                                                    {subscriber.email}
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                    {new Date(
+                                                        subscriber.subscribed_at
+                                                    ).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                            <Badge
+                                                variant={
+                                                    subscriber.is_active
+                                                        ? "default"
+                                                        : "secondary"
+                                                }
+                                                className="ml-2"
+                                            >
+                                                {subscriber.is_active
+                                                    ? "Active"
+                                                    : "Unsubscribed"}
+                                            </Badge>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
+                {/* Newsletter Editor and Preview */}
                 <div className="grid lg:grid-cols-2 gap-8">
                     {/* Newsletter Editor */}
                     <div className="space-y-6">
@@ -647,103 +701,68 @@ export default function AdminNewsletterPage() {
                                 )}
                             </CardContent>
                         </Card>
-
-                        {/* Preview */}
-                        {newsletter && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Eye className="h-5 w-5" />
-                                        Podgląd Newslettera
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Tak będzie wyglądał newsletter w emailu
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="bg-white p-6 rounded-lg border-2 border-gray-200 shadow-sm">
-                                        <h3 className="font-bold text-2xl mb-4 text-gray-900">
-                                            {newsletter.title}
-                                        </h3>
-                                        <div
-                                            className="text-sm text-gray-700"
-                                            dangerouslySetInnerHTML={{
-                                                __html: formatContent(
-                                                    newsletter.content
-                                                ),
-                                            }}
-                                        />
-                                        <div className="text-xs text-gray-500 mt-6 pt-4 border-t">
-                                            <p className="mb-1">
-                                                📅 Ostatnia aktualizacja:{" "}
-                                                {new Date(
-                                                    newsletter.updated_at
-                                                ).toLocaleString("pl-PL")}
-                                            </p>
-                                            <p className="text-gray-400">
-                                                ℹ️ To tylko podgląd - w emailu
-                                                będą dodatkowe elementy
-                                                (przycisk CTA, footer)
-                                            </p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
                     </div>
 
-                    {/* Subscribers List */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Users className="h-5 w-5" />
-                                Subscribers ({subscribers.length})
-                            </CardTitle>
-                            <CardDescription>
-                                List of all newsletter subscribers
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-2 max-h-[800px] overflow-y-auto">
-                                {subscribers.length === 0 ? (
-                                    <div className="text-center py-12 text-gray-500">
-                                        <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                        <p>No subscribers yet</p>
-                                    </div>
-                                ) : (
-                                    subscribers.map((subscriber) => (
-                                        <div
-                                            key={subscriber.id}
-                                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                                        >
-                                            <div className="flex-1">
-                                                <p className="font-medium text-sm text-gray-900">
-                                                    {subscriber.email}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    Subscribed:{" "}
-                                                    {new Date(
-                                                        subscriber.subscribed_at
-                                                    ).toLocaleDateString()}
-                                                </p>
-                                            </div>
-                                            <Badge
-                                                variant={
-                                                    subscriber.is_active
-                                                        ? "default"
-                                                        : "secondary"
-                                                }
-                                            >
-                                                {subscriber.is_active
-                                                    ? "Active"
-                                                    : "Unsubscribed"}
-                                            </Badge>
+                    {/* Preview - Right Side */}
+                    <div className="space-y-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Eye className="h-5 w-5" />
+                                    Live Preview
+                                </CardTitle>
+                                <CardDescription>
+                                    See how your newsletter will look in emails
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="bg-white p-6 rounded-lg border-2 border-gray-200 shadow-sm min-h-[600px]">
+                                    {title || content ? (
+                                        <>
+                                            <h3 className="font-bold text-2xl mb-4 text-gray-900">
+                                                {title || "Newsletter Title"}
+                                            </h3>
+                                            <div
+                                                className="text-sm text-gray-700"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: formatContent(
+                                                        content ||
+                                                            "Start typing to see preview..."
+                                                    ),
+                                                }}
+                                            />
+                                            {newsletter && (
+                                                <div className="text-xs text-gray-500 mt-6 pt-4 border-t">
+                                                    <p className="mb-1">
+                                                        📅 Last updated:{" "}
+                                                        {new Date(
+                                                            newsletter.updated_at
+                                                        ).toLocaleString(
+                                                            "pl-PL"
+                                                        )}
+                                                    </p>
+                                                    <p className="text-gray-400">
+                                                        ℹ️ This is a preview -
+                                                        actual emails will
+                                                        include CTA button and
+                                                        footer
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                            <Eye className="h-16 w-16 mb-4 opacity-30" />
+                                            <p className="text-center">
+                                                Start writing to see live
+                                                preview
+                                            </p>
                                         </div>
-                                    ))
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
 
                 {/* Instructions */}
