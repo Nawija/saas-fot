@@ -389,22 +389,22 @@ export default function AdminNewsletterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto space-y-8">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
                 {/* Header */}
-                <div>
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                <div className="text-center sm:text-left">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
                         Newsletter Management
                     </h1>
-                    <p className="text-gray-600">
+                    <p className="text-sm sm:text-base text-gray-600">
                         Create and manage your daily newsletter content
                     </p>
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid md:grid-cols-4 gap-6">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                             <CardTitle className="text-sm font-medium">
                                 Total Subscribers
                             </CardTitle>
@@ -420,8 +420,8 @@ export default function AdminNewsletterPage() {
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                             <CardTitle className="text-sm font-medium">
                                 Active Subscribers
                             </CardTitle>
@@ -437,8 +437,8 @@ export default function AdminNewsletterPage() {
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                             <CardTitle className="text-sm font-medium">
                                 Unsubscribed
                             </CardTitle>
@@ -453,79 +453,81 @@ export default function AdminNewsletterPage() {
                             </p>
                         </CardContent>
                     </Card>
-
-                    {/* Subscribers List Card */}
-                    <Card className="md:col-span-4">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Users className="h-5 w-5" />
-                                Subscribers ({subscribers.length})
-                            </CardTitle>
-                            <CardDescription>
-                                List of all newsletter subscribers
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[400px] overflow-y-auto">
-                                {subscribers.length === 0 ? (
-                                    <div className="col-span-full text-center py-12 text-gray-500">
-                                        <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                        <p>No subscribers yet</p>
-                                    </div>
-                                ) : (
-                                    subscribers.map((subscriber) => (
-                                        <div
-                                            key={subscriber.id}
-                                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                                        >
-                                            <div className="flex-1 min-w-0">
-                                                <p className="font-medium text-sm text-gray-900 truncate">
-                                                    {subscriber.email}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {new Date(
-                                                        subscriber.subscribed_at
-                                                    ).toLocaleDateString()}
-                                                </p>
-                                            </div>
-                                            <Badge
-                                                variant={
-                                                    subscriber.is_active
-                                                        ? "default"
-                                                        : "secondary"
-                                                }
-                                                className="ml-2"
-                                            >
-                                                {subscriber.is_active
-                                                    ? "Active"
-                                                    : "Unsubscribed"}
-                                            </Badge>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
                 </div>
 
+                {/* Subscribers List Card */}
+                <Card className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                            <Users className="h-5 w-5" />
+                            Subscribers ({subscribers.length})
+                        </CardTitle>
+                        <CardDescription className="text-sm">
+                            List of all newsletter subscribers
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[300px] sm:max-h-[400px] overflow-y-auto pr-2">
+                            {subscribers.length === 0 ? (
+                                <div className="col-span-full text-center py-8 sm:py-12 text-gray-500">
+                                    <Users className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 opacity-50" />
+                                    <p className="text-sm sm:text-base">
+                                        No subscribers yet
+                                    </p>
+                                </div>
+                            ) : (
+                                subscribers.map((subscriber) => (
+                                    <div
+                                        key={subscriber.id}
+                                        className="flex items-center justify-between p-3 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all"
+                                    >
+                                        <div className="flex-1 min-w-0 pr-2">
+                                            <p className="font-medium text-xs sm:text-sm text-gray-900 truncate">
+                                                {subscriber.email}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                {new Date(
+                                                    subscriber.subscribed_at
+                                                ).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                        <Badge
+                                            variant={
+                                                subscriber.is_active
+                                                    ? "default"
+                                                    : "secondary"
+                                            }
+                                            className="text-xs shrink-0"
+                                        >
+                                            {subscriber.is_active
+                                                ? "Active"
+                                                : "Inactive"}
+                                        </Badge>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
                 {/* Newsletter Editor and Preview */}
-                <div className="grid lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                     {/* Newsletter Editor */}
-                    <div className="space-y-6">
-                        <Card>
+                    <div className="space-y-4 sm:space-y-6">
+                        <Card className="hover:shadow-lg transition-shadow">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
+                                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                                     <Mail className="h-5 w-5" />
                                     Newsletter Editor
                                 </CardTitle>
-                                <CardDescription>
+                                <CardDescription className="text-sm">
                                     Create or update the newsletter content
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {/* AI Generator Button */}
-                                <div className="flex items-center gap-3 p-4 bg-linear-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
-                                    <Sparkles className="h-5 w-5 text-purple-600" />
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-linear-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+                                    <Sparkles className="h-5 w-5 text-purple-600 shrink-0" />
                                     <div className="flex-1">
                                         <p className="text-sm font-medium text-gray-900">
                                             Generate with AI
@@ -539,7 +541,7 @@ export default function AdminNewsletterPage() {
                                         onClick={() => setShowAIDialog(true)}
                                         variant="outline"
                                         size="sm"
-                                        className="bg-white"
+                                        className="bg-white w-full sm:w-auto"
                                     >
                                         <Wand2 className="h-4 w-4 mr-2" />
                                         Generate
@@ -569,7 +571,7 @@ export default function AdminNewsletterPage() {
                                         htmlFor="content"
                                         className="block text-sm font-medium text-gray-700 mb-2"
                                     >
-                                        Content (Markdown & HTML wspierane)
+                                        Content (Markdown & HTML supported)
                                     </label>
 
                                     {/* Toolbar z przyciskami formatowania */}
@@ -625,7 +627,12 @@ export default function AdminNewsletterPage() {
                                             <LinkIcon className="h-4 w-4" />
                                         </button>
                                         <div className="ml-auto text-xs text-gray-600 flex items-center px-2">
-                                            {content.length} znaków
+                                            <span className="hidden sm:inline">
+                                                {content.length} characters
+                                            </span>
+                                            <span className="sm:hidden">
+                                                {content.length}
+                                            </span>
                                         </div>
                                     </div>
 
@@ -636,23 +643,22 @@ export default function AdminNewsletterPage() {
                                             setContent(e.target.value)
                                         }
                                         placeholder="Wpisz treść newslettera... Możesz użyć Markdown:&#10;&#10;## Nagłówek&#10;**Pogrubiony tekst**&#10;- Punkt listy&#10;1. Numerowana lista&#10;✨ Emoji"
-                                        rows={12}
+                                        rows={10}
                                         className="w-full font-mono text-sm rounded-t-none border-t-0"
                                     />
                                     <p className="text-xs text-gray-500 mt-2">
-                                        💡 Wsparcie: <strong>**tekst**</strong>{" "}
-                                        = pogrubiony,{" "}
-                                        <strong>## Nagłówek</strong> = duży
-                                        nagłówek, <strong>- Lista</strong> =
-                                        bullet points
+                                        💡 <strong>**bold**</strong>,{" "}
+                                        <strong>## Heading</strong>,{" "}
+                                        <strong>- List</strong>,{" "}
+                                        <strong>[link](url)</strong>
                                     </p>
                                 </div>
 
-                                <div className="flex gap-3">
+                                <div className="flex flex-col sm:flex-row gap-3">
                                     <Button
                                         onClick={handleSave}
                                         disabled={saving}
-                                        className="flex-1"
+                                        className="flex-1 w-full"
                                     >
                                         {saving ? (
                                             <>
@@ -671,7 +677,7 @@ export default function AdminNewsletterPage() {
                                         onClick={handleSendTest}
                                         disabled={loading || !newsletter}
                                         variant="outline"
-                                        className="flex-1"
+                                        className="flex-1 w-full"
                                     >
                                         {loading ? (
                                             <>
@@ -690,7 +696,7 @@ export default function AdminNewsletterPage() {
                                 {/* Status Messages */}
                                 {message && (
                                     <div
-                                        className={`p-4 rounded-lg ${
+                                        className={`p-4 rounded-lg text-sm ${
                                             message.type === "success"
                                                 ? "bg-green-50 text-green-800 border border-green-200"
                                                 : "bg-red-50 text-red-800 border border-red-200"
@@ -704,26 +710,26 @@ export default function AdminNewsletterPage() {
                     </div>
 
                     {/* Preview - Right Side */}
-                    <div className="space-y-6">
-                        <Card>
+                    <div className="space-y-4 sm:space-y-6">
+                        <Card className="hover:shadow-lg transition-shadow">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
+                                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                                     <Eye className="h-5 w-5" />
                                     Live Preview
                                 </CardTitle>
-                                <CardDescription>
+                                <CardDescription className="text-sm">
                                     See how your newsletter will look in emails
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="bg-white p-6 rounded-lg border-2 border-gray-200 shadow-sm min-h-[600px]">
+                                <div className="bg-white p-4 sm:p-6 rounded-lg border-2 border-gray-200 shadow-sm min-h-[400px] sm:min-h-[600px]">
                                     {title || content ? (
                                         <>
-                                            <h3 className="font-bold text-2xl mb-4 text-gray-900">
+                                            <h3 className="font-bold text-xl sm:text-2xl mb-3 sm:mb-4 text-gray-900 wrap-break-word">
                                                 {title || "Newsletter Title"}
                                             </h3>
                                             <div
-                                                className="text-sm text-gray-700"
+                                                className="text-sm text-gray-700 prose prose-sm sm:prose max-w-none"
                                                 dangerouslySetInnerHTML={{
                                                     __html: formatContent(
                                                         content ||
@@ -732,7 +738,7 @@ export default function AdminNewsletterPage() {
                                                 }}
                                             />
                                             {newsletter && (
-                                                <div className="text-xs text-gray-500 mt-6 pt-4 border-t">
+                                                <div className="text-xs text-gray-500 mt-4 sm:mt-6 pt-4 border-t">
                                                     <p className="mb-1">
                                                         📅 Last updated:{" "}
                                                         {new Date(
@@ -752,8 +758,8 @@ export default function AdminNewsletterPage() {
                                         </>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                                            <Eye className="h-16 w-16 mb-4 opacity-30" />
-                                            <p className="text-center">
+                                            <Eye className="h-12 w-12 sm:h-16 sm:w-16 mb-3 sm:mb-4 opacity-30" />
+                                            <p className="text-center text-sm sm:text-base">
                                                 Start writing to see live
                                                 preview
                                             </p>
@@ -766,30 +772,32 @@ export default function AdminNewsletterPage() {
                 </div>
 
                 {/* Instructions */}
-                <Card className="bg-blue-50 border-blue-200">
+                <Card className="bg-blue-50 border-blue-200 hover:shadow-lg transition-shadow">
                     <CardHeader>
-                        <CardTitle className="text-blue-900">
+                        <CardTitle className="text-blue-900 text-lg sm:text-xl">
                             🔔 Automation Setup
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="text-sm text-blue-900">
-                        <p className="mb-4">
+                    <CardContent className="text-sm text-blue-900 space-y-3 sm:space-y-4">
+                        <p>
                             To automate newsletter sending, set up a CRON job at{" "}
                             <a
                                 href="https://console.cron-job.org"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-semibold underline"
+                                className="font-semibold underline break-all"
                             >
                                 console.cron-job.org
                             </a>
                         </p>
-                        <div className="bg-white p-4 rounded border border-blue-200 font-mono text-xs">
-                            <p className="mb-2">
+                        <div className="bg-white p-3 sm:p-4 rounded border border-blue-200 font-mono text-xs space-y-2 overflow-x-auto">
+                            <p>
                                 <strong>URL:</strong>{" "}
-                                https://seovileo.pl/api/newsletter/send
+                                <span className="break-all">
+                                    https://seovileo.pl/api/newsletter/send
+                                </span>
                             </p>
-                            <p className="mb-2">
+                            <p>
                                 <strong>Method:</strong> POST
                             </p>
                             <p>
