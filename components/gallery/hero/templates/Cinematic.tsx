@@ -5,12 +5,7 @@ import { motion } from "framer-motion";
 import { GalleryHeroTemplate } from "../types";
 
 // Premium: Cinematic look with letterbox bars and strong typography
-export const CinematicTemplate: GalleryHeroTemplate = ({
-    data,
-    elements,
-    options,
-}) => {
-    const Scroll = elements.ScrollIndicator;
+export const CinematicTemplate: GalleryHeroTemplate = ({ data, options }) => {
     const shouldAnimate = !options?.disableAnimations;
 
     // --- Variants ---
@@ -71,14 +66,6 @@ export const CinematicTemplate: GalleryHeroTemplate = ({
                   duration: 1,
                   ease: "easeOut" as const,
               },
-          }
-        : {};
-
-    const scrollVariants = shouldAnimate
-        ? {
-              initial: { opacity: 0 },
-              animate: { opacity: 1 },
-              transition: { delay: 1.5, duration: 1 },
           }
         : {};
 
