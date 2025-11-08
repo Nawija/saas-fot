@@ -18,6 +18,8 @@ import {
     Shield,
     Sparkles,
     Gem,
+    Globe,
+    ArrowRight,
 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 import Loading from "@/components/ui/Loading";
@@ -126,17 +128,16 @@ export default function DashboardPage() {
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                     <div className="text-center">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full mb-4">
-                            <Gem className="w-4 h-4 text-sky-500" />
+                            <Gem className="w-4 h-4 text-gray-800" />
                             <span className="text-xs font-semibold text-gray-800">
                                 Dashboard
                             </span>
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-                            Welcome to Your Dashboard
+                            Welcome back, {user.name || user.email}! 👋
                         </h1>
                         <p className="text-sm sm:text-base text-gray-800/90 max-w-2xl mx-auto">
-                            Create stunning photo galleries and share them
-                            professionally
+                            Your creative workspace for stunning photo galleries
                         </p>
                     </div>
                 </div>

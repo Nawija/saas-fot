@@ -101,7 +101,7 @@ export default function PricingCards({
     const plans = Object.values(PLANS);
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 max-w-7xl mx-auto py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 max-w-7xl mx-auto py-12">
             {plans.map((plan) => {
                 const isCurrentPlan = plan.id === currentPlan;
                 const isFree = plan.id === "free";
@@ -186,7 +186,7 @@ export default function PricingCards({
                                 {plan.features.map((feature, index) => (
                                     <li
                                         key={index}
-                                        className="flex items-start gap-2 text-xs lg:text-sm"
+                                        className="flex items-start gap-2 text-sm lg:text-base"
                                     >
                                         <div
                                             className={`w-5 h-5 ${colors.iconBg} rounded-full flex items-center justify-center shrink-0 mt-0.5`}
