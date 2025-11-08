@@ -123,7 +123,7 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30">
             {/* Hero Header */}
-            <div className="relative overflow-hidden bg-linear-to-br from-indigo-100 via-purple-50 to-pink-50 border-b border-gray-200">
+            <div className="relative overflow-hidden bg-linear-to-r from-violet-100 via-sky-100 to-pink-50 border-b border-gray-200">
                 <div className="absolute inset-0 bg-grid-white/[0.05] bg-size-[20px_20px]"></div>
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                     <div className="text-center">
@@ -134,7 +134,7 @@ export default function DashboardPage() {
                             </span>
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-                            Welcome back, {user.name || user.email}! 👋
+                            Welcome, {user.name || user.email}! 👋
                         </h1>
                         <p className="text-sm sm:text-base text-gray-800/90 max-w-2xl mx-auto">
                             Your creative workspace for stunning photo galleries
@@ -345,7 +345,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
             </section>
-                <FooterDashboard />
+            <FooterDashboard />
         </div>
     );
 }
