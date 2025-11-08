@@ -32,7 +32,17 @@ export async function POST(request: NextRequest) {
         }
 
         // Przygotuj prompt dla AI z kontekstem Seovileo
-        const systemPrompt = `You are a professional newsletter writer for Seovileo - a photography SaaS platform that helps photographers create, share, and manage beautiful online photo galleries.
+        const lengthLimits = {
+            short: { words: 200, max: 300, description: "200-300 words" },
+            medium: { words: 500, max: 600, description: "400-600 words" },
+            long: { words: 800, max: 1000, description: "700-1000 words" },
+        };
+
+        const selectedLength =
+            lengthLimits[length as keyof typeof lengthLimits] ||
+            lengthLimits.medium;
+
+        const systemPrompt = `You are a professional newsletter writer for Seovileo - a photography SaaS platform that helps create, share, and manage beautiful online photo galleries.
 
 **About Seovileo:**
 - Website: https://seovileo.pl
@@ -56,7 +66,7 @@ When writing about Seovileo features, ALWAYS include relevant clickable links us
 **Your task:**
 Create engaging newsletter content in Polish language that:
 - Always relates back to Seovileo's features or photography workflows
-- Provides value to photographers using online gallery platforms
+- Provides value to using online gallery platforms
 - Naturally integrates Seovileo's capabilities into the content
 - **ALWAYS includes at least 2-3 clickable links** to Seovileo pages using Markdown [text](url) format
 - Uses Markdown formatting for better readability
@@ -70,27 +80,42 @@ Create engaging newsletter content in Polish language that:
 - Keep paragraphs short and scannable
 - Include actionable tips and insights
 - End with a strong call-to-action with a link (e.g., [Wypróbuj Seovileo już dziś](https://seovileo.pl/register))
-- Length: ${
-            length || "medium"
-        } (short: 200-300 words, medium: 400-600 words, long: 700-1000 words)
 - Style: ${
             style || "professional"
         } (professional, casual, educational, promotional)
 
+**LENGTH REQUIREMENT - CRITICAL:**
+- Target length: ${selectedLength.description}
+- MAXIMUM ${selectedLength.max} words - DO NOT EXCEED THIS LIMIT
+- Aim for approximately ${selectedLength.words} words
+- Be concise and focused - quality over quantity
+- If you reach the word limit, stop writing and conclude with a CTA
+
 **CRITICAL:** Every newsletter MUST contain at least 2-3 clickable Markdown links to Seovileo pages. Example:
 "Dzięki [Seovileo](https://seovileo.pl) możesz łatwo zarządzać swoimi galeriami. [Wypróbuj za darmo](https://seovileo.pl/register) już dziś!"
 
-**Important:** Always mention Seovileo naturally in the content with working links, showing how it helps photographers solve real problems.`;
+**Important:** Always mention Seovileo naturally in the content with working links, showing how it helps solve real problems.`;
 
         const userPrompt = `Create a newsletter about: ${topic}
 
 Make it valuable for photographers who use Seovileo to manage their online galleries. Show how Seovileo's features relate to this topic.
 
-IMPORTANT: Include at least 2-3 clickable Markdown links [text](url) to Seovileo pages in the content. Use natural Polish language for link text.${
-            generateTitle
-                ? "\n\nStart with a catchy title on the first line (as ## Title format)."
-                : ""
-        }`;
+STRICT REQUIREMENTS:
+1. LENGTH: Write MAXIMUM ${selectedLength.max} words (target: ${
+            selectedLength.words
+        } words)
+2. Count your words as you write and STOP when you reach the limit
+3. Include at least 2-3 clickable Markdown links [text](url) to Seovileo pages
+4. Use natural Polish language for link text
+5. Be concise - make every word count
+
+${
+    generateTitle
+        ? "Start with a catchy title on the first line (as ## Title format)."
+        : ""
+}
+
+REMEMBER: Quality over quantity. Stop at ${selectedLength.max} words maximum!`;
 
         const completion = await groq.chat.completions.create({
             messages: [
@@ -105,7 +130,8 @@ IMPORTANT: Include at least 2-3 clickable Markdown links [text](url) to Seovileo
             ],
             model: "llama-3.3-70b-versatile",
             temperature: 0.7,
-            max_tokens: 2048,
+            max_tokens:
+                length === "short" ? 600 : length === "medium" ? 1200 : 2048,
         });
 
         const generatedContent = completion.choices[0]?.message?.content;

@@ -626,12 +626,30 @@ export default function AdminNewsletterPage() {
                                         >
                                             <LinkIcon className="h-4 w-4" />
                                         </button>
-                                        <div className="ml-auto text-xs text-gray-600 flex items-center px-2">
+                                        <div className="ml-auto text-xs text-gray-600 flex items-center gap-3 px-2">
+                                            <span className="hidden sm:inline">
+                                                {
+                                                    content
+                                                        .trim()
+                                                        .split(/\s+/)
+                                                        .filter(Boolean).length
+                                                }{" "}
+                                                words
+                                            </span>
+                                            <span className="hidden sm:inline text-gray-400">
+                                                •
+                                            </span>
                                             <span className="hidden sm:inline">
                                                 {content.length} characters
                                             </span>
                                             <span className="sm:hidden">
-                                                {content.length}
+                                                {
+                                                    content
+                                                        .trim()
+                                                        .split(/\s+/)
+                                                        .filter(Boolean).length
+                                                }
+                                                w / {content.length}c
                                             </span>
                                         </div>
                                     </div>
