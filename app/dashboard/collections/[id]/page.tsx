@@ -2,7 +2,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import Loading from "@/components/ui/Loading";
 import CollectionHeader from "@/components/dashboard/CollectionHeader";
@@ -29,7 +28,6 @@ export default function CollectionDetailPage({
 }: {
     params: Promise<{ id: string }>;
 }) {
-    const router = useRouter();
     const [collectionId, setCollectionId] = useState<string | null>(null);
     const [selectedTemplate, setSelectedTemplate] = useState<string>("minimal");
     const [selectedFont, setSelectedFont] = useState<string>("inter");
@@ -47,7 +45,6 @@ export default function CollectionDetailPage({
         feature: "",
     });
 
-    // Custom hooks
     const {
         collection,
         photos,

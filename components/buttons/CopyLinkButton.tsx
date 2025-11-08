@@ -2,11 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import {
-    Copy,
-    Link as LinkIcon,
-    CheckCircle,
-} from "lucide-react";
+import { Copy, Link as LinkIcon, CheckCircle } from "lucide-react";
 
 interface CopyLinkButtonProps {
     url: string;
@@ -98,8 +94,8 @@ export default function CopyLinkButton({
                     {copied && (
                         <div className="absolute inset-0 rounded-xl pointer-events-none animate-border-shimmer" />
                     )}
-                    <LinkIcon className="w-4 h-4 text-gray-400 shrink-0 relative z-10" />
-                    <p className="text-base text-gray-800 w-22 flex-1 truncate relative z-10">
+                    <LinkIcon className="w-4 h-4 text-gray-400 shrink-0 relative" />
+                    <p className="text-base text-gray-800 w-22 flex-1 truncate relative">
                         {url}
                     </p>
                 </div>
