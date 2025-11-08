@@ -1,8 +1,7 @@
 // components/dashboard/PhotosGrid.tsx
 "use client";
 
-import { Upload, Trash2, X, AlertCircle } from "lucide-react";
-import MainButton from "../buttons/MainButton";
+import { X, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
 interface Photo {
@@ -44,8 +43,6 @@ function PhotoThumbnail({
                     </span>
                 </div>
             ) : (
-                // Native <img> to avoid Vercel image optimization costs
-                // R2/CDN serves images directly = unlimited, zero Vercel bandwidth
                 <img
                     src={photo.file_path}
                     alt={photo.file_name}
@@ -79,26 +76,14 @@ function PhotoThumbnail({
 
 export default function PhotosGrid({ photos, onDeletePhoto }: PhotosGridProps) {
     return (
-        <div>
-            {photos.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                    <Upload className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                    <p>No photos yet</p>
-                    <p className="text-sm">
-                        Use the button above to add your first photos
-                    </p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-                    {photos.map((photo) => (
-                        <PhotoThumbnail
-                            key={photo.id}
-                            photo={photo}
-                            onDelete={() => onDeletePhoto(photo.id)}
-                        />
-                    ))}
-                </div>
-            )}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+            {photos.map((photo) => (
+                <PhotoThumbnail
+                    key={photo.id}
+                    photo={photo}
+                    onDelete={() => onDeletePhoto(photo.id)}
+                />
+            ))}
         </div>
     );
 }

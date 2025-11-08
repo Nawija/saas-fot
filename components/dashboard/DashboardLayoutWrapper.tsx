@@ -1,14 +1,20 @@
+"use client";
+
 import Header from "@/components/navbar/Header";
 import DashboardLayoutClient from "@/components/dashboard/DashboardLayoutClient";
-import { getUser } from "@/lib/auth/getUser";
 import { useAuthUser } from "@/hooks";
+import Loading from "@/components/ui/Loading";
 
-export default async function DashboardLayoutWrapper({
+export default function DashboardLayoutWrapper({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const user = await getUser();
+    const { user, loading } = useAuthUser();
+
+    if (loading) {
+        return <Loading />;
+    }
 
     return (
         <DashboardLayoutClient header={<Header />} user={user}>
