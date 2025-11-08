@@ -14,8 +14,6 @@ import {
     AlertTriangle,
     CreditCard,
     ArrowRight,
-    Images,
-    Sparkles,
 } from "lucide-react";
 import Hero from "@/components/Hero";
 
