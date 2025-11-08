@@ -125,7 +125,7 @@ export default function PhotoUploadSection({
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed z-10 rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
+                className={`border-2 border-dashed z-10 h-52 rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
                     uploading
                         ? "border-blue-300 bg-blue-50"
                         : isDragging
@@ -133,30 +133,29 @@ export default function PhotoUploadSection({
                         : "border-gray-300 hover:border-blue-300 hover:bg-blue-50"
                 }`}
             >
-                <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center">
-                    {uploading ? (
-                        <Loader
-                            size={33}
-                            className="text-blue-400 animate-spin"
-                        />
-                    ) : (
+                {!uploading && (
+                    <div className="mx-auto mb-4 flex items-center justify-center">
                         <Upload
                             className={`w-12 h-12 transition-all duration-200 ${
                                 isDragging
                                     ? "text-blue-600 scale-125"
-                                    : "text-blue-400"
+                                    : "text-blue-500"
                             }`}
                         />
-                    )}
-                </div>
+                    </div>
+                )}
                 {uploading ? (
-                    <div>
-                        <div className="text-gray-900 font-medium mb-2">
+                    <div className="flex items-center justify-center h-full w-full flex-col">
+                        <div className="text-gray-900 gap-2 font-medium mb-2 flex items-center justify-center">
+                            <Loader
+                                size={22}
+                                className="text-gray-800 animate-spin"
+                            />{" "}
                             Uploading... {uploadProgress}%
                         </div>
-                        <div className="w-full max-w-xs mx-auto bg-gray-200 rounded-full h-2">
+                        <div className="w-full max-w-xs mx-auto bg-gray-200 border border-gray-300 rounded-full h-2">
                             <div
-                                className="bg-linear-to-r from-sky-300 via-indigo-300 to-blue-400 h-2 rounded-full transition-all animate-pulse duration-300"
+                                className="bg-linear-to-r from-sky-300 via-indigo-300 to-blue-400 h-2 rounded-full transition-all duration-300"
                                 style={{
                                     width: `${uploadProgress}%`,
                                 }}
