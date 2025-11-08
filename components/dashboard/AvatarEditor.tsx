@@ -54,7 +54,7 @@ export default function AvatarEditor({
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreview(reader.result as string);
-                setTransform({ x: 0, y: 0, scale: 1.3, rotation: 0 }); // Reset with 130% zoom
+                setTransform({ x: 0, y: 0, scale: 0.2, rotation: 0 }); // Reset with 20% zoom
                 setIsEditing(true);
             };
             reader.readAsDataURL(file);
@@ -278,7 +278,7 @@ export default function AvatarEditor({
     };
 
     const resetTransform = () => {
-        setTransform({ x: 0, y: 0, scale: 1.3, rotation: 0 }); // Reset to 130% zoom
+        setTransform({ x: 0, y: 0, scale: 0.2, rotation: 0 }); // Reset to 20% zoom
     };
 
     return (
