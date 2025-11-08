@@ -10,6 +10,7 @@ import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 import MainButton from "@/components/buttons/MainButton";
 import { ArrowLeft, AlertCircle } from "lucide-react";
+import PhotoLikeButton from "@/components/gallery/PhotoLikeButton";
 
 const PHOTOS_PER_PAGE = 20;
 
@@ -721,6 +722,31 @@ export default function GalleryPhotosPage() {
                                                             }}
                                                         />
                                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+
+                                                        {/* Like button - appears on hover */}
+                                                        <div
+                                                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                            }}
+                                                            onPointerDown={(
+                                                                e
+                                                            ) => {
+                                                                e.stopPropagation();
+                                                            }}
+                                                            onMouseDown={(
+                                                                e
+                                                            ) => {
+                                                                e.stopPropagation();
+                                                            }}
+                                                        >
+                                                            <PhotoLikeButton
+                                                                photoId={
+                                                                    photo.id
+                                                                }
+                                                            />
+                                                        </div>
                                                     </>
                                                 )}
                                             </div>
