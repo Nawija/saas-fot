@@ -9,7 +9,6 @@ import PageHeader from "@/components/dashboard/PageHeader";
 import EmptyState from "@/components/dashboard/EmptyState";
 import CollectionCard from "@/components/dashboard/CollectionCard";
 
-
 export default function CollectionsPage() {
     const { collections, loading, username, deleteCollection } =
         useCollections();
@@ -35,9 +34,8 @@ export default function CollectionsPage() {
     }
 
     return (
-        <div className="min-h-screen">
+        <>
             <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-16">
-
                 {/* Page Header */}
                 <PageHeader
                     title="Galleries"
@@ -49,11 +47,11 @@ export default function CollectionsPage() {
                 {/* Collections Grid or Empty State */}
                 {collections.length === 0 ? (
                     <EmptyState
-                        icon={<ImageIcon className="w-8 h-8 text-gray-300" />}
                         title="No galleries yet"
                         description="Create your first gallery and start sharing beautiful photos with your clients"
                         actionLabel="Create your first gallery"
                         actionHref="/dashboard/collections/new"
+                        className="py-20"
                     />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
@@ -81,6 +79,6 @@ export default function CollectionsPage() {
                 cancelLabel="Cancel"
                 onConfirm={handleConfirmDelete}
             />
-        </div>
+        </>
     );
 }

@@ -125,21 +125,21 @@ export default function PhotoUploadSection({
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed z-10 h-52 rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
+                className={`border-2 border-dashed z-10 h-48 rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
                     uploading
-                        ? "border-blue-300 bg-blue-50"
+                        ? "border-blue-300 bg-blue-50 animate-pulse cursor-not-allowed"
                         : isDragging
                         ? "border-blue-500 bg-blue-100 scale-[1.02] shadow-lg"
-                        : "border-gray-300 hover:border-blue-300 hover:bg-blue-50"
+                        : "border-gray-200 hover:border-blue-100 hover:bg-blue-50/50"
                 }`}
             >
                 {!uploading && (
                     <div className="mx-auto mb-4 flex items-center justify-center">
                         <Upload
-                            className={`w-12 h-12 transition-all duration-200 ${
+                            className={`w-10 h-10 transition-all duration-200 ${
                                 isDragging
-                                    ? "text-blue-600 scale-125"
-                                    : "text-blue-500"
+                                    ? "text-blue-500 scale-125"
+                                    : "text-gray-500"
                             }`}
                         />
                     </div>

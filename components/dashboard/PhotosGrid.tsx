@@ -17,6 +17,28 @@ interface PhotosGridProps {
     onDeletePhoto: (photoId: number) => void;
 }
 
+/**
+ * Generuje URL miniaturki na podstawie głównego zdjęcia
+ * Zamienia .webp na -thumb.webp (lub dodaje -thumb przed rozszerzeniem)
+ */
+function getThumbnailUrl(filePath: string): string {
+    // Sprawdź czy jest .webp
+    if (filePath.endsWith(".webp")) {
+        return filePath.replace(".webp", "-thumb.webp");
+    }
+    // Dla innych rozszerzeń - dodaj -thumb przed ostatnią kropką
+    const lastDotIndex = filePath.lastIndexOf(".");
+    if (lastDotIndex > -1) {
+        return (
+            filePath.slice(0, lastDotIndex) +
+            "-thumb" +
+            filePath.slice(lastDotIndex)
+        );
+    }
+    // Fallback - po prostu dodaj -thumb na końcu
+    return filePath + "-thumb";
+}
+
 function PhotoThumbnail({
     photo,
     onDelete,
@@ -44,7 +66,7 @@ function PhotoThumbnail({
                 </div>
             ) : (
                 <img
-                    src={photo.file_path}
+                    src={getThumbnailUrl(photo.file_path)}
                     alt={photo.file_name}
                     loading="lazy"
                     decoding="async"

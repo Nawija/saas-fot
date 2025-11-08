@@ -45,6 +45,23 @@ export async function DELETE(
                 console.log(
                     `[Delete Photo] Successfully deleted from R2: ${key}`
                 );
+
+                // Usuń również miniaturkę (zamień .webp na -thumb.webp)
+                const thumbnailKey = key.endsWith(".webp")
+                    ? key.replace(".webp", "-thumb.webp")
+                    : key.replace(/(\.[^.]+)$/, "-thumb$1");
+
+                try {
+                    await deleteFromR2(thumbnailKey);
+                    console.log(
+                        `[Delete Photo] Successfully deleted thumbnail from R2: ${thumbnailKey}`
+                    );
+                } catch (thumbError) {
+                    // Miniaturka może nie istnieć dla starych zdjęć - ignoruj błąd
+                    console.log(
+                        `[Delete Photo] Thumbnail not found (OK for old photos): ${thumbnailKey}`
+                    );
+                }
             }
         } catch (error) {
             console.error("[Delete Photo] Error deleting from R2:", error);

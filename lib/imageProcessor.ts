@@ -3,6 +3,8 @@ import { R2Paths } from "./r2";
 
 const AVATAR_SIZE = 200; // rozmiar avatara w pikselach
 const AVATAR_QUALITY = 80; // jakość kompresji (0-100)
+const THUMBNAIL_WIDTH = 400; // szerokość miniaturki w pikselach
+const THUMBNAIL_QUALITY = 75; // jakość kompresji dla miniaturek
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 
 interface ProcessedImage {

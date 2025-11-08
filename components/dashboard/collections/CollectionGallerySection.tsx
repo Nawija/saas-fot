@@ -45,7 +45,7 @@ export default function CollectionGallerySection({
                     <PhotosGrid photos={photos} onDeletePhoto={onDeletePhoto} />
                 ) : (
                     <EmptyState
-                        icon={<ImageIcon className="w-10 h-10 text-gray-400" />}
+                        icon={<ImageIcon className="w-10 h-10 text-gray-300" />}
                         title="No photos yet"
                         description="Your gallery is empty — upload photos to start sharing and showcasing your work."
                         className="py-6"

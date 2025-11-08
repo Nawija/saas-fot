@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
         let processedBuffer: Buffer;
         let contentType = "image/webp";
         let key: string;
+        let thumbnailUrl: string | null = null; // Initialize thumbnail URL
 
         if (type === "hero") {
             const rotatedBuffer = await sharp(buffer)
@@ -272,6 +273,34 @@ export async function POST(req: NextRequest) {
                 Date.now(),
                 fileExt
             );
+
+            // GENERUJ MINIATURKĘ (400px width, WebP, quality 75)
+            let thumbnailBuffer: Buffer | null = null;
+            let thumbnailKey: string | null = null;
+            let thumbnailUrl: string | null = null;
+
+            if (canProcessWithSharp) {
+                try {
+                    thumbnailBuffer = await sharp(resizedBuffer)
+                        .resize(350, 350, {
+                            fit: "inside",
+                            withoutEnlargement: true,
+                        })
+                        .webp({ quality: 75, effort: 2 })
+                        .toBuffer();
+
+                    // Upload miniaturki do R2 z suffixem -thumb
+                    thumbnailKey = key.replace(`.${fileExt}`, `-thumb.webp`);
+                    thumbnailUrl = await uploadToR2(
+                        thumbnailBuffer,
+                        thumbnailKey,
+                        "image/webp"
+                    );
+                } catch (thumbError) {
+                    // Jeśli miniaturka się nie uda, kontynuuj bez niej
+                    console.warn("Failed to generate thumbnail:", thumbError);
+                }
+            }
         }
 
         // Pobierz wymiary przetworzonego obrazu
@@ -287,6 +316,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             ok: true,
             url,
+            thumbnailUrl,
             size,
             width,
             height,
