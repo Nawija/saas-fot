@@ -282,7 +282,7 @@ export async function POST(req: NextRequest) {
             if (canProcessWithSharp) {
                 try {
                     thumbnailBuffer = await sharp(resizedBuffer)
-                        .resize(350, 350, {
+                        .resize(400, null, {
                             fit: "inside",
                             withoutEnlargement: true,
                         })

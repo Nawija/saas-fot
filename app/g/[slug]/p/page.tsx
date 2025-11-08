@@ -482,6 +482,24 @@ export default function GalleryPhotosPage() {
         };
     }, [columnsCount, flatForHidden, singleMode]);
 
+    function getThumbnailUrl(filePath: string): string {
+        // Sprawdź czy jest .webp
+        if (filePath.endsWith(".webp")) {
+            return filePath.replace(".webp", "-thumb.webp");
+        }
+        // Dla innych rozszerzeń - dodaj -thumb przed ostatnią kropką
+        const lastDotIndex = filePath.lastIndexOf(".");
+        if (lastDotIndex > -1) {
+            return (
+                filePath.slice(0, lastDotIndex) +
+                "-thumb" +
+                filePath.slice(lastDotIndex)
+            );
+        }
+        // Fallback - po prostu dodaj -thumb na końcu
+        return filePath + "-thumb";
+    }
+
     if (loading) return <LoadingGallery />;
 
     if (!collection)
@@ -667,13 +685,13 @@ export default function GalleryPhotosPage() {
                                                 ) : (
                                                     <>
                                                         <img
-                                                            src={
+                                                            src={getThumbnailUrl(
                                                                 photo.file_path
-                                                            }
+                                                            )}
                                                             alt={`Photo ${photo.id}`}
                                                             loading="lazy"
                                                             decoding="async"
-                                                            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                                                            className="absolute inset-0  w-full h-full object-cover transition-opacity duration-300"
                                                             style={{
                                                                 opacity:
                                                                     isLoading
