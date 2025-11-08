@@ -6,9 +6,8 @@ import {
     processAvatarImage,
     isValidImageType,
     generateAvatarKey,
-} from "@/lib/imageProcessor";
+} from "@/lib/avatarProcessor";
 import { query } from "@/lib/db";
-import { canUploadFile } from "@/lib/storage";
 
 export async function POST(req: NextRequest) {
     try {

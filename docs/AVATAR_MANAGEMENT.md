@@ -32,7 +32,7 @@ System automatycznego przetwarzania i przechowywania awatarów użytkowników w 
 ```
 lib/
 ├── r2.ts                    # Klient R2 i operacje
-├── imageProcessor.ts        # Przetwarzanie obrazów
+├── avatarProcessor.ts       # Przetwarzanie obrazów (dawniej imageProcessor)
 
 app/api/user/avatar/
 └── route.ts                # API endpoints (POST, DELETE)
@@ -127,7 +127,7 @@ Usuwa avatar użytkownika.
 
 ## Przetwarzanie obrazu
 
-### Parametry (`lib/imageProcessor.ts`):
+### Parametry (`lib/avatarProcessor.ts`):
 
 ```typescript
 const AVATAR_SIZE = 200; // Rozmiar w pikselach
