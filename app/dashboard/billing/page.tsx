@@ -14,7 +14,10 @@ import {
     AlertTriangle,
     CreditCard,
     ArrowRight,
+    Images,
+    Sparkles,
 } from "lucide-react";
+import Hero from "@/components/Hero";
 
 export default function BillingPage() {
     const [user, setUser] = useState<User | null>(null);
@@ -86,26 +89,14 @@ export default function BillingPage() {
 
     return (
         <div className="min-h-screen">
-            {/* Hero Header */}
-            <div className="relative overflow-hidden bg-linear-to-r from-violet-100 via-sky-100 to-pink-50 border-b border-gray-200">
-                <div className="absolute inset-0 bg-grid-white/[0.05] bg-size-[20px_20px]"></div>
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-                    <div className="text-center">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/60 backdrop-blur-sm rounded-full mb-4 text-yellow-700">
-                            <Crown className="w-4 h-4 " />
-                            <span className="text-xs font-semibold">
-                                Subscription & Billing
-                            </span>
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-orange-900 mb-2">
-                            Manage Your Plan
-                        </h1>
-                        <p className="text-sm sm:text-base text-gray-800/90 max-w-2xl mx-auto">
-                            Monitor storage and upgrade your plan
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <Hero
+                badge="Subscription & Billing"
+                badgeIcon={<Crown className="w-4 h-4" />}
+                title="Manage"
+                highlight="Your Plan"
+                subtitle={"Monitor storage and upgrade your plan"}
+                className="mb-10"
+            />
 
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 {/* Current Plan Card */}

@@ -16,6 +16,7 @@ import {
     Check,
     Star,
 } from "lucide-react";
+import Hero from "@/components/Hero";
 import MainButton from "@/components/buttons/MainButton";
 import Loading from "@/components/ui/Loading";
 import FooterDashboard from "@/components/ui/FooterDashboard";
@@ -154,41 +155,24 @@ export default function DashboardPage() {
         <div className="min-h-screen">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-20">
                 {/* Hero Section */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-center space-y-6 pt-8"
-                >
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full border border-blue-200">
-                        <Sparkles className="w-4 h-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-600">
-                            Welcome back!
-                        </span>
-                    </div>
-
-                    <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-gray-900 leading-tight">
-                        Your platform for{" "}
-                        <span className="text-transparent bg-clip-text bg-linear-to-r from-sky-400 via-indigo-500 to-pink-500">
-                            beautiful galleries
-                        </span>
-                    </h1>
-
-                    <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
-                        Create, organize and share your photos professionally.
-                        Everything you need in one place.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
-                        <MainButton
-                            href="/dashboard/collections/new"
-                            variant="purple"
-                            icon={<Images className="w-5 h-5" />}
-                            label="Create gallery"
-                            className="text-lg px-8 py-2"
-                        />
-                    </div>
-                </motion.section>
+                <Hero
+                    badge="Welcome back!"
+                    badgeIcon={<Sparkles className="w-4 h-4" />}
+                    title="Your platform for"
+                    highlight="beautiful galleries"
+                    subtitle={
+                        "Create, organize and share your photos professionally. Everything you need in one place."
+                    }
+                    cta={[
+                        {
+                            label: "Create gallery",
+                            href: "/dashboard/collections/new",
+                            variant: "purple",
+                            icon: <Images className="w-5 h-5" />,
+                            className: "text-lg px-8 py-2",
+                        },
+                    ]}
+                />
 
                 {/* Quick Actions */}
                 <motion.section
@@ -198,7 +182,7 @@ export default function DashboardPage() {
                     className="space-y-8"
                 >
                     <div className="text-center space-y-3">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                        <h2 className="text-3xl sm:text-4xl font-bold">
                             Quick actions
                         </h2>
                         <p className="text-lg text-gray-600">

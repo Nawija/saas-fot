@@ -289,7 +289,7 @@ picture {
         @apply border-border outline-ring/50;
     }
     body {
-        @apply bg-linear-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30;
+        @apply bg-linear-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 text-gray-800;
     }
 }
 
