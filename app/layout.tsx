@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import AppToaster from "@/components/ui/AppToaster";
 import { Analytics } from "@vercel/analytics/next";
+import { ClientProviders } from "@/components/ClientProviders";
 
 export const metadata: Metadata = {
     title: "Seovileo",
@@ -25,7 +26,9 @@ export default function RootLayout({
             <body className={` antialiased`}>
                 <Analytics />
                 <AppToaster />
-                <main>{children}</main>
+                <ClientProviders>
+                    <main>{children}</main>
+                </ClientProviders>
             </body>
         </html>
     );

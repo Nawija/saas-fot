@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import type {
     Collection,
     Photo,
@@ -9,12 +10,14 @@ import type {
 
 export function useCollectionData(collectionId: string | null) {
     const router = useRouter();
+    const { user } = useAuthUser();
     const [collection, setCollection] = useState<Collection | null>(null);
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [loading, setLoading] = useState(true);
     const [deletingAll, setDeletingAll] = useState(false);
-    const [userPlan, setUserPlan] = useState<string>("free");
-    const [username, setUsername] = useState<string>("");
+
+    const userPlan = user?.subscription_plan || "free";
+    const username = user?.username || "";
 
     async function fetchCollection() {
         if (!collectionId) return;
@@ -25,14 +28,6 @@ export function useCollectionData(collectionId: string | null) {
                 setCollection(data);
             } else {
                 router.push("/dashboard/collections");
-            }
-
-            // Fetch user's plan and username
-            const userRes = await fetch("/api/user/me");
-            if (userRes.ok) {
-                const userData = await userRes.json();
-                setUserPlan(userData.user?.subscription_plan || "free");
-                setUsername(userData.user?.username || "");
             }
         } catch (error) {
             console.error("Error fetching collection:", error);

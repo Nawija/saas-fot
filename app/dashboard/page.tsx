@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { User } from "@/types/avatar";
 import { motion } from "framer-motion";
 import {
     Images,
@@ -57,30 +55,6 @@ const features = [
     },
 ];
 
-const quickActions = [
-    {
-        icon: Upload,
-        label: "Upload photos",
-        description: "Upload new photos to your gallery",
-        href: "/dashboard/collections",
-        variant: "success" as const,
-    },
-    {
-        icon: Images,
-        label: "Create collection",
-        description: "Create a new gallery from your photos",
-        href: "/dashboard/collections",
-        variant: "primary" as const,
-    },
-    {
-        icon: Globe,
-        label: "Preview profile",
-        description: "See how others see your profile",
-        href: `...`,
-        variant: "purple" as const,
-    },
-];
-
 const steps = [
     {
         number: "1",
@@ -122,26 +96,37 @@ const benefits = [
 ];
 
 export default function DashboardPage() {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { user, loading } = useAuthUser();
 
-    useEffect(() => {
-        fetchUser();
-    }, []);
-
-    const fetchUser = async () => {
-        try {
-            const res = await fetch("/api/user/me");
-            const data = await res.json();
-            if (data.ok) {
-                setUser(data.user);
-            }
-        } catch (error) {
-            console.error("Error fetching user:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const quickActions = [
+        {
+            icon: Images,
+            label: "Create collection",
+            description: "Create a new gallery from your photos",
+            href: "/dashboard/collections",
+            variant: "primary" as const,
+        },
+        {
+            icon: Upload,
+            label: "Edit profile",
+            description: "Settings and customize your public profile",
+            href: "/dashboard/profile",
+            variant: "success" as const,
+        },
+        {
+            icon: Globe,
+            label: "Your public brand",
+            description: "View your public profile domain",
+            // jeśli username jest dostępny => zbuduj bezpieczny URL do subdomeny,
+            // w przeciwnym razie kieruj do profilu w dashboardzie (fallback)
+            href: user?.username
+                ? `https://${encodeURIComponent(user.username)}.seovileo.pl/`
+                : "/dashboard/profile",
+            // zaznacz, że to zewnętrzny link (użyte przy renderowaniu)
+            external: Boolean(user?.username),
+            variant: "purple" as const,
+        },
+    ];
 
     if (loading) {
         return <Loading />;
@@ -216,6 +201,11 @@ export default function DashboardPage() {
                                         </p>
                                         <MainButton
                                             href={action.href}
+                                            target={
+                                                action.external
+                                                    ? "_blank"
+                                                    : "_self"
+                                            }
                                             variant={action.variant}
                                             icon={
                                                 <ArrowRight className="w-4 h-4" />

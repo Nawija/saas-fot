@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    Images,
-    CreditCard,
-    LayoutDashboard,
-    Globe,
-} from "lucide-react";
+import { Images, CreditCard, LayoutDashboard, Globe } from "lucide-react";
 import LogoutButton from "../buttons/LogoutButton";
 import Logo from "../navbar/Logo";
 
@@ -47,7 +42,7 @@ export default function DashboardSidebar({
 
     // Generate public gallery URL
     const publicGalleryUrl = username
-        ? `https://${username}.seovileo.pl`
+        ? `https://${encodeURIComponent(username)}.seovileo.pl/`
         : null;
 
     return (

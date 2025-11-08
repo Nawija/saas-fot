@@ -3,10 +3,11 @@
 import { useState } from "react";
 import CountdownTimer from "@/components/CountdownTimer";
 import { useRouter } from "next/navigation";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function ChangePasswordPage() {
     const router = useRouter();
-    const [email, setEmail] = useState<string | null>(null);
+    const { user } = useAuthUser();
     const [confirmed, setConfirmed] = useState(false);
     const [showCodeStep, setShowCodeStep] = useState(false);
     const [code, setCode] = useState("");
@@ -16,18 +17,7 @@ export default function ChangePasswordPage() {
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
 
-    async function fetchUserEmail() {
-        try {
-            const res = await fetch("/api/user/me"); // endpoint returning the logged-in user's data
-            const data = await res.json();
-            if (res.ok) setEmail(data.email);
-        } catch {
-            setError("Failed to load user data.");
-        }
-    }
-
-    // run on first render
-    if (email === null) fetchUserEmail();
+    const email = user?.email || null;
 
     async function handleSendCode() {
         setLoading(true);

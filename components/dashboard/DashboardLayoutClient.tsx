@@ -6,13 +6,8 @@ import { usePathname } from "next/navigation";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardMenuButton from "@/components/navbar/DashboardMenuButton";
 import SetUsernameModal from "@/components/auth/SetUsernameModal";
+import { User } from "@/types/avatar";
 
-interface User {
-    id: string;
-    email: string;
-    username?: string;
-    is_username_set: boolean;
-}
 
 export default function DashboardLayoutClient({
     children,

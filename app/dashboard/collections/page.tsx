@@ -5,7 +5,6 @@ import { Image as ImageIcon } from "lucide-react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import Loading from "@/components/ui/Loading";
 import { useCollections } from "@/hooks/useCollections";
-import PublicGalleryBanner from "@/components/dashboard/PublicGalleryBanner";
 import PageHeader from "@/components/dashboard/PageHeader";
 import EmptyState from "@/components/dashboard/EmptyState";
 import CollectionCard from "@/components/dashboard/CollectionCard";

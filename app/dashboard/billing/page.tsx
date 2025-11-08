@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { User } from "@/types/avatar";
+import { useEffect } from "react";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { PLANS, formatBytes } from "@/lib/plans";
 import PricingCards from "@/components/pricing/PricingCards";
 import Loading from "@/components/ui/Loading";
@@ -18,12 +18,7 @@ import {
 import Hero from "@/components/Hero";
 
 export default function BillingPage() {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchUser();
-    }, []);
+    const { user, loading } = useAuthUser();
 
     // If navigating with #plans hash, smooth scroll after data loads
     useEffect(() => {
@@ -39,20 +34,6 @@ export default function BillingPage() {
         }
     }, [loading]);
 
-    const fetchUser = async () => {
-        try {
-            const res = await fetch("/api/user/me");
-            const data = await res.json();
-            if (data.ok) {
-                setUser(data.user);
-            }
-        } catch (error) {
-            console.error("Error fetching user:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     if (loading) {
         return <Loading />;
     }
@@ -60,7 +41,7 @@ export default function BillingPage() {
     if (!user) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center bg-white rounded-2xl p-12 shadow-lg border border-gray-200">
+                <div className="text-center bg-white rounded-2xl p-12 shadow-sm border border-gray-200">
                     <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <Shield className="w-10 h-10 text-gray-400" />
                     </div>

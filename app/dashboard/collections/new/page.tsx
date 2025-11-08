@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Lock, Globe } from "lucide-react";
 import { toast } from "sonner";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import MainButton from "@/components/buttons/MainButton";
 import UpgradeDialog from "@/components/ui/UpgradeDialog";
 import HeroImageEditor from "@/components/dashboard/HeroImageEditor";
 
 export default function NewCollectionPage() {
     const router = useRouter();
+    const { user } = useAuthUser();
     const [loading, setLoading] = useState(false);
-    const [userPlan, setUserPlan] = useState<string>("free");
-    const [username, setUsername] = useState<string>("");
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
     const [upgradeContext, setUpgradeContext] = useState({
         title: "Feature available on higher plans",
@@ -29,22 +29,8 @@ export default function NewCollectionPage() {
     });
     const [heroImage, setHeroImage] = useState<File | null>(null);
 
-    useEffect(() => {
-        // Fetch user plan and username
-        fetch("/api/user/me")
-            .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-            .then((data) => {
-                if (data.user?.subscription_plan) {
-                    setUserPlan(data.user.subscription_plan);
-                }
-                if (data.user?.username) {
-                    setUsername(data.user.username);
-                }
-            })
-            .catch(() => {
-                // leave default "free" if it couldn't be fetched
-            });
-    }, []);
+    const userPlan = user?.subscription_plan || "free";
+    const username = user?.username || "";
 
     const generateSlug = (name: string) => {
         return name

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import type { Collection } from "@/types/collection";
 
 interface UseCollectionsReturn {
@@ -11,26 +12,15 @@ interface UseCollectionsReturn {
 }
 
 export function useCollections(): UseCollectionsReturn {
+    const { user } = useAuthUser();
     const [collections, setCollections] = useState<Collection[]>([]);
     const [loading, setLoading] = useState(true);
-    const [username, setUsername] = useState<string>("");
+
+    const username = user?.username || "";
 
     useEffect(() => {
         fetchCollections();
-        fetchUsername();
     }, []);
-
-    const fetchUsername = async () => {
-        try {
-            const res = await fetch("/api/user/me");
-            const data = await res.json();
-            if (data.ok && data.user?.username) {
-                setUsername(data.user.username);
-            }
-        } catch (error) {
-            console.error("Error fetching username:", error);
-        }
-    };
 
     const fetchCollections = async () => {
         try {

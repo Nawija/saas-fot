@@ -27,6 +27,8 @@ export interface User {
     email: string;
     name?: string;
     avatar?: string;
+    username?: string;
+    is_username_set?: boolean;
     provider: "email" | "google";
     subscription_plan: "free" | "basic" | "pro" | "unlimited";
     subscription_status: "active" | "cancelled" | "expired" | null;

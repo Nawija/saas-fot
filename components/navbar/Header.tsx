@@ -1,16 +1,21 @@
+"use client";
+
 import Link from "next/link";
-import { getUser } from "@/lib/auth/getUser";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import UserDropdown from "./UserDropdown";
 import Logo from "./Logo";
 
-export default async function Header() {
-    const user = await getUser();
+export default function Header() {
+    const { user, loading } = useAuthUser();
+
     return (
         <header className="bg-white py-3 px-4 lg:px-8">
             <nav className="flex items-center justify-between mx-auto ">
                 <Logo href="/dashboard" />
 
-                {user ? (
+                {loading ? (
+                    <div className="w-8 h-8 rounded-full bg-gray-300 animate-pulse mr-3" />
+                ) : user ? (
                     <div className="flex items-center justify-center text-sm text-gray-500 gap-3">
                         <UserDropdown
                             name={user.name}
