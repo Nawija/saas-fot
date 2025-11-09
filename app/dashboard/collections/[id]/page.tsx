@@ -434,7 +434,7 @@ export default function CollectionDetailPage({
                                 <AccordionTrigger className="px-0">
                                     <div className="flex items-center gap-2">
                                         <Heart size={20} />
-                                        Polubione zdjęcia
+                                        Polubione zdjęcia ({likedPhotos.length})
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent>
@@ -548,7 +548,7 @@ export default function CollectionDetailPage({
                                 <AccordionTrigger className="px-0">
                                     <div className="flex items-center gap-2">
                                         <Image size={20} />
-                                        Photo Gallery
+                                        Photo Gallery ({photos.length})
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent>
