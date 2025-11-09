@@ -33,7 +33,7 @@ function PhotoThumbnail({
     const [imageLoading, setImageLoading] = useState(true);
 
     return (
-        <div className="group relative aspect-square rounded-sm overflow-hidden bg-gray-100">
+        <div className="group relative h-62 rounded-sm bg-gray-100">
             <a
                 href={photo.file_path}
                 data-pswp-width={photo.width || 1200}

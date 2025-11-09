@@ -28,14 +28,8 @@ import {
     useHeroSettings,
     useCollectionSettings,
 } from "@/components/dashboard/collections";
-import {
-    ArrowBigLeft,
-    ArrowBigRight,
-    GalleryHorizontal,
-    Heart,
-    Image,
-    Download,
-} from "lucide-react";
+import { Heart, Image, Download } from "lucide-react";
+import Paginator from "@/components/ui/Paginator";
 import MainButton from "@/components/buttons/MainButton";
 import { toast } from "sonner";
 import EmptyState from "@/components/dashboard/EmptyState";
@@ -206,12 +200,6 @@ export default function CollectionDetailPage({
     }, []);
 
     useEffect(() => {
-        if (typeof window !== "undefined") {
-            setOrigin(window.location.origin);
-        }
-    }, []);
-
-    useEffect(() => {
         params.then((p) => {
             setCollectionId(p.id);
         });
@@ -368,7 +356,7 @@ export default function CollectionDetailPage({
         : `${origin}/g/${collection.slug}`;
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen pb-24 lg:pb-32">
             {/* Top Bar */}
             <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
                 <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
@@ -431,7 +419,7 @@ export default function CollectionDetailPage({
                                 value="liked"
                                 className="bg-white rounded-2xl border border-gray-200 px-6"
                             >
-                                <AccordionTrigger className="px-0">
+                                <AccordionTrigger>
                                     <div className="flex items-center gap-2">
                                         <Heart size={20} />
                                         Polubione zdjęcia ({likedPhotos.length})
@@ -473,7 +461,7 @@ export default function CollectionDetailPage({
                                                                 p.file_path
                                                             )}
                                                             alt={p.file_name}
-                                                            className="w-full h-20 object-cover rounded-md"
+                                                            className="w-full h-44 object-cover rounded-md"
                                                         />
                                                         <div className="text-xs text-gray-500 p-1 flex items-center gap-1 absolute z-10 -top-0.5 -right-0.5 bg-white px-1 rounded-md">
                                                             {
@@ -488,49 +476,14 @@ export default function CollectionDetailPage({
                                                     </div>
                                                 ))}
                                             </div>
-                                            <div className="mt-3 flex items-center gap-2">
-                                                <button
-                                                    onClick={() =>
-                                                        setLikedPage((s) =>
-                                                            Math.max(1, s - 1)
-                                                        )
-                                                    }
-                                                    disabled={likedPage <= 1}
-                                                    className="px-2 py-1 bg-gray-100 rounded disabled:opacity-50 text-sm"
-                                                >
-                                                    <ArrowBigLeft size={15} />
-                                                </button>
-                                                <div className="text-sm text-gray-600">
-                                                    Page {likedPage} /{" "}
-                                                    {Math.max(
-                                                        1,
-                                                        Math.ceil(
-                                                            likedTotal /
-                                                                LIKED_PAGE_SIZE
-                                                        )
-                                                    )}
-                                                </div>
-                                                <button
-                                                    onClick={() =>
-                                                        setLikedPage(
-                                                            (s) => s + 1
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        likedPage >=
-                                                        Math.max(
-                                                            1,
-                                                            Math.ceil(
-                                                                likedTotal /
-                                                                    LIKED_PAGE_SIZE
-                                                            )
-                                                        )
-                                                    }
-                                                    className="px-2 py-1 bg-gray-100 rounded disabled:opacity-50 text-sm"
-                                                >
-                                                    <ArrowBigRight size={15} />
-                                                </button>
-                                            </div>
+                                            <Paginator
+                                                page={likedPage}
+                                                total={likedTotal}
+                                                pageSize={LIKED_PAGE_SIZE}
+                                                onPageChange={(p) =>
+                                                    setLikedPage(p)
+                                                }
+                                            />
                                         </div>
                                     ) : (
                                         <EmptyState
@@ -545,7 +498,7 @@ export default function CollectionDetailPage({
                                 value="gallery"
                                 className="bg-white rounded-2xl border border-gray-200 px-6"
                             >
-                                <AccordionTrigger className="px-0">
+                                <AccordionTrigger>
                                     <div className="flex items-center gap-2">
                                         <Image size={20} />
                                         Photo Gallery ({photos.length})
