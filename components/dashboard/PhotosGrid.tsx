@@ -5,6 +5,7 @@ import { X, AlertCircle } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
+import { getThumbnailUrl } from "@/lib/utils/getThumbnailUrl";
 
 interface Photo {
     id: number;
@@ -19,28 +20,6 @@ interface Photo {
 interface PhotosGridProps {
     photos: Photo[];
     onDeletePhoto: (photoId: number) => void;
-}
-
-/**
- * Generuje URL miniaturki na podstawie głównego zdjęcia
- * Zamienia .webp na -thumb.webp (lub dodaje -thumb przed rozszerzeniem)
- */
-function getThumbnailUrl(filePath: string): string {
-    // Sprawdź czy jest .webp
-    if (filePath.endsWith(".webp")) {
-        return filePath.replace(".webp", "-thumb.webp");
-    }
-    // Dla innych rozszerzeń - dodaj -thumb przed ostatnią kropką
-    const lastDotIndex = filePath.lastIndexOf(".");
-    if (lastDotIndex > -1) {
-        return (
-            filePath.slice(0, lastDotIndex) +
-            "-thumb" +
-            filePath.slice(lastDotIndex)
-        );
-    }
-    // Fallback - po prostu dodaj -thumb na końcu
-    return filePath + "-thumb";
 }
 
 function PhotoThumbnail({

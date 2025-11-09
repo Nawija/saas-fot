@@ -45,10 +45,9 @@ export default function FloatingUploadButton({
         <>
             {/* Mobile */}
             <motion.div
-                className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg"
+                className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white border-t"
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
                 <AnimatePresence mode="wait">
                     {uploading || isComplete ? (
@@ -100,14 +99,10 @@ export default function FloatingUploadButton({
                                     animate={{ opacity: 1, scaleX: 1 }}
                                 >
                                     <motion.div
-                                        className="bg-blue-600 h-2 rounded-full"
+                                        className="bg-linear-to-r from-sky-300 via-indigo-300 to-blue-400 h-2 rounded-full"
                                         initial={{ width: 0 }}
                                         animate={{
                                             width: `${uploadProgress}%`,
-                                        }}
-                                        transition={{
-                                            duration: 0.3,
-                                            ease: "easeOut",
                                         }}
                                     />
                                 </motion.div>
@@ -130,20 +125,12 @@ export default function FloatingUploadButton({
                                     onChange={handleUpload}
                                     className="hidden"
                                 />
-                                <motion.div
-                                    className="flex items-center justify-center gap-2 bg-blue-600 text-white rounded-lg py-3 px-4"
-                                    whileHover={{
-                                        scale: 1.02,
-                                        backgroundColor: "#2563eb",
-                                    }}
-                                    whileTap={{ scale: 0.98 }}
-                                    transition={{ duration: 0.15 }}
-                                >
+                                <div className="flex items-center justify-center gap-2 bg-linear-to-r from-sky-500 via-indigo-500 to-pink-400 text-white rounded-lg py-3 px-4">
                                     <Upload className="h-5 w-5" />
                                     <span className="font-medium">
                                         Upload Photos
                                     </span>
-                                </motion.div>
+                                </div>
                             </label>
                         </motion.div>
                     )}
@@ -244,16 +231,11 @@ export default function FloatingUploadButton({
                             <div className="bg-linear-60 from-blue-500 to-indigo-400 border-indigo-300 border text-white rounded-full p-4 shadow-lg hover:scale-105 transition">
                                 <Upload className="h-6 w-6" />
                             </div>
-                            <motion.div
-                                className="absolute bottom-full right-0 mb-2 pointer-events-none"
-                                initial={{ opacity: 0, y: 5 }}
-                                whileHover={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.15 }}
-                            >
+                            <div className="absolute bottom-full right-0 mb-2 pointer-events-none">
                                 <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                     Upload photos
                                 </div>
-                            </motion.div>
+                            </div>
                         </motion.label>
                     )}
                 </AnimatePresence>

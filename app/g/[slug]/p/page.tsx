@@ -11,6 +11,7 @@ import "photoswipe/style.css";
 import MainButton from "@/components/buttons/MainButton";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import PhotoLikeButton from "@/components/gallery/PhotoLikeButton";
+import { getThumbnailUrl } from "@/lib/utils/getThumbnailUrl";
 
 const PHOTOS_PER_PAGE = 20;
 
@@ -482,23 +483,6 @@ export default function GalleryPhotosPage() {
         };
     }, [columnsCount, flatForHidden, singleMode]);
 
-    function getThumbnailUrl(filePath: string): string {
-        // Sprawdź czy jest .webp
-        if (filePath.endsWith(".webp")) {
-            return filePath.replace(".webp", "-thumb.webp");
-        }
-        // Dla innych rozszerzeń - dodaj -thumb przed ostatnią kropką
-        const lastDotIndex = filePath.lastIndexOf(".");
-        if (lastDotIndex > -1) {
-            return (
-                filePath.slice(0, lastDotIndex) +
-                "-thumb" +
-                filePath.slice(lastDotIndex)
-            );
-        }
-        // Fallback - po prostu dodaj -thumb na końcu
-        return filePath + "-thumb";
-    }
 
     if (loading) return <LoadingGallery />;
 

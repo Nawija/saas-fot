@@ -277,7 +277,6 @@ export async function POST(req: NextRequest) {
             // GENERUJ MINIATURKĘ (400px width, WebP, quality 75)
             let thumbnailBuffer: Buffer | null = null;
             let thumbnailKey: string | null = null;
-            let thumbnailUrl: string | null = null;
 
             if (canProcessWithSharp) {
                 try {
@@ -290,7 +289,7 @@ export async function POST(req: NextRequest) {
                         .toBuffer();
 
                     // Upload miniaturki do R2 z suffixem -thumb
-                    thumbnailKey = key.replace(`.${fileExt}`, `-thumb.webp`);
+                    thumbnailKey = key.replace(`.${fileExt}`, `t.webp`);
                     thumbnailUrl = await uploadToR2(
                         thumbnailBuffer,
                         thumbnailKey,

@@ -1,6 +1,5 @@
 // components/dashboard/collections/CollectionGallerySection.tsx
 import { Trash2, ImageIcon } from "lucide-react";
-import { motion } from "framer-motion";
 import MainButton from "@/components/buttons/MainButton";
 import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import type { Photo } from "./types";
