@@ -61,7 +61,7 @@ function PhotoThumbnail({
                         alt={photo.file_name}
                         loading="lazy"
                         decoding="async"
-                        className="absolute inset-0 w-full h-full object-cover rounded-lg transition-opacity duration-300"
+                        className="absolute inset-0 w-full h-full object-cover rounded-lg transition-opacity"
                         style={{
                             opacity: imageLoading ? 0 : 1,
                         }}
