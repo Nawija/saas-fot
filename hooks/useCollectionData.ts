@@ -43,7 +43,14 @@ export function useCollectionData(collectionId: string | null) {
             if (res.ok) {
                 const data = await res.json();
                 console.log("Photos data:", data);
-                setPhotos(data);
+                // API may return either an array (legacy) or an object { ok: true, photos, total }
+                if (Array.isArray(data)) {
+                    setPhotos(data);
+                } else if (data && Array.isArray(data.photos)) {
+                    setPhotos(data.photos);
+                } else {
+                    setPhotos([]);
+                }
             }
         } catch (error) {
             console.error("Error fetching photos:", error);

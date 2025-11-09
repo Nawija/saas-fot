@@ -3,6 +3,12 @@
 
 import { useEffect, useState } from "react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import {
+    Accordion,
+    AccordionItem,
+    AccordionTrigger,
+    AccordionContent,
+} from "@/components/ui/accordion";
 import Loading from "@/components/ui/Loading";
 import CollectionHeader from "@/components/dashboard/CollectionHeader";
 import PhotoUploadSection from "@/components/dashboard/PhotoUploadSection";
@@ -22,6 +28,13 @@ import {
     useHeroSettings,
     useCollectionSettings,
 } from "@/components/dashboard/collections";
+import {
+    ArrowBigLeft,
+    ArrowBigRight,
+    ArrowLeft,
+    ArrowLeftCircle,
+    Heart,
+} from "lucide-react";
 
 export default function CollectionDetailPage({
     params,
@@ -68,50 +81,101 @@ export default function CollectionDetailPage({
         uploadPhotos,
     } = usePhotoUpload(collectionId);
 
-    // Liked photos state: fetch like counts for photos and show those with > 0 likes
+    // Liked photos state (paginated)
     const [likedPhotos, setLikedPhotos] = useState<
-        ((typeof photos)[number] & { likeCount: number })[]
+        ((typeof photos)[number] & { likeCount?: number })[]
     >([]);
     const [likedLoading, setLikedLoading] = useState(false);
+    const [likedPage, setLikedPage] = useState(1);
+    const LIKED_PAGE_SIZE = 20;
+    const [likedTotal, setLikedTotal] = useState(0);
+    const fetchLikedPageNow = async (page = likedPage) => {
+        if (!collectionId) {
+            setLikedPhotos([]);
+            setLikedTotal(0);
+            return;
+        }
+
+        setLikedLoading(true);
+        try {
+            const res = await fetch(
+                `/api/collections/${collectionId}/liked-photos?page=${page}&pageSize=${LIKED_PAGE_SIZE}`
+            );
+            if (!res.ok) {
+                setLikedPhotos([]);
+                setLikedTotal(0);
+                return;
+            }
+            const data = await res.json();
+            setLikedPhotos(data.photos || []);
+            setLikedTotal(data.total || 0);
+        } catch (err) {
+            console.error("Error fetching liked photos:", err);
+            setLikedPhotos([]);
+            setLikedTotal(0);
+        } finally {
+            setLikedLoading(false);
+        }
+    };
 
     useEffect(() => {
         let mounted = true;
-        async function fetchLikedForCollection() {
-            if (!collectionId) {
-                setLikedPhotos([]);
-                return;
-            }
-
-            setLikedLoading(true);
-            try {
-                const res = await fetch(
-                    `/api/collections/${collectionId}/liked-photos`
-                );
-                if (!res.ok) {
-                    setLikedPhotos([]);
-                    return;
-                }
-                const data = await res.json();
-                if (!mounted) return;
-                const list = data.photos || [];
-                setLikedPhotos(list);
-            } catch (err) {
-                console.error("Error fetching liked photos:", err);
-                if (mounted) setLikedPhotos([]);
-            } finally {
-                if (mounted) setLikedLoading(false);
-            }
-        }
-
-        fetchLikedForCollection();
-
+        (async () => {
+            if (!mounted) return;
+            await fetchLikedPageNow(likedPage);
+        })();
         return () => {
             mounted = false;
         };
-    }, [photos]);
+    }, [collectionId, likedPage]);
 
     const [uploadedCount, setUploadedCount] = useState(0);
     const [totalUploadCount, setTotalUploadCount] = useState(0);
+
+    // Gallery pagination
+    const [galleryPage, setGalleryPage] = useState(1);
+    const GALLERY_PAGE_SIZE = 20;
+    const [galleryPhotos, setGalleryPhotos] = useState<typeof photos>([]);
+    const [galleryTotal, setGalleryTotal] = useState(0);
+    const [galleryLoading, setGalleryLoading] = useState(false);
+    const fetchGalleryPageNow = async (page = galleryPage) => {
+        if (!collectionId) {
+            setGalleryPhotos([]);
+            setGalleryTotal(0);
+            return;
+        }
+        setGalleryLoading(true);
+        try {
+            const res = await fetch(
+                `/api/collections/${collectionId}/photos?page=${page}&pageSize=${GALLERY_PAGE_SIZE}`
+            );
+            if (!res.ok) {
+                setGalleryPhotos([]);
+                setGalleryTotal(0);
+                return;
+            }
+            const data = await res.json();
+            setGalleryPhotos(data.photos || []);
+            setGalleryTotal(data.total || 0);
+        } catch (err) {
+            console.error("Error fetching gallery page:", err);
+            setGalleryPhotos([]);
+            setGalleryTotal(0);
+        } finally {
+            setGalleryLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            if (!mounted) return;
+            await fetchGalleryPageNow(galleryPage);
+        })();
+        return () => {
+            mounted = false;
+        };
+    }, [collectionId, galleryPage]);
 
     const { saving, savingHeroImage, updateHeroSettings, saveHeroImage } =
         useHeroSettings(
@@ -200,6 +264,12 @@ export default function CollectionDetailPage({
             await fetchCollection();
             setUploadedCount(files.length);
         });
+
+        // Refresh paginated gallery and liked lists explicitly
+        await fetchGalleryPageNow(1);
+        setGalleryPage(1);
+        await fetchLikedPageNow(1);
+        setLikedPage(1);
     }
 
     async function handleDrop(files: FileList) {
@@ -213,6 +283,12 @@ export default function CollectionDetailPage({
             await fetchCollection();
             setUploadedCount(files.length);
         });
+
+        // Refresh paginated gallery and liked lists explicitly
+        await fetchGalleryPageNow(1);
+        setGalleryPage(1);
+        await fetchLikedPageNow(1);
+        setLikedPage(1);
     }
 
     function handleDeletePhotoClick(photoId: number) {
@@ -315,60 +391,141 @@ export default function CollectionDetailPage({
                             </div>
                         </div>
 
-                        {/* Liked Photos (polubione zdjęcia) */}
-                        {likedLoading ? (
-                            <div className="bg-white rounded-2xl border border-gray-200 p-4">
-                                <div className="text-sm text-gray-600">
-                                    Ładowanie polubionych zdjęć...
-                                </div>
-                            </div>
-                        ) : likedPhotos.length > 0 ? (
-                            <div className="bg-white rounded-2xl border border-gray-200 p-4">
-                                <h3 className="text-sm font-semibold text-gray-800 mb-3">
-                                    Polubione zdjęcia
-                                </h3>
-                                <div className="flex gap-3 overflow-x-auto">
-                                    {likedPhotos.map((p) => (
-                                        <div
-                                            key={p.id}
-                                            className="w-28 shrink-0"
-                                        >
-                                            <img
-                                                src={p.file_path}
-                                                alt={p.file_name}
-                                                className="w-full h-20 object-cover rounded-md"
-                                            />
-                                            <div className="text-xs text-gray-500 mt-1">
-                                                {p.likeCount}{" "}
-                                                {p.likeCount === 1
-                                                    ? "polubienie"
-                                                    : "polubień"}
+                        <Accordion
+                            type="single"
+                            collapsible
+                            defaultValue="gallery"
+                            className="space-y-6"
+                        >
+                            <AccordionItem
+                                value="liked"
+                                className="bg-white rounded-2xl border border-gray-200 px-4"
+                            >
+                                <AccordionTrigger className="px-0">
+                                    Polubione zdjęcia ({likedPhotos.length})
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    {likedLoading ? (
+                                        <div className="bg-white rounded-2xl border border-gray-200 p-4">
+                                            <div className="text-sm text-gray-600">
+                                                Ładowanie polubionych zdjęć...
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="bg-white rounded-2xl border border-gray-200 p-4">
-                                <div className="text-sm text-gray-600">
-                                    Brak polubionych zdjęć.
-                                </div>
-                            </div>
-                        )}
+                                    ) : likedPhotos.length > 0 ? (
+                                        <div className="bg-white rounded-2xl border border-gray-200 p-4">
+                                            <div className="flex gap-3 overflow-x-auto">
+                                                {likedPhotos.map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="w-28 shrink-0 relative"
+                                                    >
+                                                        <img
+                                                            src={
+                                                                (p as any)
+                                                                    .file_path
+                                                            }
+                                                            alt={
+                                                                (p as any)
+                                                                    .file_name
+                                                            }
+                                                            className="w-full h-20 object-cover rounded-md"
+                                                        />
+                                                        <div className="text-xs text-gray-500 p-1 flex items-center gap-1 absolute z-10 -top-0.5 -right-0.5 bg-white px-1 rounded-md">
+                                                            {
+                                                                (p as any)
+                                                                    .likeCount
+                                                            }{" "}
+                                                            <Heart
+                                                                size={12}
+                                                                className="fill-red-500 text-red-500"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="mt-3 flex items-center gap-2">
+                                                <button
+                                                    onClick={() =>
+                                                        setLikedPage((s) =>
+                                                            Math.max(1, s - 1)
+                                                        )
+                                                    }
+                                                    disabled={likedPage <= 1}
+                                                    className="px-2 py-1 bg-gray-100 rounded disabled:opacity-50 text-sm"
+                                                >
+                                                    <ArrowBigLeft size={15} />
+                                                </button>
+                                                <div className="text-sm text-gray-600">
+                                                    Page {likedPage} /{" "}
+                                                    {Math.max(
+                                                        1,
+                                                        Math.ceil(
+                                                            likedTotal /
+                                                                LIKED_PAGE_SIZE
+                                                        )
+                                                    )}
+                                                </div>
+                                                <button
+                                                    onClick={() =>
+                                                        setLikedPage(
+                                                            (s) => s + 1
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        likedPage >=
+                                                        Math.max(
+                                                            1,
+                                                            Math.ceil(
+                                                                likedTotal /
+                                                                    LIKED_PAGE_SIZE
+                                                            )
+                                                        )
+                                                    }
+                                                    className="px-2 py-1 bg-gray-100 rounded disabled:opacity-50 text-sm"
+                                                >
+                                                    <ArrowBigRight size={15} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-white rounded-2xl border border-gray-200 p-4">
+                                            <div className="text-sm text-gray-600">
+                                                Brak polubionych zdjęć.
+                                            </div>
+                                        </div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
 
-                        {/* Upload Errors */}
-                        <UploadErrorsList
-                            errors={uploadErrors}
-                            onClose={() => setUploadErrors([])}
-                        />
+                            <AccordionItem
+                                value="gallery"
+                                className="bg-white rounded-2xl border border-gray-200 px-4"
+                            >
+                                <AccordionTrigger className="px-0">
+                                    Photo Gallery ({galleryPhotos.length})
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    {/* Upload Errors */}
+                                    <UploadErrorsList
+                                        errors={uploadErrors}
+                                        onClose={() => setUploadErrors([])}
+                                    />
 
-                        {/* Gallery Section */}
-                        <CollectionGallerySection
-                            photos={photos}
-                            deletingAll={deletingAll}
-                            onDeletePhoto={handleDeletePhotoClick}
-                            onDeleteAll={() => setConfirmDeleteAllOpen(true)}
-                        />
+                                    <CollectionGallerySection
+                                        photos={galleryPhotos}
+                                        deletingAll={deletingAll}
+                                        onDeletePhoto={handleDeletePhotoClick}
+                                        onDeleteAll={() =>
+                                            setConfirmDeleteAllOpen(true)
+                                        }
+                                        page={galleryPage}
+                                        total={galleryTotal}
+                                        pageSize={GALLERY_PAGE_SIZE}
+                                        onPageChange={(p) => setGalleryPage(p)}
+                                    />
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                     </div>
                 </div>
             </div>

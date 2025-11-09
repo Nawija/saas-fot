@@ -31,7 +31,20 @@ export async function GET(
             );
         }
 
-        // Pobierz zdjęcia
+        // Paginacja
+        const url = new URL(request.url);
+        const page = parseInt(url.searchParams.get("page") || "1");
+        const pageSize = parseInt(url.searchParams.get("pageSize") || "100");
+        const offset = (Math.max(page, 1) - 1) * pageSize;
+
+        // total count
+        const countRes = await query(
+            "SELECT COUNT(*) as count FROM photos WHERE collection_id = $1",
+            [id]
+        );
+        const total = parseInt(countRes.rows[0].count) || 0;
+
+        // Pobierz zdjęcia z limitem
         const result = await query(
             `SELECT id, file_name, file_path, 
              CAST(file_size AS INTEGER) as file_size,
@@ -39,11 +52,12 @@ export async function GET(
              created_at 
        FROM photos 
        WHERE collection_id = $1 
-       ORDER BY created_at DESC`,
-            [id]
+       ORDER BY created_at DESC
+       LIMIT $2 OFFSET $3`,
+            [id, pageSize, offset]
         );
 
-        return NextResponse.json(result.rows);
+        return NextResponse.json({ ok: true, photos: result.rows, total });
     } catch (error) {
         console.error("Get photos error:", error);
         return NextResponse.json(

@@ -10,6 +10,11 @@ interface CollectionGallerySectionProps {
     deletingAll?: boolean;
     onDeletePhoto: (photoId: number) => void;
     onDeleteAll: () => void;
+    // pagination
+    page?: number;
+    total?: number;
+    pageSize?: number;
+    onPageChange?: (newPage: number) => void;
 }
 
 export default function CollectionGallerySection({
@@ -17,15 +22,63 @@ export default function CollectionGallerySection({
     deletingAll = false,
     onDeletePhoto,
     onDeleteAll,
+    page = 1,
+    total = 0,
+    pageSize = 20,
+    onPageChange,
 }: CollectionGallerySectionProps) {
+    const totalPages = Math.max(
+        1,
+        Math.ceil((total || photos.length) / pageSize)
+    );
+
+    function prev() {
+        if (page > 1 && onPageChange) onPageChange(page - 1);
+    }
+
+    function next() {
+        if (page < totalPages && onPageChange) onPageChange(page + 1);
+    }
+
     return (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="border-b border-gray-200 px-5 py-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-base font-semibold text-gray-900">
-                        Photo gallery ({photos.length})
-                    </h2>
-                    {photos.length > 0 && (
+                    <h2 className="text-base font-semibold text-gray-900"></h2>
+                    {total > 0 && (
+                        <div className="flex items-center gap-3">
+                            <div className="text-sm text-gray-600">
+                                Strona {page} / {totalPages}
+                            </div>
+                            <button
+                                onClick={prev}
+                                disabled={page <= 1}
+                                className="px-2 py-1 bg-gray-100 rounded disabled:opacity-50 text-sm"
+                            >
+                                Prev
+                            </button>
+                            <button
+                                onClick={next}
+                                disabled={page >= totalPages}
+                                className="px-2 py-1 bg-gray-100 rounded disabled:opacity-50 text-sm"
+                            >
+                                Next
+                            </button>
+                            {photos.length > 0 && (
+                                <MainButton
+                                    onClick={onDeleteAll}
+                                    loading={deletingAll}
+                                    disabled={deletingAll}
+                                    loadingText="Deleting..."
+                                    icon={<Trash2 size={15} />}
+                                    label={"Delete all"}
+                                    variant="danger"
+                                    className="text-xs md:text-sm"
+                                />
+                            )}
+                        </div>
+                    )}
+                    {total === 0 && photos.length > 0 && (
                         <MainButton
                             onClick={onDeleteAll}
                             loading={deletingAll}

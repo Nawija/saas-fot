@@ -38,7 +38,23 @@ export async function GET(
             );
         }
 
-        // Get photos with like counts (only those with > 0 likes)
+        // Paginacja
+        const url = new URL(req.url);
+        const page = parseInt(url.searchParams.get("page") || "1");
+        const pageSize = parseInt(url.searchParams.get("pageSize") || "20");
+        const offset = (Math.max(page, 1) - 1) * pageSize;
+
+        // total liked count
+        const totalRes = await query(
+            `SELECT COUNT(DISTINCT p.id) as count
+             FROM photos p
+             JOIN photo_likes pl ON p.id = pl.photo_id
+             WHERE p.collection_id = $1`,
+            [collectionId]
+        );
+        const total = parseInt(totalRes.rows[0].count) || 0;
+
+        // Get photos with like counts (only those with > 0 likes) with pagination
         const result = await query(
             `SELECT 
                 p.id,
@@ -53,8 +69,9 @@ export async function GET(
             WHERE p.collection_id = $1
             GROUP BY p.id, p.file_path, p.thumbnail_path, p.file_name, p.width, p.height
             HAVING COUNT(pl.id) > 0
-            ORDER BY COUNT(pl.id) DESC, p.uploaded_at DESC`,
-            [collectionId]
+            ORDER BY COUNT(pl.id) DESC, p.uploaded_at DESC
+            LIMIT $2 OFFSET $3`,
+            [collectionId, pageSize, offset]
         );
 
         const photos = result.rows.map((row: any) => ({
@@ -67,7 +84,7 @@ export async function GET(
             likeCount: parseInt(row.like_count) || 0,
         }));
 
-        return NextResponse.json({ ok: true, photos });
+        return NextResponse.json({ ok: true, photos, total });
     } catch (error: any) {
         console.error("Error fetching liked photos:", error);
         return createErrorResponse("Błąd pobierania polubionych zdjęć", 500);
