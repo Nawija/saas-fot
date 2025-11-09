@@ -417,7 +417,7 @@ export default function CollectionDetailPage({
                         >
                             <AccordionItem
                                 value="liked"
-                                className="bg-white rounded-2xl border border-gray-200 px-6"
+                                className="bg-white rounded-2xl border border-gray-200 px-6 last:border-b"
                             >
                                 <AccordionTrigger>
                                     <div className="flex items-center gap-2">
@@ -496,7 +496,7 @@ export default function CollectionDetailPage({
 
                             <AccordionItem
                                 value="gallery"
-                                className="bg-white rounded-2xl border border-gray-200 px-6"
+                                className="bg-white rounded-2xl border border-gray-200 px-6 last:border-b"
                             >
                                 <AccordionTrigger>
                                     <div className="flex items-center gap-2">

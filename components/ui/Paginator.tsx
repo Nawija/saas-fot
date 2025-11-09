@@ -1,10 +1,10 @@
-import * as React from "react";
 import {
     Pagination,
     PaginationContent,
     PaginationItem,
     PaginationLink,
 } from "@/components/ui/pagination";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 type PaginatorProps = {
     page: number;
@@ -53,7 +53,7 @@ export default function Paginator({
     const pages = makePages();
 
     return (
-        <div className="mt-3 pt-3 border-t border-gray-100 flex justify-center">
+        <div className="mt-3 pt-5 border-t border-gray-200 flex justify-center">
             <Pagination>
                 <PaginationContent>
                     <PaginationItem>
@@ -66,7 +66,7 @@ export default function Paginator({
                             }
                             aria-disabled={page <= 1}
                         >
-                            Previous
+                            <ArrowLeft size={20} />
                         </PaginationLink>
                     </PaginationItem>
 
@@ -105,7 +105,7 @@ export default function Paginator({
                             }
                             aria-disabled={page >= totalPages}
                         >
-                            Next
+                            <ArrowRight size={20} />
                         </PaginationLink>
                     </PaginationItem>
                 </PaginationContent>
