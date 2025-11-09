@@ -28,7 +28,16 @@ import {
     useHeroSettings,
     useCollectionSettings,
 } from "@/components/dashboard/collections";
-import { ArrowBigLeft, ArrowBigRight, GalleryHorizontal, Heart, Image } from "lucide-react";
+import {
+    ArrowBigLeft,
+    ArrowBigRight,
+    GalleryHorizontal,
+    Heart,
+    Image,
+    Download,
+} from "lucide-react";
+import MainButton from "@/components/buttons/MainButton";
+import { toast } from "sonner";
 import EmptyState from "@/components/dashboard/EmptyState";
 import { getThumbnailUrl } from "@/lib/utils/getThumbnailUrl";
 
@@ -283,6 +292,37 @@ export default function CollectionDetailPage({
         setLikedPage(1);
     }
 
+    async function downloadLikedPhotos() {
+        if (!collectionId || likedTotal === 0) return;
+
+        try {
+            toast.info("Przygotowuję pobieranie polubionych zdjęć...");
+
+            const response = await fetch(
+                `/api/collections/${collectionId}/download-liked-zip`
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to download");
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${collection?.slug || "photos"}-liked.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            toast.success("Pobieranie uruchomione!");
+        } catch (error) {
+            console.error("Error downloading liked photos:", error);
+            toast.error("Błąd podczas pobierania polubionych zdjęć");
+        }
+    }
+
     function handleDeletePhotoClick(photoId: number) {
         setPendingPhotoId(photoId);
         setConfirmOpen(true);
@@ -406,6 +446,22 @@ export default function CollectionDetailPage({
                                         </div>
                                     ) : likedPhotos.length > 0 ? (
                                         <div className="bg-white rounded-2xl border border-gray-200 p-4">
+                                            <div className="mb-3 flex justify-end">
+                                                <MainButton
+                                                    onClick={async () =>
+                                                        await downloadLikedPhotos()
+                                                    }
+                                                    label="Pobierz polubione"
+                                                    icon={
+                                                        <Download size={14} />
+                                                    }
+                                                    variant="secondary"
+                                                    disabled={
+                                                        likedTotal === 0 ||
+                                                        likedLoading
+                                                    }
+                                                />
+                                            </div>
                                             <div className="flex gap-3 overflow-x-auto">
                                                 {likedPhotos.map((p) => (
                                                     <div
