@@ -53,7 +53,7 @@ export default function Paginator({
     const pages = makePages();
 
     return (
-        <div className="mt-3 pt-5 border-t border-gray-200 flex justify-center">
+        <div className="pt-4 flex justify-center">
             <Pagination>
                 <PaginationContent>
                     <PaginationItem>

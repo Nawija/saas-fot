@@ -426,6 +426,18 @@ export default function CollectionDetailPage({
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent>
+                                    <div className="mb-6 flex justify-end">
+                                        <MainButton
+                                            onClick={async () =>
+                                                await downloadLikedPhotos()
+                                            }
+                                            label="Pobierz polubione"
+                                            icon={<Download size={14} />}
+                                            disabled={
+                                                likedTotal === 0 || likedLoading
+                                            }
+                                        />
+                                    </div>
                                     {likedLoading ? (
                                         <div className="bg-white rounded-2xl border border-gray-200 p-4">
                                             <div className="text-sm text-gray-600">
@@ -433,48 +445,36 @@ export default function CollectionDetailPage({
                                             </div>
                                         </div>
                                     ) : likedPhotos.length > 0 ? (
-                                        <div className="bg-white rounded-2xl border border-gray-200 p-4">
-                                            <div className="mb-3 flex justify-end">
-                                                <MainButton
-                                                    onClick={async () =>
-                                                        await downloadLikedPhotos()
-                                                    }
-                                                    label="Pobierz polubione"
-                                                    icon={
-                                                        <Download size={14} />
-                                                    }
-                                                    variant="secondary"
-                                                    disabled={
-                                                        likedTotal === 0 ||
-                                                        likedLoading
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="flex gap-3 overflow-x-auto">
-                                                {likedPhotos.map((p) => (
-                                                    <div
-                                                        key={p.id}
-                                                        className="w-28 shrink-0 relative"
-                                                    >
-                                                        <img
-                                                            src={getThumbnailUrl(
-                                                                p.file_path
-                                                            )}
-                                                            alt={p.file_name}
-                                                            className="w-full h-44 object-cover rounded-md"
-                                                        />
-                                                        <div className="text-xs text-gray-500 p-1 flex items-center gap-1 absolute z-10 -top-0.5 -right-0.5 bg-white px-1 rounded-md">
-                                                            {
-                                                                (p as any)
-                                                                    .likeCount
-                                                            }{" "}
-                                                            <Heart
-                                                                size={12}
-                                                                className="fill-red-500 text-red-500"
+                                        <>
+                                            <div className="bg-white rounded-2xl border border-gray-200 p-3">
+                                                <div className="flex gap-3 overflow-x-auto">
+                                                    {likedPhotos.map((p) => (
+                                                        <div
+                                                            key={p.id}
+                                                            className="w-28 shrink-0 relative"
+                                                        >
+                                                            <img
+                                                                src={getThumbnailUrl(
+                                                                    p.file_path
+                                                                )}
+                                                                alt={
+                                                                    p.file_name
+                                                                }
+                                                                className="w-full h-44 object-cover rounded-md"
                                                             />
+                                                            <div className="text-xs text-gray-500 p-1 flex items-center gap-1 absolute z-10 -top-0.5 -right-0.5 bg-white px-1 rounded-md">
+                                                                {
+                                                                    (p as any)
+                                                                        .likeCount
+                                                                }{" "}
+                                                                <Heart
+                                                                    size={12}
+                                                                    className="fill-red-500 text-red-500"
+                                                                />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))}
+                                                    ))}
+                                                </div>
                                             </div>
                                             <Paginator
                                                 page={likedPage}
@@ -484,7 +484,7 @@ export default function CollectionDetailPage({
                                                     setLikedPage(p)
                                                 }
                                             />
-                                        </div>
+                                        </>
                                     ) : (
                                         <EmptyState
                                             title="No liked photos"
