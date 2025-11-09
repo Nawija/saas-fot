@@ -156,18 +156,18 @@ export default function proxy(request: NextRequest) {
     }
 }
 
-// export const config = {
-//     // Obsługuj wszystkie ścieżki OPRÓCZ statycznych plików i FormData endpoints
-//     matcher: [
-//         /*
-//          * Match all request paths except for:
-//          * - _next/static (static files)
-//          * - _next/image (image optimization files)
-//          * - favicon.ico (favicon file)
-//          * - public folder files
-//          * - api/collections/upload (photo upload with FormData)
-//          * - api/user/avatar (avatar upload with FormData)
-//          */
-//         "/((?!_next/static|_next/image|favicon.ico|api/collections/upload|api/user/avatar|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-//     ],
-// };
+export const config = {
+    // Obsługuj wszystkie ścieżki OPRÓCZ statycznych plików i FormData endpoints
+    matcher: [
+        /*
+         * Match all request paths except for:
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * - public folder files
+         * - api/collections/upload (photo upload with FormData)
+         * - api/user/avatar (avatar upload with FormData)
+         */
+        "/((?!_next/static|_next/image|favicon.ico|api/collections/upload|api/user/avatar|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    ],
+};
