@@ -28,13 +28,9 @@ import {
     useHeroSettings,
     useCollectionSettings,
 } from "@/components/dashboard/collections";
-import {
-    ArrowBigLeft,
-    ArrowBigRight,
-    ArrowLeft,
-    ArrowLeftCircle,
-    Heart,
-} from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, GalleryHorizontal, Heart, Image } from "lucide-react";
+import EmptyState from "@/components/dashboard/EmptyState";
+import { getThumbnailUrl } from "@/lib/utils/getThumbnailUrl";
 
 export default function CollectionDetailPage({
     params,
@@ -137,14 +133,12 @@ export default function CollectionDetailPage({
     const GALLERY_PAGE_SIZE = 20;
     const [galleryPhotos, setGalleryPhotos] = useState<typeof photos>([]);
     const [galleryTotal, setGalleryTotal] = useState(0);
-    const [galleryLoading, setGalleryLoading] = useState(false);
     const fetchGalleryPageNow = async (page = galleryPage) => {
         if (!collectionId) {
             setGalleryPhotos([]);
             setGalleryTotal(0);
             return;
         }
-        setGalleryLoading(true);
         try {
             const res = await fetch(
                 `/api/collections/${collectionId}/photos?page=${page}&pageSize=${GALLERY_PAGE_SIZE}`
@@ -161,8 +155,6 @@ export default function CollectionDetailPage({
             console.error("Error fetching gallery page:", err);
             setGalleryPhotos([]);
             setGalleryTotal(0);
-        } finally {
-            setGalleryLoading(false);
         }
     };
 
@@ -351,6 +343,7 @@ export default function CollectionDetailPage({
                     <CollectionSidebar
                         collection={collection}
                         photos={photos}
+                        likedPhotos={likedPhotos}
                         templateLabel={currentTemplate?.label || "Minimal"}
                         galleryUrl={galleryUrl}
                         onEditTemplate={() => setHeroModalOpen(true)}
@@ -361,15 +354,12 @@ export default function CollectionDetailPage({
 
                     {/* Right Content - Upload & Gallery */}
                     <div className="lg:col-span-8 xl:col-span-9 space-y-6">
-                        {/* Copy Gallery Link */}
-                        <div className="mb-6">
-                            <CopyLinkButton
-                                url={galleryUrl}
-                                showUrl={true}
-                                label="Copy"
-                                variant="default"
-                            />
-                        </div>
+                        <CopyLinkButton
+                            url={galleryUrl}
+                            showUrl={true}
+                            label="Copy"
+                            variant="default"
+                        />
 
                         {/* Upload Section - Desktop Only */}
                         <div className="hidden lg:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -399,10 +389,13 @@ export default function CollectionDetailPage({
                         >
                             <AccordionItem
                                 value="liked"
-                                className="bg-white rounded-2xl border border-gray-200 px-4"
+                                className="bg-white rounded-2xl border border-gray-200 px-6"
                             >
                                 <AccordionTrigger className="px-0">
-                                    Polubione zdjęcia ({likedPhotos.length})
+                                    <div className="flex items-center gap-2">
+                                        <Heart size={20} />
+                                        Polubione zdjęcia
+                                    </div>
                                 </AccordionTrigger>
                                 <AccordionContent>
                                     {likedLoading ? (
@@ -420,14 +413,10 @@ export default function CollectionDetailPage({
                                                         className="w-28 shrink-0 relative"
                                                     >
                                                         <img
-                                                            src={
-                                                                (p as any)
-                                                                    .file_path
-                                                            }
-                                                            alt={
-                                                                (p as any)
-                                                                    .file_name
-                                                            }
+                                                            src={getThumbnailUrl(
+                                                                p.file_path
+                                                            )}
+                                                            alt={p.file_name}
                                                             className="w-full h-20 object-cover rounded-md"
                                                         />
                                                         <div className="text-xs text-gray-500 p-1 flex items-center gap-1 absolute z-10 -top-0.5 -right-0.5 bg-white px-1 rounded-md">
@@ -488,21 +477,23 @@ export default function CollectionDetailPage({
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="bg-white rounded-2xl border border-gray-200 p-4">
-                                            <div className="text-sm text-gray-600">
-                                                Brak polubionych zdjęć.
-                                            </div>
-                                        </div>
+                                        <EmptyState
+                                            title="No liked photos"
+                                            description="You haven't liked any photos yet."
+                                        />
                                     )}
                                 </AccordionContent>
                             </AccordionItem>
 
                             <AccordionItem
                                 value="gallery"
-                                className="bg-white rounded-2xl border border-gray-200 px-4"
+                                className="bg-white rounded-2xl border border-gray-200 px-6"
                             >
                                 <AccordionTrigger className="px-0">
-                                    Photo Gallery ({galleryPhotos.length})
+                                    <div className="flex items-center gap-2">
+                                        <Image size={20} />
+                                        Photo Gallery
+                                    </div>
                                 </AccordionTrigger>
                                 <AccordionContent>
                                     {/* Upload Errors */}

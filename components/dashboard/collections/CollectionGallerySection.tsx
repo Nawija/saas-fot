@@ -1,5 +1,5 @@
 // components/dashboard/collections/CollectionGallerySection.tsx
-import { Trash2, ImageIcon } from "lucide-react";
+import { Trash2, ImageIcon, ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 import PhotosGrid from "@/components/dashboard/PhotosGrid";
 import type { Photo } from "./types";
@@ -48,21 +48,21 @@ export default function CollectionGallerySection({
                     {total > 0 && (
                         <div className="flex items-center gap-3">
                             <div className="text-sm text-gray-600">
-                                Strona {page} / {totalPages}
+                                Page {page} / {totalPages}
                             </div>
                             <button
                                 onClick={prev}
                                 disabled={page <= 1}
                                 className="px-2 py-1 bg-gray-100 rounded disabled:opacity-50 text-sm"
                             >
-                                Prev
+                                <ArrowBigLeft size={15} />
                             </button>
                             <button
                                 onClick={next}
                                 disabled={page >= totalPages}
                                 className="px-2 py-1 bg-gray-100 rounded disabled:opacity-50 text-sm"
                             >
-                                Next
+                                <ArrowBigRight size={15} />
                             </button>
                             {photos.length > 0 && (
                                 <MainButton

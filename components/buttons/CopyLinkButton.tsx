@@ -24,7 +24,6 @@ export default function CopyLinkButton({
     url,
     showUrl = false,
     label = "Kopiuj",
-    variant = "default",
 }: CopyLinkButtonProps) {
     const [copied, setCopied] = useState(false);
     const [confetti, setConfetti] = useState<Confetti[]>([]);
@@ -89,7 +88,7 @@ export default function CopyLinkButton({
         <div className="flex items-center gap-2">
             {showUrl && (
                 <div
-                    className={`relative flex w-full items-center gap-2 px-3 py-2 rounded-xl bg-white border-2 border-gray-200`}
+                    className={`relative flex w-full items-center gap-2 px-3 py-2 rounded-xl bg-white border border-gray-200`}
                 >
                     {copied && (
                         <div className="absolute inset-0 rounded-xl pointer-events-none animate-border-shimmer" />
