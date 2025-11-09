@@ -68,6 +68,48 @@ export default function CollectionDetailPage({
         uploadPhotos,
     } = usePhotoUpload(collectionId);
 
+    // Liked photos state: fetch like counts for photos and show those with > 0 likes
+    const [likedPhotos, setLikedPhotos] = useState<
+        ((typeof photos)[number] & { likeCount: number })[]
+    >([]);
+    const [likedLoading, setLikedLoading] = useState(false);
+
+    useEffect(() => {
+        let mounted = true;
+        async function fetchLikedForCollection() {
+            if (!collectionId) {
+                setLikedPhotos([]);
+                return;
+            }
+
+            setLikedLoading(true);
+            try {
+                const res = await fetch(
+                    `/api/collections/${collectionId}/liked-photos`
+                );
+                if (!res.ok) {
+                    setLikedPhotos([]);
+                    return;
+                }
+                const data = await res.json();
+                if (!mounted) return;
+                const list = data.photos || [];
+                setLikedPhotos(list);
+            } catch (err) {
+                console.error("Error fetching liked photos:", err);
+                if (mounted) setLikedPhotos([]);
+            } finally {
+                if (mounted) setLikedLoading(false);
+            }
+        }
+
+        fetchLikedForCollection();
+
+        return () => {
+            mounted = false;
+        };
+    }, [photos]);
+
     const [uploadedCount, setUploadedCount] = useState(0);
     const [totalUploadCount, setTotalUploadCount] = useState(0);
 
@@ -272,6 +314,47 @@ export default function CollectionDetailPage({
                                 />
                             </div>
                         </div>
+
+                        {/* Liked Photos (polubione zdjęcia) */}
+                        {likedLoading ? (
+                            <div className="bg-white rounded-2xl border border-gray-200 p-4">
+                                <div className="text-sm text-gray-600">
+                                    Ładowanie polubionych zdjęć...
+                                </div>
+                            </div>
+                        ) : likedPhotos.length > 0 ? (
+                            <div className="bg-white rounded-2xl border border-gray-200 p-4">
+                                <h3 className="text-sm font-semibold text-gray-800 mb-3">
+                                    Polubione zdjęcia
+                                </h3>
+                                <div className="flex gap-3 overflow-x-auto">
+                                    {likedPhotos.map((p) => (
+                                        <div
+                                            key={p.id}
+                                            className="w-28 shrink-0"
+                                        >
+                                            <img
+                                                src={p.file_path}
+                                                alt={p.file_name}
+                                                className="w-full h-20 object-cover rounded-md"
+                                            />
+                                            <div className="text-xs text-gray-500 mt-1">
+                                                {p.likeCount}{" "}
+                                                {p.likeCount === 1
+                                                    ? "polubienie"
+                                                    : "polubień"}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-2xl border border-gray-200 p-4">
+                                <div className="text-sm text-gray-600">
+                                    Brak polubionych zdjęć.
+                                </div>
+                            </div>
+                        )}
 
                         {/* Upload Errors */}
                         <UploadErrorsList
