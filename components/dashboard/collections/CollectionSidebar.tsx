@@ -44,7 +44,7 @@ export default function CollectionSidebar({
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-5">
                 <CollectionActions
                     isPublic={collection.is_public}
-                    photosCount={photos.length}
+                    photosCount={collection.photo_count ?? photos.length}
                     galleryUrl={galleryUrl}
                     onEditTemplate={onEditTemplate}
                     onEditImage={onEditImage}
@@ -55,7 +55,7 @@ export default function CollectionSidebar({
 
             {/* Stats Card */}
             <CollectionStats
-                photosCount={photos.length}
+                photosCount={collection.photo_count ?? photos.length}
                 totalSize={totalSize}
                 createdAt={collection.created_at}
                 likedPhotos={likedPhotos}

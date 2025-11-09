@@ -501,7 +501,10 @@ export default function CollectionDetailPage({
                                 <AccordionTrigger>
                                     <div className="flex items-center gap-2">
                                         <Image size={20} />
-                                        Photo Gallery ({photos.length})
+                                        Photo Gallery (
+                                        {collection?.photo_count ??
+                                            photos.length}
+                                        )
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent>
