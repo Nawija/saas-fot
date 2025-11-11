@@ -7,6 +7,8 @@ import { OverlayTemplate } from "./templates/Overlay";
 import { GradientTemplate } from "./templates/Gradient";
 import { CinematicTemplate } from "./templates/Cinematic";
 import { EditorialTemplate } from "./templates/Editorial";
+import { ModernTemplate } from "./templates/Modern";
+import { OrnateTemplate } from "./templates/Ornate";
 
 // Single source-of-truth for available gallery hero templates.
 // Dashboard registry will import `HERO_TEMPLATE_SOURCE` and wrap each tpl
@@ -22,6 +24,8 @@ export const HERO_TEMPLATE_SOURCE: Array<{
     { key: "split", label: "Split", tpl: SplitTemplate, premium: true },
     { key: "overlay", label: "Overlay", tpl: OverlayTemplate },
     { key: "gradient", label: "Gradient", tpl: GradientTemplate },
+    { key: "modern", label: "Modern", tpl: ModernTemplate, premium: true },
+    { key: "ornate", label: "Ornate", tpl: OrnateTemplate },
     {
         key: "cinematic",
         label: "Cinematic",
