@@ -39,13 +39,17 @@ export async function GET(
         }
 
         // Return all liked photos (no pagination). Thumbnails will be lazy-loaded on the client.
-        // Use denormalized like_count on photos to avoid heavy aggregation on photo_likes
+        // total liked count
         const totalRes = await query(
-            `SELECT COUNT(*) as count FROM photos WHERE collection_id = $1 AND COALESCE(like_count,0) > 0`,
+            `SELECT COUNT(DISTINCT p.id) as count
+             FROM photos p
+             JOIN photo_likes pl ON p.id = pl.photo_id
+             WHERE p.collection_id = $1`,
             [collectionId]
         );
         const total = parseInt(totalRes.rows[0].count) || 0;
 
+        // Get all photos with like counts (only those with > 0 likes)
         const result = await query(
             `SELECT 
                 p.id,
@@ -54,10 +58,13 @@ export async function GET(
                 p.file_name,
                 p.width,
                 p.height,
-                COALESCE(p.like_count, 0) as like_count
+                COUNT(pl.id) as like_count
             FROM photos p
-            WHERE p.collection_id = $1 AND COALESCE(p.like_count,0) > 0
-            ORDER BY p.like_count DESC, p.uploaded_at DESC`,
+            LEFT JOIN photo_likes pl ON p.id = pl.photo_id
+            WHERE p.collection_id = $1
+            GROUP BY p.id, p.file_path, p.thumbnail_path, p.file_name, p.width, p.height
+            HAVING COUNT(pl.id) > 0
+            ORDER BY COUNT(pl.id) DESC, p.uploaded_at DESC`,
             [collectionId]
         );
 

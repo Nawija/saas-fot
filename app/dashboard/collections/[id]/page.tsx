@@ -103,7 +103,8 @@ export default function CollectionDetailPage({
 
         try {
             const res = await fetch(
-                `/api/collections/${collectionId}/liked-photos`
+                `/api/collections/${collectionId}/liked-photos`,
+                { credentials: "same-origin" }
             );
             if (!res.ok) {
                 if (!append) {
@@ -383,7 +384,8 @@ export default function CollectionDetailPage({
             toast.info("Przygotowuję pobieranie polubionych zdjęć...");
 
             const response = await fetch(
-                `/api/collections/${collectionId}/download-liked-zip`
+                `/api/collections/${collectionId}/download-liked-zip`,
+                { credentials: "same-origin" }
             );
 
             if (!response.ok) {
