@@ -488,7 +488,7 @@ export default function GalleryPhotosPage() {
     if (!collection)
         return (
             <div
-                className="flex items-center justify-center bg-black text-white"
+                className="flex items-center justify-center bg-white text-gray-900"
                 style={{ minHeight: "100dvh" }}
             >
                 <div className="text-center">
@@ -523,9 +523,7 @@ export default function GalleryPhotosPage() {
                 <div className="w-full flex-1 flex items-center justify-center relative">
                     {/* Loading skeleton */}
                     {!singleImageLoaded && !singleImageError && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                            <div className="w-16 h-16 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-                        </div>
+                        <LoadingGallery />
                     )}
 
                     {/* Error state */}
@@ -649,14 +647,14 @@ export default function GalleryPhotosPage() {
                                                     aspectRatio: `${photo.width} / ${photo.height}`,
                                                 }}
                                             >
-                                                {/* Loading skeleton */}
+                                                {/* Loading image skeleton */}
                                                 {isLoading && !isError && (
-                                                    <div className="absolute inset-0 bg-linear-to-br from-gray-100 via-gray-200 to-gray-100 animate-pulse" />
+                                                    <div className="absolute inset-0 bg-gray-200 animate-pulse" />
                                                 )}
 
                                                 {/* Error state */}
                                                 {isError ? (
-                                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 text-gray-500">
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white text-gray-600">
                                                         <AlertCircle
                                                             size={32}
                                                             className="mb-2"
