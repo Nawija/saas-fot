@@ -115,7 +115,7 @@ export const CinematicTemplate: GalleryHeroTemplate = ({ data, options }) => {
                     {data.description && (
                         <motion.p
                             {...descVariants}
-                            className="text-lg md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed mb-10"
+                            className="text-sm lg:text-base font-semibold text-gray-100 max-w-3xl mx-auto leading-relaxed mb-10"
                         >
                             {data.description}
                         </motion.p>
@@ -124,7 +124,7 @@ export const CinematicTemplate: GalleryHeroTemplate = ({ data, options }) => {
                     <motion.a
                         href="#gallery"
                         {...linkVariants}
-                        className="inline-block py-3 px-8 border border-white/70 bg-white/10 hover:bg-black/10 text-white/90 text-sm font-semibold transition-all duration-300 hover:text-white"
+                        className="inline-block py-3 px-8 border border-white/70 bg-white/10 hover:bg-black/10 text-white text-sm font-semibold transition-all duration-300 hover:text-white"
                     >
                         Przejdź do galerii
                     </motion.a>
