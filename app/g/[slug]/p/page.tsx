@@ -213,13 +213,19 @@ export default function GalleryPhotosPage() {
     // infinite scroll
     const handleScroll = useCallback(() => {
         if (isLoadingMore) return;
+
+        // If we've already displayed all photos, don't trigger loading more
+        if (displayedPhotos.length >= allPhotos.length) return;
+
         const { scrollTop, scrollHeight, clientHeight } =
             document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 100) {
+        if (scrollTop + clientHeight >= scrollHeight - 150) {
             setIsLoadingMore(true);
-            setPage((prev) => prev + 1);
+            setTimeout(() => {
+                setPage((prev) => prev + 1);
+            }, 500);
         }
-    }, [isLoadingMore]);
+    }, [isLoadingMore, displayedPhotos.length, allPhotos.length]);
 
     useEffect(() => {
         window.addEventListener("scroll", handleScroll);
@@ -781,7 +787,7 @@ export default function GalleryPhotosPage() {
                     ))}
                 </div>
 
-                {displayedPhotos.length < allPhotos.length && (
+                {isLoadingMore && (
                     <div className="flex flex-col items-center justify-center py-8">
                         <div className="w-10 h-10 border-4 border-gray-300 border-t-gray-900 rounded-full animate-spin mb-3" />
                         <p className="text-gray-600 text-sm font-medium">
