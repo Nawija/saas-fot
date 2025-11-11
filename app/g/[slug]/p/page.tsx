@@ -215,7 +215,7 @@ export default function GalleryPhotosPage() {
         if (isLoadingMore) return;
         const { scrollTop, scrollHeight, clientHeight } =
             document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 300) {
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
             setIsLoadingMore(true);
             setPage((prev) => prev + 1);
         }
