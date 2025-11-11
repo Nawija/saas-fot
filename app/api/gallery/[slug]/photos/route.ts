@@ -62,15 +62,16 @@ export async function GET(
         const guestId = req.headers.get("x-forwarded-for") || "unknown";
 
         // Pobierz zdjęcia z informacją o polubienia przez tego gościa
-        // Use denormalized p.like_count to avoid GROUP BY over large photo_likes
         const photosResult = await query(
             `SELECT 
                 p.id, p.file_path, p.thumbnail_path, p.width, p.height,
-                COALESCE(p.like_count, 0) as likes,
+                COUNT(pl.id) as likes,
                 CASE WHEN guest_likes.id IS NOT NULL THEN true ELSE false END as is_liked
             FROM photos p
-            LEFT JOIN photo_likes guest_likes ON p.id = guest_likes.photo_id AND guest_likes.guest_session_id = $2
+            LEFT JOIN photo_likes pl ON p.id = pl.photo_id
+            LEFT JOIN photo_likes guest_likes ON p.id = guest_likes.photo_id AND guest_likes.guest_identifier = $2
             WHERE p.collection_id = $1
+            GROUP BY p.id, guest_likes.id
             ORDER BY p.uploaded_at DESC`,
             [collection.id, guestId]
         );
