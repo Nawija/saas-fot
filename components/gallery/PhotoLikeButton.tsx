@@ -164,21 +164,16 @@ export default function PhotoLikeButton({
                     e.stopPropagation();
                 }}
                 disabled={loading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full shadow-lg transition-all duration-200 group disabled:opacity-50"
+                className={`flex items-center gap-1.5 px-3 py-1.5  rounded transition-all duration-200 ${
+                    liked
+                        ? "text-red-500 bg-white"
+                        : "text-white/80 bg-white/20 hover:bg-white/30 hover:text-white"
+                }`}
                 title={liked ? "Unlike" : "Like"}
             >
-                <Heart
-                    size={18}
-                    className={`transition-all duration-200 ${
-                        liked
-                            ? "fill-red-500 text-red-500"
-                            : "text-gray-700 group-hover:text-red-500"
-                    }`}
-                />
+                <Heart size={18} />
                 {likeCount > 0 && (
-                    <span className="text-sm font-medium text-gray-700">
-                        {likeCount}
-                    </span>
+                    <span className="text-sm font-medium">{likeCount}</span>
                 )}
             </button>
 

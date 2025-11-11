@@ -483,7 +483,6 @@ export default function GalleryPhotosPage() {
         };
     }, [columnsCount, flatForHidden, singleMode]);
 
-
     if (loading) return <LoadingGallery />;
 
     if (!collection)

@@ -38,12 +38,7 @@ export async function GET(
             );
         }
 
-        // Paginacja
-        const url = new URL(req.url);
-        const page = parseInt(url.searchParams.get("page") || "1");
-        const pageSize = parseInt(url.searchParams.get("pageSize") || "20");
-        const offset = (Math.max(page, 1) - 1) * pageSize;
-
+        // Return all liked photos (no pagination). Thumbnails will be lazy-loaded on the client.
         // total liked count
         const totalRes = await query(
             `SELECT COUNT(DISTINCT p.id) as count
@@ -54,7 +49,7 @@ export async function GET(
         );
         const total = parseInt(totalRes.rows[0].count) || 0;
 
-        // Get photos with like counts (only those with > 0 likes) with pagination
+        // Get all photos with like counts (only those with > 0 likes)
         const result = await query(
             `SELECT 
                 p.id,
@@ -69,9 +64,8 @@ export async function GET(
             WHERE p.collection_id = $1
             GROUP BY p.id, p.file_path, p.thumbnail_path, p.file_name, p.width, p.height
             HAVING COUNT(pl.id) > 0
-            ORDER BY COUNT(pl.id) DESC, p.uploaded_at DESC
-            LIMIT $2 OFFSET $3`,
-            [collectionId, pageSize, offset]
+            ORDER BY COUNT(pl.id) DESC, p.uploaded_at DESC`,
+            [collectionId]
         );
 
         const photos = result.rows.map((row: any) => ({

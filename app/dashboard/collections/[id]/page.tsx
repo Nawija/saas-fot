@@ -1,7 +1,7 @@
 // app/dashboard/collections/[id]/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import {
     Accordion,
@@ -86,50 +86,146 @@ export default function CollectionDetailPage({
     >([]);
     const [likedLoading, setLikedLoading] = useState(false);
     const [likedPage, setLikedPage] = useState(1);
-    const LIKED_PAGE_SIZE = 20;
+    const LIKED_PAGE_SIZE = 50;
     const [likedTotal, setLikedTotal] = useState(0);
-    const fetchLikedPageNow = async (page = likedPage) => {
+    const [likedLoadingMore, setLikedLoadingMore] = useState(false);
+
+    const fetchLikedPageNow = async (page = likedPage, append = false) => {
         if (!collectionId) {
             setLikedPhotos([]);
             setLikedTotal(0);
             return;
         }
 
-        setLikedLoading(true);
+        // when appending, set a separate loading-more flag
+        if (append) setLikedLoadingMore(true);
+        else setLikedLoading(true);
+
         try {
             const res = await fetch(
-                `/api/collections/${collectionId}/liked-photos?page=${page}&pageSize=${LIKED_PAGE_SIZE}`
+                `/api/collections/${collectionId}/liked-photos`
             );
             if (!res.ok) {
-                setLikedPhotos([]);
-                setLikedTotal(0);
+                if (!append) {
+                    setLikedPhotos([]);
+                    setLikedTotal(0);
+                }
                 return;
             }
             const data = await res.json();
-            setLikedPhotos(data.photos || []);
+            if (append) {
+                setLikedPhotos((prev) => [...prev, ...(data.photos || [])]);
+            } else {
+                setLikedPhotos(data.photos || []);
+            }
             setLikedTotal(data.total || 0);
         } catch (err) {
             console.error("Error fetching liked photos:", err);
-            setLikedPhotos([]);
-            setLikedTotal(0);
+            if (!append) {
+                setLikedPhotos([]);
+                setLikedTotal(0);
+            }
         } finally {
-            setLikedLoading(false);
+            if (append) setLikedLoadingMore(false);
+            else setLikedLoading(false);
         }
     };
 
+    // initial load for liked photos (replace)
     useEffect(() => {
         let mounted = true;
         (async () => {
             if (!mounted) return;
-            await fetchLikedPageNow(likedPage);
+            await fetchLikedPageNow(1, false);
+            setLikedPage(1);
         })();
         return () => {
             mounted = false;
         };
-    }, [collectionId, likedPage]);
+    }, [collectionId]);
+
+    // infinite horizontal scroll: append pages when sentinel visible
+    const likedScrollerRef = useRef<HTMLDivElement | null>(null);
+    const likedSentinelRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const scroller = likedScrollerRef.current;
+        const sentinel = likedSentinelRef.current;
+        if (!scroller || !sentinel) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (
+                        entry.isIntersecting &&
+                        !likedLoadingMore &&
+                        !likedLoading
+                    ) {
+                        const currentTotalPages = Math.max(
+                            1,
+                            Math.ceil(likedTotal / LIKED_PAGE_SIZE)
+                        );
+                        if (likedPage < currentTotalPages) {
+                            const next = likedPage + 1;
+                            setLikedPage(next);
+                            fetchLikedPageNow(next, true);
+                        }
+                    }
+                });
+            },
+            { root: scroller, rootMargin: "200px", threshold: 0.1 }
+        );
+
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, [
+        likedScrollerRef.current,
+        likedSentinelRef.current,
+        likedLoadingMore,
+        likedLoading,
+        likedPage,
+        likedTotal,
+    ]);
 
     const [uploadedCount, setUploadedCount] = useState(0);
     const [totalUploadCount, setTotalUploadCount] = useState(0);
+
+    // Lazy thumbnail component: only sets img src when the thumbnail enters the viewport
+    function LazyThumb({ photo }: { photo: any }) {
+        const imgRef = useRef<HTMLImageElement | null>(null);
+        const [src, setSrc] = useState<string | undefined>(undefined);
+
+        useEffect(() => {
+            const el = imgRef.current;
+            if (!el) return;
+
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            setSrc(getThumbnailUrl(photo.file_path));
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                },
+                { root: null, rootMargin: "200px", threshold: 0.01 }
+            );
+
+            observer.observe(el);
+            return () => observer.disconnect();
+        }, [photo.file_path]);
+
+        return (
+            <img
+                ref={imgRef}
+                src={src}
+                alt={photo.file_name}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-44 object-cover rounded-md"
+            />
+        );
+    }
 
     // Gallery pagination
     const [galleryPage, setGalleryPage] = useState(1);
@@ -447,26 +543,20 @@ export default function CollectionDetailPage({
                                     ) : likedPhotos.length > 0 ? (
                                         <>
                                             <div className="bg-white rounded-2xl border border-gray-200 p-3">
-                                                <div className="flex gap-3 overflow-x-auto">
+                                                <div
+                                                    ref={likedScrollerRef}
+                                                    className="flex gap-3 overflow-x-auto"
+                                                >
                                                     {likedPhotos.map((p) => (
                                                         <div
                                                             key={p.id}
                                                             className="w-28 shrink-0 relative"
                                                         >
-                                                            <img
-                                                                src={getThumbnailUrl(
-                                                                    p.file_path
-                                                                )}
-                                                                alt={
-                                                                    p.file_name
-                                                                }
-                                                                className="w-full h-44 object-cover rounded-md"
+                                                            <LazyThumb
+                                                                photo={p}
                                                             />
                                                             <div className="text-xs text-gray-500 p-1 flex items-center gap-1 absolute z-10 -top-0.5 -right-0.5 bg-white px-1 rounded-md">
-                                                                {
-                                                                    (p as any)
-                                                                        .likeCount
-                                                                }{" "}
+                                                                {p.likeCount}
                                                                 <Heart
                                                                     size={12}
                                                                     className="fill-red-500 text-red-500"
@@ -474,16 +564,14 @@ export default function CollectionDetailPage({
                                                             </div>
                                                         </div>
                                                     ))}
+
+                                                    {/* sentinel for loading next page */}
+                                                    <div
+                                                        ref={likedSentinelRef}
+                                                        className="w-2 shrink-0"
+                                                    />
                                                 </div>
                                             </div>
-                                            <Paginator
-                                                page={likedPage}
-                                                total={likedTotal}
-                                                pageSize={LIKED_PAGE_SIZE}
-                                                onPageChange={(p) =>
-                                                    setLikedPage(p)
-                                                }
-                                            />
                                         </>
                                     ) : (
                                         <EmptyState
