@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
+import CloseButton from "@/components/buttons/CloseButton";
 import { toast } from "sonner";
 import {
     AlertDialog,
@@ -9,8 +10,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogCancel,
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 
@@ -135,7 +134,7 @@ export default function PhotoLikeButton({
                 }
                 toast.success(data.liked ? "Liked!" : "Unliked");
             } else if (res.status === 409) {
-                // Already liked - just update UI 
+                // Already liked - just update UI
                 setLiked(true);
                 fetchLikeStatus(guestEmail);
             } else {
@@ -183,7 +182,7 @@ export default function PhotoLikeButton({
                 onOpenChange={setEmailDialogOpen}
             >
                 <AlertDialogContent
-                    className="max-w-md"
+                    className="max-w-md rounded p-12 space-y-4"
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -192,11 +191,14 @@ export default function PhotoLikeButton({
                         e.stopPropagation();
                     }}
                 >
+                    {/* Close button extracted to shared component */}
+                    <CloseButton onClick={() => setEmailDialogOpen(false)} />
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Like this photo?</AlertDialogTitle>
+                        <AlertDialogTitle>Favorites</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Enter your email to like photos. We won't store your
-                            email or send you spam.
+                            Save your favorite photos and revisit them at
+                            anytime using your email address. You can share this
+                            list with your photographer, family and friends.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
@@ -234,25 +236,19 @@ export default function PhotoLikeButton({
                         )}
                     </div>
 
-                    <AlertDialogFooter>
-                        <AlertDialogCancel
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
-                        >
-                            Cancel
-                        </AlertDialogCancel>
+                    <div className="flex items-center justify-between w-full">
+                        <p>Why do you need my email?</p>
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 handleEmailSubmit();
                             }}
-                            className="bg-blue-600 hover:bg-blue-700"
+                            className="bg-teal-600 hover:bg-teal-700"
                         >
                             Continue
                         </AlertDialogAction>
-                    </AlertDialogFooter>
+                    </div>
                 </AlertDialogContent>
             </AlertDialog>
         </>
