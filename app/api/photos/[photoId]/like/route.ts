@@ -4,7 +4,10 @@ import crypto from "crypto";
 
 // Hash email to create guest identifier (never store raw email)
 function hashEmail(email: string): string {
-    return crypto.createHash("sha256").update(email.toLowerCase().trim()).digest("hex");
+    return crypto
+        .createHash("sha256")
+        .update(email.toLowerCase().trim())
+        .digest("hex");
 }
 
 export async function POST(
@@ -41,13 +44,12 @@ export async function POST(
         }
 
         // Hash email to create anonymous identifier
-        const guestIdentifier = hashEmail(email);
+        const guestSessionId = hashEmail(email);
 
         // Check if photo exists
-        const photoCheck = await query(
-            "SELECT id FROM photos WHERE id = $1",
-            [photoId]
-        );
+        const photoCheck = await query("SELECT id FROM photos WHERE id = $1", [
+            photoId,
+        ]);
 
         if (photoCheck.rows.length === 0) {
             return NextResponse.json(
@@ -56,36 +58,33 @@ export async function POST(
             );
         }
 
-        // Try to insert like (will fail if already exists due to unique constraint)
-        try {
-            await query(
-                "INSERT INTO photo_likes (photo_id, guest_identifier) VALUES ($1, $2)",
-                [photoId, guestIdentifier]
+        // Try to insert like; use RETURNING to detect whether we inserted a new row.
+        const insertRes = await query(
+            "INSERT INTO photo_likes (photo_id, guest_session_id) VALUES ($1, $2) ON CONFLICT (photo_id, guest_session_id) DO NOTHING RETURNING id",
+            [photoId, guestSessionId]
+        );
+
+        if (insertRes.rows.length === 0) {
+            // already liked
+            return NextResponse.json(
+                { error: "Already liked" },
+                { status: 409 }
             );
-
-            // Get updated like count
-            const countResult = await query(
-                "SELECT COUNT(*) as count FROM photo_likes WHERE photo_id = $1",
-                [photoId]
-            );
-
-            const likeCount = parseInt(countResult.rows[0].count);
-
-            return NextResponse.json({
-                success: true,
-                liked: true,
-                likeCount,
-            });
-        } catch (err: any) {
-            // If unique constraint violation, user already liked this photo
-            if (err.code === "23505") {
-                return NextResponse.json(
-                    { error: "Already liked" },
-                    { status: 409 }
-                );
-            }
-            throw err;
         }
+
+        // Increment denormalized counter and return the new value
+        const upd = await query(
+            "UPDATE photos SET like_count = like_count + 1 WHERE id = $1 RETURNING like_count",
+            [photoId]
+        );
+
+        const likeCount = upd.rows?.[0]?.like_count ?? null;
+
+        return NextResponse.json({
+            success: true,
+            liked: true,
+            likeCount,
+        });
     } catch (error) {
         console.error("Error adding like:", error);
         return NextResponse.json(
@@ -119,28 +118,28 @@ export async function DELETE(
             );
         }
 
-        const guestIdentifier = hashEmail(email);
+        const guestSessionId = hashEmail(email);
 
-        // Delete like
+        // Delete like and know whether a row was removed
         const result = await query(
-            "DELETE FROM photo_likes WHERE photo_id = $1 AND guest_identifier = $2",
-            [photoId, guestIdentifier]
+            "DELETE FROM photo_likes WHERE photo_id = $1 AND guest_session_id = $2 RETURNING id",
+            [photoId, guestSessionId]
         );
 
-        if (result.rowCount === 0) {
+        if (result.rows.length === 0) {
             return NextResponse.json(
                 { error: "Like not found" },
                 { status: 404 }
             );
         }
 
-        // Get updated like count
-        const countResult = await query(
-            "SELECT COUNT(*) as count FROM photo_likes WHERE photo_id = $1",
+        // Decrement denormalized counter safely
+        const upd = await query(
+            "UPDATE photos SET like_count = GREATEST(like_count - 1, 0) WHERE id = $1 RETURNING like_count",
             [photoId]
         );
 
-        const likeCount = parseInt(countResult.rows[0].count);
+        const likeCount = upd.rows?.[0]?.like_count ?? null;
 
         return NextResponse.json({
             success: true,
@@ -173,21 +172,33 @@ export async function GET(
         const { searchParams } = new URL(req.url);
         const email = searchParams.get("email");
 
-        // Get like count
-        const countResult = await query(
-            "SELECT COUNT(*) as count FROM photo_likes WHERE photo_id = $1",
+        // Prefer denormalized counter if available
+        const photoRes = await query(
+            "SELECT like_count FROM photos WHERE id = $1",
             [photoId]
         );
-
-        const likeCount = parseInt(countResult.rows[0].count);
+        let likeCount: number | null = null;
+        if (
+            photoRes.rows.length > 0 &&
+            typeof photoRes.rows[0].like_count !== "undefined"
+        ) {
+            likeCount = parseInt(photoRes.rows[0].like_count, 10) || 0;
+        } else {
+            // fallback to counting rows in photo_likes
+            const countResult = await query(
+                "SELECT COUNT(*) as count FROM photo_likes WHERE photo_id = $1",
+                [photoId]
+            );
+            likeCount = parseInt(countResult.rows[0].count, 10) || 0;
+        }
 
         // Check if user liked (if email provided)
         let liked = false;
         if (email) {
-            const guestIdentifier = hashEmail(email);
+            const guestSessionId = hashEmail(email);
             const likeCheck = await query(
-                "SELECT id FROM photo_likes WHERE photo_id = $1 AND guest_identifier = $2",
-                [photoId, guestIdentifier]
+                "SELECT id FROM photo_likes WHERE photo_id = $1 AND guest_session_id = $2",
+                [photoId, guestSessionId]
             );
             liked = likeCheck.rows.length > 0;
         }

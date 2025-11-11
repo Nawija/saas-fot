@@ -44,6 +44,9 @@ CREATE TABLE IF NOT EXISTS photos (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Denormalized like counter to avoid expensive COUNT(*) queries on photo_likes
+ALTER TABLE photos ADD COLUMN IF NOT EXISTS like_count INTEGER DEFAULT 0;
+
 CREATE INDEX IF NOT EXISTS idx_photos_collection_id ON photos(collection_id);
 CREATE INDEX IF NOT EXISTS idx_photos_user_id ON photos(user_id);
 
