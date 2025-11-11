@@ -135,7 +135,7 @@ export default function PhotoLikeButton({
                 }
                 toast.success(data.liked ? "Liked!" : "Unliked");
             } else if (res.status === 409) {
-                // Already liked - just update UI
+                // Already liked - just update UI 
                 setLiked(true);
                 fetchLikeStatus(guestEmail);
             } else {
