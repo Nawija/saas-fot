@@ -19,7 +19,7 @@ export default function Paginator({
     total,
     pageSize,
     onPageChange,
-    maxPagesToShow = 7,
+    maxPagesToShow = 5,
 }: PaginatorProps) {
     const totalPages = Math.max(1, Math.ceil((total || 0) / pageSize));
 

@@ -29,7 +29,6 @@ import {
     useCollectionSettings,
 } from "@/components/dashboard/collections";
 import { Heart, Image, Download } from "lucide-react";
-import Paginator from "@/components/ui/Paginator";
 import MainButton from "@/components/buttons/MainButton";
 import { toast } from "sonner";
 import EmptyState from "@/components/dashboard/EmptyState";
