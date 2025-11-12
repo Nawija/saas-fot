@@ -36,7 +36,7 @@ export default function HeroTemplateCard({
                         />
                         <div
                             onClick={onEditImage}
-                            className="flex items-center cursor-pointer opacity-0 hover:opacity-100 transition-opacity justify-center h-full w-full bg-black/30 gap-1 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                            className="flex items-center cursor-pointer font-semibold text-sm opacity-0 hover:opacity-100 transition-opacity justify-center h-full w-full bg-black/30 gap-1 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                         >
                             <SquarePen size={20} /> Edit
                         </div>
