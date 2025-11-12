@@ -3,16 +3,91 @@
 
 import { GalleryHeroTemplate } from "../types";
 import ResponsiveHeroImage from "../ResponsiveHeroImage";
-import { useAuthUser } from "@/hooks";
+import { useEffect, useRef } from "react";
 
 export const ModernTemplate: GalleryHeroTemplate = ({ data, elements }) => {
     const Scroll = elements.ScrollIndicator;
-    const { user } = useAuthUser();
+    // Confetti confined to this component: create a local canvas and use
+    // canvas-confetti's `create` API so particles render only inside this node.
+    const confettiCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    useEffect(() => {
+        let mounted = true;
+        let confettiInstance: any = null;
+        (async () => {
+            try {
+                const mod = await import("canvas-confetti");
+                const confetti = (mod && (mod.default || mod)) as any;
+                if (!mounted || !confetti) return;
+
+                const canvas = confettiCanvasRef.current;
+                if (!canvas) return;
+
+                // create a confetti launcher bound to this canvas
+                if (typeof confetti.create === "function") {
+                    confettiInstance = confetti.create(canvas, {
+                        resize: true,
+                    });
+                } else {
+                    confettiInstance = confetti;
+                }
+
+                const burst = (opts: any) =>
+                    confettiInstance({
+                        particleCount: opts.particleCount ?? 40,
+                        spread: opts.spread ?? 60,
+                        startVelocity: opts.startVelocity ?? 50,
+                        ticks: opts.ticks ?? 500,
+                        gravity: opts.gravity ?? 0.6,
+                        origin: { x: opts.x ?? 0.5, y: opts.y ?? 0.35 },
+                        scalar: opts.scalar ?? 1,
+                        colors: opts.colors,
+                    });
+
+                burst({
+                    x: 0.5,
+                    y: 0.35,
+                    scalar: 1.1,
+                    colors: ["#ffd166", "#ef476f", "#06d6a0"],
+                });
+                setTimeout(
+                    () =>
+                        burst({
+                            x: 0.3,
+                            y: 0.4,
+                            colors: ["#ffd166", "#ef476f"],
+                        }),
+                    150
+                );
+                setTimeout(
+                    () =>
+                        burst({
+                            x: 0.7,
+                            y: 0.4,
+                            colors: ["#06d6a0", "#118ab2"],
+                        }),
+                    300
+                );
+            } catch (err) {
+                // eslint-disable-next-line no-console
+                console.error("Confetti failed to load:", err);
+            }
+        })();
+
+        return () => {
+            mounted = false;
+            confettiInstance = null;
+        };
+    }, []);
     return (
         <div
             className="relative w-full overflow-hidden bg-black text-white"
             style={{ height: "100dvh" }}
         >
+            {/* Confetti canvas confined to this template */}
+            <canvas
+                ref={confettiCanvasRef}
+                className="pointer-events-none absolute inset-0 w-full h-full z-40"
+            />
             {/* Background image with soft overlay */}
             {data.image ? (
                 <div className="absolute inset-0 z-10">
@@ -74,7 +149,7 @@ export const ModernTemplate: GalleryHeroTemplate = ({ data, elements }) => {
             <div className="absolute bottom-6 left-6 right-6 z-30 flex items-center justify-between text-sm text-white/70">
                 <span className="hidden md:inline">Premium Collection</span>
 
-                <div className="opacity-90">{`${user?.avatar}`}</div>
+                <div className="opacity-90">Gallery</div>
             </div>
 
             {Scroll && <Scroll />}

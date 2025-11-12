@@ -65,8 +65,8 @@ export const OrnateTemplate: GalleryHeroTemplate = ({ data, elements }) => {
             <div className="absolute left-8 top-16 bottom-16 w-0.5 bg-white/10" />
 
             {/* Content layout: left text, right floating glass card */}
-            <div className="absolute inset-0 z-20 flex items-center justify-between px-6 pl-16 md:px-16">
-                <div className="max-w-2xl">
+            <div className="absolute inset-0 z-20 flex items-center md:justify-between px-6 text-center md:text-left md:px-16 flex-col md:flex-row justify-center gap-10">
+                <div className="max-w-2xl order-1 md:order-0">
                     <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight">
                         {data.name}
                     </h1>
@@ -85,8 +85,8 @@ export const OrnateTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                     </div>
                 </div>
 
-                <div className="hidden md:block max-w-sm w-full">
-                    <div className="bg-white/6 backdrop-blur-md border border-white/6 rounded-2xl p-6 shadow-2xl">
+                <div className="md:block max-w-sm w-full">
+                    <div className="bg-white/6 backdrop-blur-sm border border-white/6 rounded-md p-6 shadow-2xl">
                         <div className="w-full h-48 rounded-lg overflow-hidden mb-4">
                             {data.image && (
                                 <ResponsiveHeroImage

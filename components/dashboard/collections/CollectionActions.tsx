@@ -31,13 +31,13 @@ export default function CollectionActions({
     return (
         <div className="grid grid-cols-5 gap-2">
             <MainButton
-                onClick={onEditTemplate}
-                icon={<Paintbrush size={22} />}
+                onClick={onEditImage}
+                icon={<ImagePlus size={22} />}
                 variant="secondary"
             />
             <MainButton
-                onClick={onEditImage}
-                icon={<ImagePlus size={22} />}
+                onClick={onEditTemplate}
+                icon={<Paintbrush size={22} />}
                 variant="secondary"
             />
             <MainButton

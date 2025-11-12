@@ -219,11 +219,11 @@ export default function GalleryPhotosPage() {
 
         const { scrollTop, scrollHeight, clientHeight } =
             document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 150) {
+        if (scrollTop + clientHeight >= scrollHeight - 300) {
             setIsLoadingMore(true);
             setTimeout(() => {
                 setPage((prev) => prev + 1);
-            }, 500);
+            }, 300);
         }
     }, [isLoadingMore, displayedPhotos.length, allPhotos.length]);
 
