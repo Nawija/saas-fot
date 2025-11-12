@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Lock } from "lucide-react";
 import LoadingGallery from "./loading";
 import ResponsiveHeroImage from "@/components/gallery/hero/ResponsiveHeroImage";
+import MainButton from "@/components/buttons/MainButton";
 
 interface Collection {
     id: number;
@@ -196,32 +197,32 @@ export default function GalleryLandingPage() {
     if (error || !collection) {
         return (
             <div
-                className="flex items-center justify-center bg-neutral-950 p-4"
+                className="flex items-center justify-center p-4"
                 style={{ minHeight: "100dvh" }}
             >
                 <div className="text-center max-w-md mx-auto">
-                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-10 md:p-12 shadow-2xl">
+                    <div className="border border-white/10 rounded-2xl p-10 md:p-12">
                         <div className="mb-6">
-                            <div className="w-16 h-16 mx-auto bg-red-500/10 rounded-full flex items-center justify-center mb-4">
+                            <div className="w-16 h-16 mx-auto bg-red-700/10 rounded-full flex items-center justify-center mb-4">
                                 <Lock
-                                    className="w-8 h-8 text-red-400"
+                                    className="w-8 h-8 text-red-900"
                                     strokeWidth={1.5}
                                 />
                             </div>
-                            <h1 className="text-2xl md:text-3xl font-semibold mb-3 text-white">
+                            <h1 className="text-2xl md:text-3xl font-semibold mb-3 ">
                                 {error || "Nie znaleziono galerii"}
                             </h1>
-                            <p className="text-white/60 text-sm leading-relaxed">
+                            <p className=" text-sm leading-relaxed">
                                 Sprawdź poprawność linku lub spróbuj ponownie
                                 później
                             </p>
                         </div>
-                        <button
+                        <MainButton
                             onClick={() => router.back()}
-                            className="w-full px-6 py-3 bg-white/10 hover:bg-white/15 border border-white/20 text-white rounded-lg font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                            Powrót
-                        </button>
+                            className="w-full px-6 py-2 font-medium"
+                            variant="secondary"
+                            label="Powrót"
+                        />
                     </div>
                 </div>
             </div>
