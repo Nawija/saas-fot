@@ -23,7 +23,7 @@ export default function CollectionStats({
     likedPhotos = [],
 }: CollectionStatsProps) {
     return (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <div className="border-b border-gray-200 px-5 py-4">
                 <h2 className="text-base font-semibold text-gray-900">Stats</h2>
             </div>

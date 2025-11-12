@@ -597,7 +597,6 @@ export default function CollectionDetailPage({
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent>
-                                    {/* Upload Errors */}
                                     <UploadErrorsList
                                         errors={uploadErrors}
                                         onClose={() => setUploadErrors([])}

@@ -41,7 +41,7 @@ export default function CollectionSidebar({
             />
 
             {/* Action Buttons */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-5">
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden p-5">
                 <CollectionActions
                     isPublic={collection.is_public}
                     photosCount={collection.photo_count ?? photos.length}

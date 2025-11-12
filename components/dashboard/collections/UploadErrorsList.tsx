@@ -13,8 +13,8 @@ export default function UploadErrorsList({
     if (errors.length === 0) return null;
 
     return (
-        <div className="bg-white border border-red-200 rounded-2xl overflow-hidden shadow-lg">
-            <div className="bg-linear-to-r from-red-50 to-orange-50 border-b border-red-100 px-6 py-5">
+        <div className="bg-white border mb-6 border-red-100 rounded-lg overflow-hidden">
+            <div className="bg-red-50/50 border-red-100 px-6 py-5">
                 <div className="flex items-center gap-3">
                     <div className="shrink-0 w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
                         <svg
@@ -45,10 +45,7 @@ export default function UploadErrorsList({
             </div>
             <div className="p-5 space-y-3 max-h-[400px] overflow-y-auto">
                 {errors.map((error, idx) => (
-                    <div
-                        key={idx}
-                        className="group bg-white border border-red-100 rounded-xl p-4 hover:border-red-200 hover:shadow-md transition-all duration-200"
-                    >
+                    <div key={idx} className="p-2">
                         <div className="flex items-start gap-4">
                             {/* Image Icon - Szara ikona zdjęcia */}
                             <div className="relative shrink-0 w-12 h-12 bg-linear-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
