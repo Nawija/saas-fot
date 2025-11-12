@@ -33,28 +33,28 @@ export const ModernTemplate: GalleryHeroTemplate = ({ data, elements }) => {
 
                 const burst = (opts: any) =>
                     confettiInstance({
-                        particleCount: opts.particleCount ?? 40,
-                        spread: opts.spread ?? 60,
+                        particleCount: opts.particleCount ?? 50,
+                        spread: opts.spread ?? 80,
                         startVelocity: opts.startVelocity ?? 50,
-                        ticks: opts.ticks ?? 500,
-                        gravity: opts.gravity ?? 0.6,
-                        origin: { x: opts.x ?? 0.5, y: opts.y ?? 0.35 },
+                        ticks: opts.ticks ?? 700,
+                        gravity: opts.gravity ?? 0.9,
+                        origin: { x: opts.x ?? 0.5, y: opts.y ?? 0.05 },
                         scalar: opts.scalar ?? 1,
                         colors: opts.colors,
                     });
 
                 burst({
                     x: 0.5,
-                    y: 0.35,
+                    y: 1.05,
                     scalar: 1.1,
-                    colors: ["#ffd166", "#ef476f", "#06d6a0"],
+                    colors: ["#ef476f", "#ef476f", "#f5f5f5"],
                 });
                 setTimeout(
                     () =>
                         burst({
                             x: 0.3,
                             y: 0.4,
-                            colors: ["#ffd166", "#ef476f"],
+                            colors: ["#f5f5f5", "#ef476f"],
                         }),
                     150
                 );
@@ -63,7 +63,7 @@ export const ModernTemplate: GalleryHeroTemplate = ({ data, elements }) => {
                         burst({
                             x: 0.7,
                             y: 0.4,
-                            colors: ["#06d6a0", "#118ab2"],
+                            colors: ["#ef476f", "#f5f5f5"],
                         }),
                     300
                 );
