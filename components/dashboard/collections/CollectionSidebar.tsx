@@ -35,6 +35,8 @@ export default function CollectionSidebar({
             <HeroTemplateCard
                 heroImage={collection.hero_image}
                 collectionName={collection.name}
+                title={collection.name}
+                description={collection.description}
                 templateLabel={templateLabel}
                 onEditImage={onEditImage}
             />

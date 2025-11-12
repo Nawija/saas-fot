@@ -458,7 +458,7 @@ export default function HeroImageEditor({
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
                 <div
                     ref={containerRef}
-                    className="relative aspect-video rounded-xl overflow-hidden bg-gray-200/70"
+                    className="relative aspect-video overflow-hidden bg-gray-200/70"
                     style={{ touchAction: isEditing ? "none" : "auto" }}
                 >
                     {preview ? (

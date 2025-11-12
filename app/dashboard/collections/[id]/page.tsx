@@ -420,10 +420,60 @@ export default function CollectionDetailPage({
         }
     }
 
-    async function handleSaveHeroImage(file: File) {
-        const success = await saveHeroImage(file);
-        if (success) {
+    async function handleSaveHeroImage(
+        file?: File | null,
+        title?: string,
+        description?: string
+    ) {
+        // If an image file was provided, upload it first
+        if (file) {
+            const success = await saveHeroImage(file);
+            if (!success) {
+                return;
+            }
+        }
+
+        // If title/description provided, update the collection
+        try {
+            if (
+                collectionId &&
+                (typeof title !== "undefined" ||
+                    typeof description !== "undefined")
+            ) {
+                const body: any = {};
+                if (typeof title !== "undefined") body.name = title;
+                if (typeof description !== "undefined")
+                    body.description = description;
+
+                // Only call API if something to update
+                if (Object.keys(body).length > 0) {
+                    const res = await fetch(
+                        `/api/collections/${collectionId}`,
+                        {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(body),
+                        }
+                    );
+
+                    if (res.ok) {
+                        const result = await res.json();
+                        setCollection(result.collection);
+                        toast.success("Collection updated");
+                    } else {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(
+                            err?.error || "Failed to update collection"
+                        );
+                    }
+                }
+            }
+
+            // Close modal after successful operations
             setHeroImageEditModalOpen(false);
+        } catch (err: any) {
+            console.error("Error saving hero image/title/description:", err);
+            toast.error(err?.message || "Error saving collection data");
         }
     }
 
@@ -696,6 +746,8 @@ export default function CollectionDetailPage({
                 open={heroImageEditModalOpen}
                 onClose={() => setHeroImageEditModalOpen(false)}
                 currentHeroImage={collection.hero_image}
+                currentTitle={collection.name}
+                currentDescription={collection.description}
                 onSave={handleSaveHeroImage}
                 saving={savingHeroImage}
             />

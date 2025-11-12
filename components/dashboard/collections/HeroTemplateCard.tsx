@@ -5,6 +5,8 @@ interface HeroTemplateCardProps {
     heroImage: string;
     collectionName: string;
     templateLabel: string;
+    title?: string;
+    description?: string;
     onEditImage: () => void;
 }
 
@@ -12,6 +14,8 @@ export default function HeroTemplateCard({
     heroImage,
     collectionName,
     templateLabel,
+    title,
+    description,
     onEditImage,
 }: HeroTemplateCardProps) {
     return (
@@ -27,6 +31,21 @@ export default function HeroTemplateCard({
 
             <div className="p-5">
                 <div className="space-y-4">
+                    {/* Title & description */}
+                    {(title || description) && (
+                        <div className="px-2">
+                            {title && (
+                                <h3 className="text-sm font-semibold text-gray-900">
+                                    {title}
+                                </h3>
+                            )}
+                            {description && (
+                                <p className="text-xs text-gray-600 mt-1">
+                                    {description}
+                                </p>
+                            )}
+                        </div>
+                    )}
                     {/* Template Preview */}
                     <div className="relative group">
                         <img
