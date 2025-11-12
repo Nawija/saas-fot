@@ -234,8 +234,35 @@ export default function HeroPreviewModal({
             );
 
             return () => {
-                rootRef.current?.unmount();
-                rootRef.current = null;
+                try {
+                    const root = rootRef.current;
+                    if (root && typeof (root as any).unmount === "function") {
+                        // Defer unmount to avoid React warning about synchronous unmount
+                        // during an ongoing render. Scheduling via setTimeout lets the
+                        // current render complete first.
+                        setTimeout(() => {
+                            try {
+                                (root as any).unmount();
+                            } catch (err) {
+                                // eslint-disable-next-line no-console
+                                console.error(
+                                    "Error during deferred unmount:",
+                                    err
+                                );
+                            }
+                        }, 0);
+                    }
+                } catch (err) {
+                    // Protect the app from unmount errors coming from the iframe root
+                    // (e.g. if iframe/doc was partially torn down). Log for debugging.
+                    // eslint-disable-next-line no-console
+                    console.error(
+                        "Error while scheduling preview root unmount:",
+                        err
+                    );
+                } finally {
+                    rootRef.current = null;
+                }
             };
         }, [BaseComp, baseW, baseH]);
 
@@ -322,10 +349,7 @@ export default function HeroPreviewModal({
                     aria-label="Hero design editor"
                 >
                     {/* Backdrop */}
-                    <div
-                        className="absolute inset-0"
-                        onClick={onClose}
-                    />
+                    <div className="absolute inset-0" onClick={onClose} />
 
                     {/* Content */}
                     <div className="relative z-10 flex h-full w-full items-stretch">
