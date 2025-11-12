@@ -1,13 +1,11 @@
 // components/dashboard/collections/HeroTemplateCard.tsx
-import { Paintbrush, SquarePen } from "lucide-react";
-import MainButton from "@/components/buttons/MainButton";
+import { SquarePen } from "lucide-react";
 
 interface HeroTemplateCardProps {
     heroImage: string;
     collectionName: string;
     templateLabel: string;
     onEditImage: () => void;
-    onEditTemplate: () => void;
 }
 
 export default function HeroTemplateCard({
@@ -15,7 +13,6 @@ export default function HeroTemplateCard({
     collectionName,
     templateLabel,
     onEditImage,
-    onEditTemplate,
 }: HeroTemplateCardProps) {
     return (
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -37,17 +34,11 @@ export default function HeroTemplateCard({
                             alt={collectionName}
                             className="w-full h-auto"
                         />
-                        <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 justify-center h-full w-full bg-black/10 gap-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                            <MainButton
-                                onClick={onEditImage}
-                                icon={<SquarePen size={20} />}
-                                variant="secondary"
-                            />
-                            <MainButton
-                                onClick={onEditTemplate}
-                                icon={<Paintbrush size={20} />}
-                                variant="secondary"
-                            />
+                        <div
+                            onClick={onEditImage}
+                            className="flex items-center cursor-pointer opacity-0 hover:opacity-100 transition-opacity justify-center h-full w-full bg-black/30 gap-1 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                        >
+                            <SquarePen size={20} /> Edit
                         </div>
                     </div>
 

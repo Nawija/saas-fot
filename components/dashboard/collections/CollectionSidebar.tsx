@@ -37,7 +37,6 @@ export default function CollectionSidebar({
                 collectionName={collection.name}
                 templateLabel={templateLabel}
                 onEditImage={onEditImage}
-                onEditTemplate={onEditTemplate}
             />
 
             {/* Action Buttons */}
