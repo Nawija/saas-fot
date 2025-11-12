@@ -281,14 +281,14 @@ export default function GalleryLandingPage() {
 
     return (
         <div
-            className="relative w-full flex items-center justify-center bg-black"
+            className="relative w-full flex items-center justify-center"
             style={{
                 minHeight: "100dvh",
                 height: "100dvh",
             }}
         >
             {showPasswordPrompt && collection.has_password && (
-                <div className="absolute inset-0 z-10 h-full w-full overflow-hidden p-4">
+                <div className="absolute inset-0 z-10 h-full w-full overflow-hidden bg-black p-4">
                     {collection.hero_image && (
                         <ResponsiveHeroImage
                             desktop={collection.hero_image}
@@ -299,8 +299,10 @@ export default function GalleryLandingPage() {
                     )}
                 </div>
             )}
+            {showPasswordPrompt && collection.has_password && (
+                <div className="absolute inset-0 bg-linear-to-b z-20 from-black/20 via-black/40 backdrop-blur-md" />
+            )}
 
-            <div className="absolute inset-0 bg-linear-to-b z-20 from-black/20 via-black/40 backdrop-blur-md" />
             <div className="relative z-30 w-full py-12">
                 {showPasswordPrompt &&
                     collection.has_password &&
