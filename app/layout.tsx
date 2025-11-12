@@ -5,8 +5,6 @@ import { Analytics } from "@vercel/analytics/next";
 import { ClientProviders } from "@/components/ClientProviders";
 
 export const metadata: Metadata = {
-    title: "Seovileo",
-    description: "",
     viewport: {
         width: "device-width",
         initialScale: 1,
