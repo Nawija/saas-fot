@@ -44,10 +44,8 @@ export default function FloatingUploadButton({
     return (
         <>
             {/* Mobile */}
-            <motion.div
+            <div
                 className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white border-t"
-                initial={{ y: 100 }}
-                animate={{ y: 0 }}
             >
                 <AnimatePresence mode="wait">
                     {uploading || isComplete ? (
@@ -55,48 +53,42 @@ export default function FloatingUploadButton({
                             key="progress"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="p-4"
+                            exit={{ opacity: 0, y: 10 }}
+                            className="p-2"
                         >
-                            <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center justify-center gap-2 pb-2">
                                 <AnimatePresence mode="wait">
                                     {uploading ? (
                                         <Loader className="animate-spin h-4 w-4 text-gray-700" />
                                     ) : isSuccess ? (
-                                        <motion.div
+                                        <div
                                             key="success"
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
+
                                         >
                                             <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                        </motion.div>
+                                        </div>
                                     ) : (
-                                        <motion.div
+                                        <div
                                             key="error"
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
                                         >
                                             <AlertCircle className="h-5 w-5 text-red-600" />
-                                        </motion.div>
+                                        </div>
                                     )}
                                 </AnimatePresence>
-                                <motion.span
-                                    className="text-sm font-medium text-gray-900"
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
+                                <span
+                                    className="text-sm font-medium text-gray-900 mt-2"
                                 >
                                     {uploading
                                         ? `Uploading ${uploadedCount}/${totalCount}...`
                                         : isSuccess
                                         ? `${uploadedCount} photos uploaded`
                                         : "Upload complete"}
-                                </motion.span>
+                                </span>
                             </div>
                             {uploading && (
-                                <motion.div
+                                <div
                                     className="w-full bg-gray-200 rounded-full h-2 overflow-hidden"
-                                    initial={{ opacity: 0, scaleX: 0.9 }}
-                                    animate={{ opacity: 1, scaleX: 1 }}
+
                                 >
                                     <motion.div
                                         className="bg-linear-to-r from-sky-300 via-indigo-300 to-blue-400 h-2 rounded-full"
@@ -105,7 +97,7 @@ export default function FloatingUploadButton({
                                             width: `${uploadProgress}%`,
                                         }}
                                     />
-                                </motion.div>
+                                </div>
                             )}
                         </motion.div>
                     ) : (
@@ -113,8 +105,8 @@ export default function FloatingUploadButton({
                             key="button"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="p-4"
+                            exit={{ opacity: 0, y: 5 }}
+                            className="p-2"
                         >
                             <label className="block cursor-pointer">
                                 <input
@@ -125,7 +117,7 @@ export default function FloatingUploadButton({
                                     onChange={handleUpload}
                                     className="hidden"
                                 />
-                                <div className="flex items-center justify-center gap-2 bg-linear-to-r from-sky-500 via-indigo-500 to-pink-400 text-white rounded-lg py-3 px-4">
+                                <div className="flex items-center text-sm justify-center gap-2 bg-linear-to-r from-sky-500 via-indigo-500 to-pink-400 text-white rounded-md py-2 px-4 mx-2">
                                     <Upload className="h-5 w-5" />
                                     <span className="font-medium">
                                         Upload Photos
@@ -135,7 +127,7 @@ export default function FloatingUploadButton({
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </motion.div>
+            </div>
 
             {/* Desktop */}
             <div className="hidden lg:block fixed bottom-6 right-6 z-50">
