@@ -455,10 +455,10 @@ export default function HeroImageEditor({
             <canvas ref={canvasRef} className="hidden" />
 
             {/* Main Editor */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
+            <div className="bg-white ">
                 <div
                     ref={containerRef}
-                    className="relative aspect-video overflow-hidden bg-gray-200/70"
+                    className="relative aspect-video h-[30vh]uto overflow-hidden bg-gray-200/70"
                     style={{ touchAction: isEditing ? "none" : "auto" }}
                 >
                     {preview ? (
@@ -507,8 +507,11 @@ export default function HeroImageEditor({
                             {/* Change Image Button - widoczny TYLKO gdy NIE edytujemy */}
                             {!isEditing && !isDragging && (
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20">
-                                    <label className="px-6 py-3 bg-white/95 hover:bg-white backdrop-blur-sm text-gray-900 text-sm font-semibold rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xl hover:shadow-2xl active:scale-95 border-2 border-gray-200 hover:border-blue-500 pointer-events-auto">
-                                        <Upload className="w-5 h-5 text-blue-500" />
+                                    <label className="px-4 py-2.5 bg-white/90 hover:bg-white text-gray-900 text-sm font-semibold rounded transition-all cursor-pointer flex items-center gap-2 pointer-events-auto">
+                                        <Upload
+                                            className="text-blue-500"
+                                            size={16}
+                                        />
                                         <span>Change image</span>
                                         <input
                                             type="file"
@@ -616,15 +619,14 @@ export default function HeroImageEditor({
                 {preview && isEditing ? (
                     <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
                         <ul className="text-xs text-blue-900 space-y-1">
+                            <li>• Recommended: 1920x1080px or higher</li>
                             <li className="hidden sm:block">
                                 • Drag the image to reposition
                             </li>
-                            <li>• Use zoom to adjust the crop</li>
                             <li>
                                 • Rotate for portrait images or different
                                 orientation
                             </li>
-                            <li>• Recommended: 1920x1080px or higher</li>
                         </ul>
                     </div>
                 ) : preview && !isEditing ? (

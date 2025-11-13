@@ -31,21 +31,6 @@ export default function HeroTemplateCard({
 
             <div className="p-5">
                 <div className="space-y-4">
-                    {/* Title & description */}
-                    {(title || description) && (
-                        <div className="px-2">
-                            {title && (
-                                <h3 className="text-sm font-semibold text-gray-900">
-                                    {title}
-                                </h3>
-                            )}
-                            {description && (
-                                <p className="text-xs text-gray-600 mt-1">
-                                    {description}
-                                </p>
-                            )}
-                        </div>
-                    )}
                     {/* Template Preview */}
                     <div className="relative group">
                         <img
@@ -60,6 +45,22 @@ export default function HeroTemplateCard({
                             <SquarePen size={20} /> Edit
                         </div>
                     </div>
+
+                    {/* Title & description */}
+                    {(title || description) && (
+                        <div className="px-2">
+                            {title && (
+                                <h3 className="text-sm line-clamp-1 font-semibold text-gray-900">
+                                    {title}
+                                </h3>
+                            )}
+                            {description && (
+                                <p className="text-xs line-clamp-2 text-gray-600 mt-1">
+                                    {description}
+                                </p>
+                            )}
+                        </div>
+                    )}
 
                     {/* Template Name */}
                     <div className="bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-200">
