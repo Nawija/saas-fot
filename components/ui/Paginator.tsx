@@ -56,7 +56,7 @@ export default function Paginator({
         <div className="pt-4 flex justify-center">
             <Pagination>
                 <PaginationContent>
-                    <PaginationItem>
+                    <PaginationItem className="cursor-pointer">
                         <PaginationLink
                             onClick={() => onPageChange(Math.max(1, page - 1))}
                             className={
@@ -73,7 +73,10 @@ export default function Paginator({
                     {pages.map((p, i) => {
                         if (p === "...") {
                             return (
-                                <PaginationItem key={`e-${i}`}>
+                                <PaginationItem
+                                    key={`e-${i}`}
+                                    className="cursor-default"
+                                >
                                     <span className="flex items-center px-3 text-sm text-gray-500">
                                         …
                                     </span>
@@ -82,7 +85,7 @@ export default function Paginator({
                         }
 
                         return (
-                            <PaginationItem key={p}>
+                            <PaginationItem key={p} className="cursor-pointer">
                                 <PaginationLink
                                     isActive={p === page}
                                     onClick={() => onPageChange(p as number)}
@@ -93,7 +96,7 @@ export default function Paginator({
                         );
                     })}
 
-                    <PaginationItem>
+                    <PaginationItem className="cursor-pointer">
                         <PaginationLink
                             onClick={() =>
                                 onPageChange(Math.min(totalPages, page + 1))

@@ -4,20 +4,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
 import { HERO_TEMPLATES, getTemplateByKey } from "./hero-templates/registry";
-import { Inter, Playfair_Display, Poppins } from "next/font/google";
-
-// Preload fonts using Next.js font optimization so they are served locally and fast.
-const interFont = Inter({ subsets: ["latin"], weight: ["400", "600", "700"] });
-const playfairFont = Playfair_Display({
-    subsets: ["latin"],
-    weight: ["400", "600", "700"],
-});
-const poppinsFont = Poppins({
-    subsets: ["latin"],
-    weight: ["400", "600", "700"],
-});
 import HeroTemplateSelector from "./HeroTemplateSelector";
 import CloseButton from "../buttons/CloseButton";
 
