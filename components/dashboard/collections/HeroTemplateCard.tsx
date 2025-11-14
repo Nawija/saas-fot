@@ -22,11 +22,8 @@ export default function HeroTemplateCard({
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <div className="border-b border-gray-200 px-5 py-4">
                 <h2 className="text-base font-semibold text-gray-900">
-                    Hero appearance
-                </h2>
-                <p className="text-sm text-gray-600 mt-1">
                     Gallery page template
-                </p>
+                </h2>
             </div>
 
             <div className="p-5">
@@ -36,31 +33,30 @@ export default function HeroTemplateCard({
                         <img
                             src={heroImage}
                             alt={collectionName}
-                            className="w-full h-auto"
+                            className="w-full h-auto z-0"
                         />
                         <div
                             onClick={onEditImage}
-                            className="flex items-center cursor-pointer font-semibold text-sm opacity-0 hover:opacity-100 transition-opacity justify-center h-full w-full bg-black/30 gap-1 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                            className="flex items-center cursor-pointer font-semibold text-sm opacity-0 hover:opacity-100 transition-opacity justify-center h-full w-full bg-black/30 gap-1 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
                         >
                             <SquarePen size={20} /> Edit
                         </div>
+                        {/* Title & description */}
+                        {(title || description) && (
+                            <div className="px-2 absolute bottom-2 left-2 bg-white/90 rounded p-2 max-w-[90%] z-10">
+                                {title && (
+                                    <h3 className="text-sm line-clamp-1 font-semibold text-gray-900">
+                                        {title}
+                                    </h3>
+                                )}
+                                {description && (
+                                    <p className="text-xs line-clamp-1 text-gray-600 mt-1">
+                                        {description}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </div>
-
-                    {/* Title & description */}
-                    {(title || description) && (
-                        <div className="px-2">
-                            {title && (
-                                <h3 className="text-sm line-clamp-1 font-semibold text-gray-900">
-                                    {title}
-                                </h3>
-                            )}
-                            {description && (
-                                <p className="text-xs line-clamp-2 text-gray-600 mt-1">
-                                    {description}
-                                </p>
-                            )}
-                        </div>
-                    )}
 
                     {/* Template Name */}
                     <div className="bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-200">

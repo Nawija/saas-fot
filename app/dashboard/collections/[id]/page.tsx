@@ -512,7 +512,7 @@ export default function CollectionDetailPage({
             </div>
 
             {/* Main Content */}
-            <div className="max-w-[1500px] mx-auto p-2 md:p-6">
+            <div className="max-w-[1500px] mx-auto p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
                     {/* Left Sidebar */}
                     <CollectionSidebar
