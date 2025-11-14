@@ -6,7 +6,20 @@ import ReactDOM from "react-dom/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { HERO_TEMPLATES, getTemplateByKey } from "./hero-templates/registry";
+import { Inter, Playfair_Display, Poppins } from "next/font/google";
+
+// Preload fonts using Next.js font optimization so they are served locally and fast.
+const interFont = Inter({ subsets: ["latin"], weight: ["400", "600", "700"] });
+const playfairFont = Playfair_Display({
+    subsets: ["latin"],
+    weight: ["400", "600", "700"],
+});
+const poppinsFont = Poppins({
+    subsets: ["latin"],
+    weight: ["400", "600", "700"],
+});
 import HeroTemplateSelector from "./HeroTemplateSelector";
+import CloseButton from "../buttons/CloseButton";
 
 interface HeroPreviewModalProps {
     open: boolean;
@@ -44,31 +57,24 @@ export default function HeroPreviewModal({
         key: string;
         label: string;
         cssFamily: string;
-        googleHref: string;
     }> = [
         {
             key: "inter",
             label: "Inter",
             cssFamily:
                 "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
-            googleHref:
-                "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
         },
         {
             key: "playfair",
             label: "Playfair Display",
             cssFamily:
                 "'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif",
-            googleHref:
-                "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap",
         },
         {
             key: "poppins",
             label: "Poppins",
             cssFamily:
                 "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif",
-            googleHref:
-                "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap",
         },
     ];
 
@@ -117,7 +123,6 @@ export default function HeroPreviewModal({
         image,
         fitBoth = false,
         fontCssFamily,
-        fontHref,
     }: {
         BaseComp: React.ComponentType<{
             title: string;
@@ -131,7 +136,6 @@ export default function HeroPreviewModal({
         image?: string;
         fitBoth?: boolean;
         fontCssFamily?: string;
-        fontHref?: string;
     }) {
         const wrapperRef = useRef<HTMLDivElement | null>(null);
         const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -200,18 +204,9 @@ export default function HeroPreviewModal({
                 }
             } catch {}
 
-            // Ensure selected Google Font is loaded inside iframe
-            if (fontHref) {
-                const id = "hero-font-link";
-                let link = doc.getElementById(id) as HTMLLinkElement | null;
-                if (!link) {
-                    link = doc.createElement("link");
-                    link.id = id;
-                    link.rel = "stylesheet";
-                    doc.head.appendChild(link);
-                }
-                link.href = fontHref;
-            }
+            // Font rules (from next/font) are copied into iframe via the
+            // "Copy styles from parent document" block above, so no explicit
+            // Google Fonts link injection is necessary here.
 
             const mount = doc.getElementById("root");
             if (!mount) return;
@@ -271,18 +266,8 @@ export default function HeroPreviewModal({
             const iframe = iframeRef.current;
             const doc = iframe?.contentDocument;
             if (!doc || !rootRef.current) return;
-            // Update font link if changed
-            if (fontHref) {
-                const id = "hero-font-link";
-                let link = doc.getElementById(id) as HTMLLinkElement | null;
-                if (!link) {
-                    link = doc.createElement("link");
-                    link.id = id;
-                    link.rel = "stylesheet";
-                    doc.head.appendChild(link);
-                }
-                if (link.href !== fontHref) link.href = fontHref;
-            }
+            // No explicit font link update needed; parent styles (including
+            // next/font injected @font-face rules) are copied into the iframe.
             rootRef.current.render(
                 <div
                     className="hero-preview-scope"
@@ -299,16 +284,7 @@ export default function HeroPreviewModal({
                     />
                 </div>
             );
-        }, [
-            title,
-            description,
-            image,
-            BaseComp,
-            baseW,
-            baseH,
-            fontCssFamily,
-            fontHref,
-        ]);
+        }, [title, description, image, BaseComp, baseW, baseH, fontCssFamily]);
 
         const height = Math.round(baseH * scale);
 
@@ -359,14 +335,7 @@ export default function HeroPreviewModal({
                                 <h2 className="text-base sm:text-lg font-semibold text-gray-900">
                                     Hero design editor
                                 </h2>
-
-                                <button
-                                    onClick={onClose}
-                                    className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-150"
-                                    aria-label="Close editor (Esc)"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
+                                <CloseButton onClick={onClose} />
                             </div>
 
                             {/* Main area */}
@@ -435,13 +404,6 @@ export default function HeroPreviewModal({
                                                                         selectedFont
                                                                 )?.cssFamily
                                                             }
-                                                            fontHref={
-                                                                FONT_OPTIONS.find(
-                                                                    (f) =>
-                                                                        f.key ===
-                                                                        selectedFont
-                                                                )?.googleHref
-                                                            }
                                                         />
                                                     </div>
                                                 </div>
@@ -470,13 +432,6 @@ export default function HeroPreviewModal({
                                                                         f.key ===
                                                                         selectedFont
                                                                 )?.cssFamily
-                                                            }
-                                                            fontHref={
-                                                                FONT_OPTIONS.find(
-                                                                    (f) =>
-                                                                        f.key ===
-                                                                        selectedFont
-                                                                )?.googleHref
                                                             }
                                                         />
                                                     </div>
@@ -514,16 +469,6 @@ export default function HeroPreviewModal({
                                                                         )
                                                                             ?.cssFamily
                                                                     }
-                                                                    fontHref={
-                                                                        FONT_OPTIONS.find(
-                                                                            (
-                                                                                f
-                                                                            ) =>
-                                                                                f.key ===
-                                                                                selectedFont
-                                                                        )
-                                                                            ?.googleHref
-                                                                    }
                                                                 />
                                                             </div>
                                                         </div>
@@ -553,13 +498,6 @@ export default function HeroPreviewModal({
                                                                     f.key ===
                                                                     selectedFont
                                                             )?.cssFamily
-                                                        }
-                                                        fontHref={
-                                                            FONT_OPTIONS.find(
-                                                                (f) =>
-                                                                    f.key ===
-                                                                    selectedFont
-                                                            )?.googleHref
                                                         }
                                                     />
                                                 </div>
