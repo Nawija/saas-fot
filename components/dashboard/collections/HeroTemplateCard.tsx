@@ -29,33 +29,40 @@ export default function HeroTemplateCard({
             <div className="p-5">
                 <div className="space-y-4">
                     {/* Template Preview */}
-                    <div className="relative group">
-                        <img
-                            src={heroImage}
-                            alt={collectionName}
-                            className="w-full h-auto z-0"
-                        />
-                        <div
-                            onClick={onEditImage}
-                            className="flex items-center cursor-pointer font-semibold text-sm opacity-0 hover:opacity-100 transition-opacity justify-center h-full w-full bg-black/30 gap-1 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
-                        >
-                            <SquarePen size={20} /> Edit
+                    <div className="relative group rounded-lg overflow-hidden border border-transparent hover:border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md">
+                        <div className="relative w-full aspect-video bg-gray-100">
+                            <img
+                                src={heroImage}
+                                alt={collectionName}
+                                className="w-full h-full object-cover"
+                            />
+
+                            {/* top-right edit button (visible on hover/focus) */}
+                            <button
+                                onClick={onEditImage}
+                                aria-label="Edit hero image"
+                                className="absolute top-3 right-3 z-30 inline-flex items-center gap-2 rounded-full bg-white/90 text-sm font-medium px-3 py-1 shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <SquarePen size={16} />
+                                <span className="hidden sm:inline">Edit</span>
+                            </button>
+
+                            {/* Bottom gradient with title/description */}
+                            {(title || description) && (
+                                <div className="absolute left-0 right-0 bottom-0 p-3 bg-linear-to-t from-black/80 via-black/50 to-transparent text-white">
+                                    {title && (
+                                        <h3 className="text-sm md:text-base font-semibold truncate">
+                                            {title}
+                                        </h3>
+                                    )}
+                                    {description && (
+                                        <p className="text-xs md:text-sm text-gray-100 mt-1 line-clamp-1">
+                                            {description}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </div>
-                        {/* Title & description */}
-                        {(title || description) && (
-                            <div className="px-2 absolute bottom-2 left-2 bg-white/90 rounded p-2 max-w-[90%] z-10">
-                                {title && (
-                                    <h3 className="text-sm line-clamp-1 font-semibold text-gray-900">
-                                        {title}
-                                    </h3>
-                                )}
-                                {description && (
-                                    <p className="text-xs line-clamp-1 text-gray-600 mt-1">
-                                        {description}
-                                    </p>
-                                )}
-                            </div>
-                        )}
                     </div>
 
                     {/* Template Name */}
