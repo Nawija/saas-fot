@@ -13,7 +13,7 @@ import { ArrowLeft, AlertCircle } from "lucide-react";
 import PhotoLikeButton from "@/components/gallery/PhotoLikeButton";
 import { getThumbnailUrl } from "@/lib/utils/getThumbnailUrl";
 
-const PHOTOS_PER_PAGE = 20;
+const PHOTOS_PER_PAGE = 25;
 
 // helpers
 const createEmptyColumns = (n: number) =>
@@ -219,7 +219,7 @@ export default function GalleryPhotosPage() {
 
         const { scrollTop, scrollHeight, clientHeight } =
             document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 300) {
+        if (scrollTop + clientHeight >= scrollHeight - 350) {
             setIsLoadingMore(true);
             setTimeout(() => {
                 setPage((prev) => prev + 1);
@@ -791,15 +791,25 @@ export default function GalleryPhotosPage() {
                     <div className="flex flex-col items-center justify-center py-8">
                         <div className="w-10 h-10 border-4 border-gray-300 border-t-gray-900 rounded-full animate-spin mb-3" />
                         <p className="text-gray-600 text-sm font-medium">
-                            Ładowanie kolejnych zdjęć...
+                            Ładowanie więcej zdjęć...
                         </p>
                     </div>
                 )}
 
                 {displayedPhotos.length === allPhotos.length &&
                     allPhotos.length > 0 && (
-                        <div className="text-center text-gray-400 py-6 text-sm">
-                            Wszystkie zdjęcia zostały załadowane
+                        <div className="text-center text-gray-400 mt-12 py-6 text-sm flex flex-col items-center gap-3">
+                            <p>Zaobserwuj nas na social mediach</p>
+                            <MainButton
+                                onClick={() =>
+                                    window.scrollTo({
+                                        top: 0,
+                                        behavior: "smooth",
+                                    })
+                                }
+                                label="Wróć na górę"
+                                variant="secondary"
+                            />
                         </div>
                     )}
             </div>

@@ -1,20 +1,11 @@
 // components/gallery/hero/templates/Split.tsx
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { GalleryHeroTemplate } from "../types";
 
 export const SplitTemplate: GalleryHeroTemplate = ({ data, options }) => {
     const shouldAnimate = !options?.disableAnimations;
-
-    const leftPanelVariants = shouldAnimate
-        ? {
-              initial: { opacity: 0, x: -40 },
-              animate: { opacity: 1, x: 0 },
-              transition: { duration: 0.8, ease: "easeOut" as const },
-          }
-        : {};
 
     const titleVariants = shouldAnimate
         ? {
@@ -54,8 +45,8 @@ export const SplitTemplate: GalleryHeroTemplate = ({ data, options }) => {
 
     const rightPanelVariants = shouldAnimate
         ? {
-              initial: { opacity: 0, x: 40 },
-              animate: { opacity: 1, x: 0 },
+              initial: { opacity: 0, scale: 1.05 },
+              animate: { opacity: 1, scale: 1 },
               transition: { duration: 1, ease: "easeOut" as const },
           }
         : {};
@@ -66,10 +57,7 @@ export const SplitTemplate: GalleryHeroTemplate = ({ data, options }) => {
             style={{ height: "100dvh" }}
         >
             {/* TEKST */}
-            <motion.div
-                {...leftPanelVariants}
-                className="relative order-2 md:order-1 flex items-center justify-center p-10 bg-white"
-            >
+            <div className="relative order-2 md:order-1 flex items-center justify-center p-10 bg-white">
                 <div className="max-w-lg text-center md:text-left">
                     <motion.h1
                         {...titleVariants}
@@ -90,29 +78,24 @@ export const SplitTemplate: GalleryHeroTemplate = ({ data, options }) => {
                     <motion.div {...buttonVariants}>
                         <a
                             href="#gallery"
-                            className="inline-block px-6 py-3 bg-black rounded-xl text-white border-gray-200 text-sm font-semibold hover:bg-gray-900 transition-colors duration-300"
+                            className="inline-block px-6 py-3 bg-black rounded text-white border-gray-200 text-sm font-semibold hover:bg-gray-900 transition-colors duration-300"
                         >
                             Zobacz zdjęcia
                         </a>
                     </motion.div>
                 </div>
-            </motion.div>
+            </div>
 
             {/* OBRAZ */}
-            <motion.div
-                {...rightPanelVariants}
-                className="relative order-1 md:order-2"
-            >
-                {data.image ? (
+            <div className="relative order-1 md:order-2 overflow-hidden">
+                <motion.div {...rightPanelVariants} className="w-full h-full ">
                     <img
                         src={data.image}
                         alt={data.name}
                         className="w-full h-full object-cover"
                     />
-                ) : (
-                    <div className="w-full h-full bg-linear-to-br from-gray-700 to-gray-500" />
-                )}
-            </motion.div>
+                </motion.div>
+            </div>
         </div>
     );
 };
