@@ -1,7 +1,9 @@
+// NEW PREMIUM VERSION WITH REAL PROGRESS — MOBILE FLOATING BUTTON
+
 "use client";
 
-import { useState, useEffect } from "react";
-import { Upload, CheckCircle2, AlertCircle, Loader } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Upload, Loader, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface FloatingUploadButtonProps {
@@ -20,220 +22,134 @@ export default function FloatingUploadButton({
     totalCount = 0,
 }: FloatingUploadButtonProps) {
     const [key, setKey] = useState(0);
-    const [showComplete, setShowComplete] = useState(false);
+    const [state, setState] = useState<"idle" | "loading" | "done">("idle");
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files?.length) return;
+        setState("loading");
         onUpload(e);
         setKey((prev) => prev + 1);
     };
 
-    // Auto-hide after upload complete
+    // change UI automatically when progress hits 100% or all files uploaded
     useEffect(() => {
-        if (!uploading && uploadedCount > 0 && uploadedCount === totalCount) {
-            setShowComplete(true);
-            const timer = setTimeout(() => {
-                setShowComplete(false);
-            }, 2000);
-            return () => clearTimeout(timer);
+        if (uploading) {
+            setState("loading");
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
+            }
         }
-    }, [uploading, uploadedCount, totalCount]);
+    }, [uploading]);
 
-    const isComplete = !uploading && uploadedCount > 0 && showComplete;
-    const isSuccess = uploadedCount === totalCount;
+    useEffect(() => {
+        const finishedByProgress = uploadProgress === 100 && !uploading;
+        const finishedByCount =
+            totalCount > 0 && uploadedCount === totalCount && !uploading;
+
+        if (finishedByProgress || finishedByCount) {
+            setState("done");
+
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+            }
+
+            timerRef.current = setTimeout(() => {
+                setState("idle");
+                timerRef.current = null;
+            }, 1200);
+        }
+    }, [uploading, uploadProgress, uploadedCount, totalCount]);
+
+    // clear timer on unmount
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+            }
+        };
+    }, []);
 
     return (
-        <>
-            {/* Mobile */}
-            <div
-                className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white border-t"
-            >
+        <div className="fixed bottom-6 right-6 lg:hidden z-40">
+            <label className="cursor-pointer block">
+                <input
+                    key={key}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleUpload}
+                    className="hidden"
+                />
+
                 <AnimatePresence mode="wait">
-                    {uploading || isComplete ? (
+                    {state === "idle" && (
                         <motion.div
-                            key="progress"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            className="p-2"
+                            key="idle"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            className="w-16 h-16 rounded-full bg-black text-white flex items-center justify-center"
                         >
-                            <div className="flex items-center justify-center gap-2 pb-2">
-                                <AnimatePresence mode="wait">
-                                    {uploading ? (
-                                        <Loader className="animate-spin h-4 w-4 text-gray-700" />
-                                    ) : isSuccess ? (
-                                        <div
-                                            key="success"
-
-                                        >
-                                            <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                        </div>
-                                    ) : (
-                                        <div
-                                            key="error"
-                                        >
-                                            <AlertCircle className="h-5 w-5 text-red-600" />
-                                        </div>
-                                    )}
-                                </AnimatePresence>
-                                <span
-                                    className="text-sm font-medium text-gray-900 mt-2"
-                                >
-                                    {uploading
-                                        ? `Uploading ${uploadedCount}/${totalCount}...`
-                                        : isSuccess
-                                        ? `${uploadedCount} photos uploaded`
-                                        : "Upload complete"}
-                                </span>
-                            </div>
-                            {uploading && (
-                                <div
-                                    className="w-full bg-gray-200 rounded-full h-2 overflow-hidden"
-
-                                >
-                                    <motion.div
-                                        className="bg-linear-to-r from-sky-300 via-indigo-300 to-blue-400 h-2 rounded-full"
-                                        initial={{ width: 0 }}
-                                        animate={{
-                                            width: `${uploadProgress}%`,
-                                        }}
-                                    />
-                                </div>
-                            )}
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="button"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 5 }}
-                            className="p-2"
-                        >
-                            <label className="block cursor-pointer">
-                                <input
-                                    key={key}
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleUpload}
-                                    className="hidden"
-                                />
-                                <div className="flex items-center text-sm justify-center gap-2 bg-linear-to-r from-sky-500 via-indigo-500 to-pink-400 text-white rounded-md py-2 px-4 mx-2">
-                                    <Upload className="h-5 w-5" />
-                                    <span className="font-medium">
-                                        Upload Photos
-                                    </span>
-                                </div>
-                            </label>
+                            <Upload size={26} />
                         </motion.div>
                     )}
-                </AnimatePresence>
-            </div>
 
-            {/* Desktop */}
-            <div className="hidden lg:block fixed bottom-6 right-6 z-50">
-                <AnimatePresence mode="wait">
-                    {uploading || isComplete ? (
+                    {state === "loading" && (
                         <motion.div
-                            key="card"
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white rounded-lg shadow-xl border w-80 p-4"
+                            key="loading"
+                            initial={{ width: 64 }}
+                            animate={{ width: 260 }}
+                            exit={{ width: 64 }}
+                            transition={{ type: "tween", duration: 0.22 }}
+                            className="h-16 rounded-full bg-black text-white flex items-center gap-4 px-4 overflow-hidden"
                         >
-                            <div className="flex items-center gap-2 pb-2">
-                                <AnimatePresence mode="wait">
-                                    {uploading ? (
-                                        <Loader className="animate-spin h-4 w-4 text-gray-700" />
-                                    ) : isSuccess ? (
+                            <Loader className="w-6 h-6 animate-spin" />
+
+                            <div className="w-full flex items-center gap-3">
+                                <div className="flex-1">
+                                    <motion.div
+                                        className="w-full h-1 bg-white/20 rounded-full overflow-hidden"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                    >
                                         <motion.div
-                                            key="success"
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                        >
-                                            <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div
-                                            key="error"
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                        >
-                                            <AlertCircle className="h-5 w-5 text-red-600" />
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                                <motion.span
-                                    className="text-sm font-semibold text-gray-900"
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                >
-                                    {uploading ? "Uploading" : "Complete"}
-                                </motion.span>
-                            </div>
-                            {uploading && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                >
-                                    <div className="flex justify-between text-xs text-gray-600">
-                                        <span
-                                            key={`${uploadedCount}-${totalCount}`}
-                                        >
-                                            {uploadedCount} of {totalCount}
-                                        </span>
-                                        <span
-                                            key={uploadProgress}
-                                            className="font-semibold"
-                                        >
-                                            {uploadProgress}%
-                                        </span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                        <motion.div
-                                            className="bg-linear-to-r from-sky-300 via-indigo-300 to-blue-400 h-2 rounded-full"
-                                            initial={{ width: 0 }}
+                                            className="h-full bg-white"
                                             animate={{
                                                 width: `${uploadProgress}%`,
                                             }}
-                                            transition={{
-                                                duration: 0.3,
-                                                ease: "easeOut",
-                                            }}
+                                            transition={{ ease: "linear" }}
                                         />
-                                    </div>
-                                </motion.div>
-                            )}
-                        </motion.div>
-                    ) : (
-                        <motion.label
-                            key="fab"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0 }}
-                            className="block cursor-pointer group"
-                        >
-                            <input
-                                key={key}
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={handleUpload}
-                                className="hidden"
-                            />
-                            <div className="bg-linear-60 from-blue-500 to-indigo-400 border-indigo-300 border text-white rounded-full p-4 shadow-lg hover:scale-105 transition">
-                                <Upload className="h-6 w-6" />
-                            </div>
-                            <div className="absolute bottom-full right-0 mb-2 pointer-events-none">
-                                <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Upload photos
+                                    </motion.div>
+                                </div>
+
+                                <div className="w-12 text-right text-xs tabular-nums">
+                                    {Math.min(
+                                        100,
+                                        Math.max(0, Math.round(uploadProgress))
+                                    )}
+                                    %
                                 </div>
                             </div>
-                        </motion.label>
+                        </motion.div>
+                    )}
+
+                    {state === "done" && (
+                        <div
+                            key="done"
+                            className="w-16 h-16 rounded-full bg-black text-white flex items-center justify-center px-4"
+                        >
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                <CheckCircle2 size={26} className="text-green-600" />
+                            </motion.div>
+                        </div>
                     )}
                 </AnimatePresence>
-            </div>
-
-            <div className="lg:hidden h-20" />
-        </>
+            </label>
+        </div>
     );
 }

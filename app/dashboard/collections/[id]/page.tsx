@@ -568,7 +568,7 @@ export default function CollectionDetailPage({
                             >
                                 <AccordionTrigger>
                                     <div className="flex items-center gap-2">
-                                        <Heart size={20} className="fill-rose-400 text-rose-600" />
+                                        <Heart size={20} className="fill-red-500 text-red-500" />
                                         Polubione zdjęcia ({likedPhotos.length})
                                     </div>
                                 </AccordionTrigger>
@@ -593,7 +593,7 @@ export default function CollectionDetailPage({
                                         </div>
                                     ) : likedPhotos.length > 0 ? (
                                         <>
-                                            <div className="bg-white rounded-2xl border border-gray-200 p-3">
+                                            <div>
                                                 <div
                                                     ref={likedScrollerRef}
                                                     className="flex gap-3 overflow-x-auto"

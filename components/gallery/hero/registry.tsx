@@ -21,11 +21,11 @@ export const HERO_TEMPLATE_SOURCE: Array<{
 }> = [
     { key: "minimal", label: "Minimal", tpl: MinimalTemplate },
     { key: "fullscreen", label: "Fullscreen", tpl: FullscreenTemplate },
-    { key: "split", label: "Split", tpl: SplitTemplate, premium: true },
     { key: "overlay", label: "Overlay", tpl: OverlayTemplate },
     { key: "gradient", label: "Gradient", tpl: GradientTemplate },
-    { key: "modern", label: "Modern", tpl: ModernTemplate, premium: true },
     { key: "ornate", label: "Ornate", tpl: OrnateTemplate },
+    { key: "split", label: "Split", tpl: SplitTemplate, premium: true },
+    { key: "modern", label: "Modern", tpl: ModernTemplate, premium: true },
     {
         key: "cinematic",
         label: "Cinematic",
