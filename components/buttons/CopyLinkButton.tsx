@@ -82,7 +82,7 @@ export default function CopyLinkButton({
 
     const buttonClasses = copied
         ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 hover:border-emerald-200"
-        : "bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-300 hover:border-orange-200";
+        : "bg-black hover:bg-gray-900 text-white border border-gray-700 hover:border-gray-600 font-semibold";
 
     return (
         <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export default function CopyLinkButton({
                                 : "translate-y-0 opacity-100"
                         }`}
                     >
-                        <Copy size={15} className="shrink-0" />
+                        <Copy size={15} strokeWidth={3} className="shrink-0" />
                         <span>{label}</span>
                     </div>
 
