@@ -72,7 +72,7 @@ export default function FloatingUploadButton({
     }, []);
 
     return (
-        <div className="fixed bottom-6 right-6 lg:hidden z-40">
+        <div className="fixed bottom-6 right-6 z-40">
             <label className="cursor-pointer block">
                 <input
                     key={key}
