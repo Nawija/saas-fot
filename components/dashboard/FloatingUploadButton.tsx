@@ -2,8 +2,8 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useCallback, memo } from "react";
-import { Upload, Loader, CheckCircle2 } from "lucide-react";
+import { useState, useEffect, useCallback, memo } from "react";
+import { Upload, Loader } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface FloatingUploadButtonProps {
@@ -14,6 +14,14 @@ interface FloatingUploadButtonProps {
     totalCount?: number;
 }
 
+const baseClasses =
+    "bg-blue-50 hover:bg-blue-100 text-blue-800 hover:text-blue-600 border border-blue-300 hover:border-blue-200";
+const springTransition = {
+    type: "spring" as const,
+    stiffness: 300,
+    damping: 30,
+};
+
 const FloatingUploadButton = memo(function FloatingUploadButton({
     uploading,
     uploadProgress,
@@ -22,10 +30,9 @@ const FloatingUploadButton = memo(function FloatingUploadButton({
     totalCount = 0,
 }: FloatingUploadButtonProps) {
     const [key, setKey] = useState(0);
-    const [state, setState] = useState<"welcome" | "idle" | "loading" | "done">(
+    const [state, setState] = useState<"welcome" | "idle" | "loading">(
         "welcome"
     );
-    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleUpload = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,10 +56,6 @@ const FloatingUploadButton = memo(function FloatingUploadButton({
     useEffect(() => {
         if (uploading) {
             setState("loading");
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-                timerRef.current = null;
-            }
         }
     }, [uploading]);
 
@@ -62,55 +65,9 @@ const FloatingUploadButton = memo(function FloatingUploadButton({
             totalCount > 0 && uploadedCount === totalCount && !uploading;
 
         if (finishedByProgress || finishedByCount) {
-            setState("done");
-
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
-
-            timerRef.current = setTimeout(() => {
-                setState("idle");
-                timerRef.current = null;
-            }, 1200);
+            setState("idle");
         }
     }, [uploading, uploadProgress, uploadedCount, totalCount]);
-
-    // clear timer on unmount
-    useEffect(() => {
-        return () => {
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        const finishedByProgress = uploadProgress === 100 && !uploading;
-        const finishedByCount =
-            totalCount > 0 && uploadedCount === totalCount && !uploading;
-
-        if (finishedByProgress || finishedByCount) {
-            setState("done");
-
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
-
-            timerRef.current = setTimeout(() => {
-                setState("idle");
-                timerRef.current = null;
-            }, 1200);
-        }
-    }, [uploading, uploadProgress, uploadedCount, totalCount]);
-
-    // clear timer on unmount
-    useEffect(() => {
-        return () => {
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
-        };
-    }, []);
 
     return (
         <div className="fixed bottom-6 right-6 z-40">
@@ -131,12 +88,8 @@ const FloatingUploadButton = memo(function FloatingUploadButton({
                             initial={{ width: 64, opacity: 0 }}
                             animate={{ width: 128, opacity: 1 }}
                             exit={{ width: 64, opacity: 0 }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 300,
-                                damping: 30,
-                            }}
-                            className="h-12 rounded-full bg-black text-white flex items-center justify-center gap-2 px-4 overflow-hidden"
+                            transition={springTransition}
+                            className={`${baseClasses} h-12 rounded-full flex items-center justify-center gap-2 px-4 overflow-hidden`}
                         >
                             <Upload size={20} />
                             <span className="text-sm font-medium">Upload</span>
@@ -149,12 +102,8 @@ const FloatingUploadButton = memo(function FloatingUploadButton({
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.8, opacity: 0 }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 300,
-                                damping: 30,
-                            }}
-                            className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center"
+                            transition={springTransition}
+                            className={`${baseClasses} w-12 h-12 rounded-full flex items-center justify-center`}
                         >
                             <Upload size={20} />
                         </motion.div>
@@ -166,29 +115,21 @@ const FloatingUploadButton = memo(function FloatingUploadButton({
                             initial={{ width: 64, opacity: 0 }}
                             animate={{ width: 260, opacity: 1 }}
                             exit={{ width: 64, opacity: 0 }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 300,
-                                damping: 30,
-                            }}
-                            className="h-12 rounded-full bg-black text-white flex items-center gap-4 px-4 overflow-hidden"
+                            transition={springTransition}
+                            className={`${baseClasses} h-12 rounded-full flex items-center gap-4 px-4 overflow-hidden`}
                         >
                             <Loader className="w-6 h-6 animate-spin" />
 
                             <div className="w-full flex items-center gap-3">
                                 <div className="flex-1">
                                     <motion.div
-                                        className="w-full h-1 bg-white/20 rounded-full overflow-hidden"
+                                        className="w-full h-1 bg-gray-200 border rounded-full overflow-hidden"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        transition={{
-                                            type: "spring",
-                                            stiffness: 300,
-                                            damping: 30,
-                                        }}
+                                        transition={springTransition}
                                     >
                                         <motion.div
-                                            className="h-full bg-white"
+                                            className="h-full bg-linear-to-r from-sky-300 via-indigo-300 to-blue-400"
                                             animate={{
                                                 width: `${uploadProgress}%`,
                                             }}
@@ -208,26 +149,6 @@ const FloatingUploadButton = memo(function FloatingUploadButton({
                                     %
                                 </div>
                             </div>
-                        </motion.div>
-                    )}
-
-                    {state === "done" && (
-                        <motion.div
-                            key="done"
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.8, opacity: 0 }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 300,
-                                damping: 30,
-                            }}
-                            className="w-12 h-12 rounded-full bg-green-700 text-white flex items-center justify-center px-3"
-                        >
-                            <CheckCircle2
-                                size={30}
-                                strokeWidth={2}
-                            />
                         </motion.div>
                     )}
                 </AnimatePresence>

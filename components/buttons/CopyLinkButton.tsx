@@ -82,7 +82,7 @@ export default function CopyLinkButton({
 
     const buttonClasses = copied
         ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 hover:border-emerald-200"
-        : "bg-black hover:bg-gray-900 text-white border border-gray-700 hover:border-gray-600 font-semibold";
+        : "bg-blue-50 hover:bg-blue-100 text-blue-800 hover:text-blue-600 border border-blue-300 hover:border-blue-200";
 
     return (
         <div className="flex items-center gap-2">
@@ -102,7 +102,7 @@ export default function CopyLinkButton({
             <button
                 ref={buttonRef}
                 onClick={copyToClipboard}
-                className={`relative flex items-center justify-center min-w-[140px] px-4 py-2.5 rounded-lg gap-2 text-sm font-medium transition-all duration-300 shadow-sm overflow-visible ${buttonClasses}`}
+                className={`relative flex items-center justify-center min-w-[140px] px-4 py-2.5 rounded-lg gap-2 text-sm transition-all font-semibold duration-300 shadow-sm overflow-visible ${buttonClasses}`}
             >
                 {/* Confetti */}
                 {confetti.map((conf) => (
