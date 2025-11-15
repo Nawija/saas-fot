@@ -128,7 +128,7 @@ export default function CopyLinkButton({
                 ))}
 
                 {/* Content with slide animation */}
-                <div className="relative flex items-center justify-center gap-2 w-full h-5">
+                <div className="relative flex items-center justify-center gap-2 w-full h-4.5">
                     {/* Default state - slides up and fades */}
                     <div
                         className={`absolute inset-0 flex items-center justify-center gap-2 transition-all duration-400 ease-out ${
