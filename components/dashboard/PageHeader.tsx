@@ -17,10 +17,10 @@ export default function PageHeader({
     return (
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
             <div className="mb-6 md:mb-0">
-                <h1 className="text-4xl md:text-5xl font-light text-gray-900 tracking-tight mb-3">
+                <h1 className="text-3xl md:text-4xl font-light text-gray-900 tracking-tight mb-3">
                     {title}
                 </h1>
-                <p className="text-xl text-gray-500 font-light leading-relaxed max-w-2xl">
+                <p className="text-base text-gray-500 font-light leading-relaxed max-w-2xl">
                     {description}
                 </p>
             </div>
