@@ -47,12 +47,12 @@ export default function Hero({
                 </div>
             )}
 
-            <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-6xl font-bold  tracking-tight leading-tight">
                 {typeof title === "string" ? (
                     highlight ? (
                         <>
                             {title}{" "}
-                            <span className="text-transparent bg-clip-text bg-linear-to-r from-sky-400 via-indigo-500 to-pink-500">
+                            <span className="text-transparent py-6 bg-clip-text bg-linear-to-r from-sky-400 via-indigo-500 to-pink-500">
                                 {highlight}
                             </span>
                         </>

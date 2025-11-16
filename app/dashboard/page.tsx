@@ -7,7 +7,6 @@ import {
     Share2,
     Coffee,
     Upload,
-    Shield,
     Sparkles,
     Globe,
     ArrowRight,
@@ -24,28 +23,30 @@ import Hero from "@/components/Hero";
 const features = [
     {
         icon: Images,
-        title: "Collections",
-        description: "Fast gallery management with drag & drop and previews.",
+        title: "Kolekcje",
+        description:
+            "Szybkie zarządzanie galeriami z przeciągnij-i-upuść i podglądem.",
         href: "/dashboard/collections",
     },
     {
         icon: Palette,
-        title: "Appearance",
+        title: "Wygląd",
         description:
-            "Themes, templates and brand settings for your public pages.",
+            "Motywy, szablony i ustawienia marki dla stron publicznych.",
         href: "/dashboard/settings",
     },
     {
         icon: Share2,
-        title: "Distribution",
-        description: "Share public links, embed galleries and control privacy.",
+        title: "Udostępnianie",
+        description:
+            "Udostępniaj linki publiczne, osadzaj galerie i kontroluj prywatność.",
         href: "/dashboard/share",
     },
     {
         icon: Sparkles,
-        title: "AI Tools",
+        title: "Narzędzia AI",
         description:
-            "Auto-tag, suggest titles and write descriptions in one click.",
+            "Automatyczne tagowanie, sugerowanie tytułów i tworzenie opisów jednym kliknięciem.",
         href: "/dashboard/ai",
     },
 ];
@@ -53,37 +54,37 @@ const features = [
 const steps = [
     {
         number: "1",
-        title: "Upload",
-        description: "Add photos quickly.",
+        title: "Prześlij",
+        description: "Dodaj zdjęcia szybko.",
         icon: Upload,
     },
     {
         number: "2",
-        title: "Organize",
-        description: "Group by collections.",
+        title: "Organizuj",
+        description: "Grupuj w kolekcje.",
         icon: Images,
     },
     {
         number: "3",
-        title: "Style",
-        description: "Choose a theme.",
+        title: "Stylizuj",
+        description: "Wybierz motyw.",
         icon: Palette,
     },
     {
         number: "4",
-        title: "Publish",
-        description: "Share with the world.",
+        title: "Opublikuj",
+        description: "Udostępnij światu.",
         icon: Share2,
     },
 ];
 
 const benefits = [
-    "Unlimited galleries",
-    "Fast CDN delivery",
-    "Custom domain",
-    "Privacy controls",
-    "Analytics",
-    "Priority support",
+    "Nieograniczone galerie",
+    "Szybkie dostarczanie przez CDN",
+    "Własna domena",
+    "Kontrola prywatności",
+    "Analityka",
+    "Priorytetowe wsparcie",
 ];
 
 export default function DashboardPage() {
@@ -92,22 +93,22 @@ export default function DashboardPage() {
     const quickActions = [
         {
             icon: Images,
-            label: "New gallery",
-            description: "Create a gallery",
+            label: "Nowa galeria",
+            description: "Utwórz galerię",
             href: "/dashboard/collections/new",
             variant: "primary" as const,
         },
         {
             icon: Upload,
-            label: "Upload photos",
-            description: "Add new images",
+            label: "Prześlij zdjęcia",
+            description: "Dodaj nowe zdjęcia",
             href: "/dashboard/collections",
             variant: "success" as const,
         },
         {
             icon: Globe,
-            label: "View site",
-            description: "Open your public profile",
+            label: "Zobacz stronę",
+            description: "Otwórz swój profil publiczny",
             href: user?.username
                 ? `https://${encodeURIComponent(user.username)}.seovileo.pl/`
                 : "/dashboard/profile",
@@ -120,16 +121,16 @@ export default function DashboardPage() {
     if (!user) return <></>;
 
     return (
-        <div className="min-h-screen bg-white text-black">
+        <div className="min-h-screen">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
                 {/* Top split hero */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                     <div className="lg:col-span-2 space-y-8">
                         <Hero
-                            badge="Subscription & Billing"
+                            badge="Subskrypcja i rozliczenia"
                             badgeIcon={<Crown className="w-4 h-4" />}
-                            title="Build"
-                            highlight="beautiful galleries"
+                            title="Buduj"
+                            highlight="piękne galerie"
                             className="mb-6"
                         />
                         <motion.div
@@ -139,20 +140,20 @@ export default function DashboardPage() {
                             className="lg:col-span-2 bg-white rounded-2xl p-8 border border-gray-200"
                         >
                             <p className="mt-2 text-slate-600 max-w-2xl">
-                                A modern dashboard to organize, style and share
-                                your photography. New look, focused on clarity
-                                and speed.
+                                Nowoczesny panel do organizowania, stylizowania
+                                i udostępniania Twojej fotografii. Nowy wygląd,
+                                skupiony na przejrzystości i szybkości.
                             </p>
                             <div className="mt-4 flex flex-wrap gap-3">
                                 <MainButton
                                     href="/dashboard/collections/new"
                                     icon={<Images className="w-4 h-4" />}
-                                    label="Create gallery"
+                                    label="Utwórz galerię"
                                 />
                                 <MainButton
                                     href="/dashboard/profile"
                                     icon={<Star className="w-4 h-4" />}
-                                    label="Edit profile"
+                                    label="Edytuj profil"
                                 />
                             </div>
 
@@ -163,7 +164,7 @@ export default function DashboardPage() {
                                     return (
                                         <div
                                             key={i}
-                                            className="flex items-start gap-4 p-4 rounded-xl bg-white border border-gray-200 shadow-sm"
+                                            className="flex items-start gap-4 p-4 rounded-xl bg-white border border-gray-200"
                                         >
                                             <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-slate-900">
                                                 <Icon className="w-5 h-5" />
@@ -188,10 +189,10 @@ export default function DashboardPage() {
                             className="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-200"
                         >
                             <h3 className="text-lg font-semibold">
-                                How it works
+                                Jak to działa
                             </h3>
                             <p className="text-sm text-gray-600">
-                                Simple steps from upload to share.
+                                Proste kroki od przesłania do udostępnienia.
                             </p>
                             <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 {steps.map((s, i) => (
@@ -223,10 +224,11 @@ export default function DashboardPage() {
                     >
                         <div className="rounded-2xl p-4 bg-white border border-gray-200">
                             <h4 className="text-sm font-semibold text-gray-700">
-                                Quick actions
+                                Szybkie akcje
                             </h4>
                             <p className="text-xs text-slate-600">
-                                Most common tasks at a glance
+                                Najczęściej wykonywane zadania na pierwszy rzut
+                                oka
                             </p>
                             <div className="mt-4 flex flex-col gap-3">
                                 {quickActions.map((a, idx) => {
@@ -234,7 +236,7 @@ export default function DashboardPage() {
                                     return (
                                         <div
                                             key={idx}
-                                            className="flex items-center justify-between gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition"
+                                            className="flex items-center justify-between gap-3 p-3 rounded-lg bg-gray-50"
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center">
@@ -259,7 +261,7 @@ export default function DashboardPage() {
                                                 icon={
                                                     <ArrowRight className="w-4 h-4" />
                                                 }
-                                                label="Open"
+                                                label="Otwórz"
                                             />
                                         </div>
                                     );
@@ -268,15 +270,16 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="rounded-2xl p-4 bg-white border border-gray-200">
-                            <h4 className="text-sm font-semibold">Support</h4>
+                            <h4 className="text-sm font-semibold">Wsparcie</h4>
                             <p className="text-xs text-gray-600">
-                                Need help? Our team responds quickly.
+                                Potrzebujesz pomocy? Nasz zespół odpowiada
+                                szybko.
                             </p>
                             <div className="mt-3">
                                 <MainButton
                                     href="/support"
                                     icon={<Coffee className="w-4 h-4" />}
-                                    label="Contact support"
+                                    label="Skontaktuj się"
                                 />
                             </div>
                         </div>
@@ -288,7 +291,7 @@ export default function DashboardPage() {
                             className="bg-white rounded-2xl p-6 border border-gray-200"
                         >
                             <h3 className="text-lg font-semibold">
-                                Why choose us
+                                Dlaczego warto nas wybrać
                             </h3>
                             <ul className="mt-4 space-y-2 text-sm text-gray-600">
                                 {benefits.map((b, i) => (
@@ -299,7 +302,9 @@ export default function DashboardPage() {
                                         <div className="w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center">
                                             <Check className="w-3 h-3" />
                                         </div>
-                                        <span className="text-green-800">{b}</span>
+                                        <span className="text-green-800">
+                                            {b}
+                                        </span>
                                     </li>
                                 ))}
                             </ul>
@@ -307,7 +312,7 @@ export default function DashboardPage() {
                                 <MainButton
                                     href="/dashboard/billing#plans"
                                     icon={<Star className="w-4 h-4" />}
-                                    label="View plans"
+                                    label="Zobacz plany"
                                 />
                             </div>
                         </motion.div>
