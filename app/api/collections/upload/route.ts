@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/getUser";
 import { createErrorResponse } from "@/lib/utils/apiHelpers";
-import { uploadToR2, R2Paths } from "@/lib/r2";
+import { uploadToR2, R2Paths, deleteFromR2, extractKeyFromUrl } from "@/lib/r2";
 import { query } from "@/lib/db";
 import sharp from "sharp";
 import path from "path";
@@ -86,19 +86,58 @@ export async function POST(req: NextRequest) {
             ]);
 
             // Upload obu wersji RÓWNOLEGLE do R2
-            const keyDesktop = R2Paths.collectionHero(
-                user.id,
-                parseInt(collectionId)
-            );
-            const keyMobile = R2Paths.collectionHeroMobile(
-                user.id,
-                parseInt(collectionId)
-            );
+            // Use unique keys for hero images so each upload creates a new
+            // object instead of overwriting the previous one. This prevents
+            // browser/CDN caching issues where the URL stays the same.
+            const ts = Date.now();
+            const keyDesktop = `users/${user.id}/collections/${collectionId}/hero-${ts}.webp`;
+            const keyMobile = `users/${user.id}/collections/${collectionId}/hero-mobile-${ts}.webp`;
 
             const [urlDesktop, urlMobile] = await Promise.all([
                 uploadToR2(heroDesktopBuffer, keyDesktop, contentType),
                 uploadToR2(heroMobileBuffer, keyMobile, contentType),
             ]);
+
+            // After successful upload, attempt to delete previous hero files (if any)
+            try {
+                const colRes = await query(
+                    "SELECT hero_image, hero_image_mobile FROM collections WHERE id = $1",
+                    [parseInt(collectionId)]
+                );
+
+                const prev = colRes.rows[0];
+                if (prev) {
+                    const prevDesktopUrl = prev.hero_image as string | null;
+                    const prevMobileUrl = prev.hero_image_mobile as
+                        | string
+                        | null;
+
+                    const prevDesktopKey = prevDesktopUrl
+                        ? extractKeyFromUrl(
+                              prevDesktopUrl.split("?")[0] as string
+                          )
+                        : null;
+                    const prevMobileKey = prevMobileUrl
+                        ? extractKeyFromUrl(
+                              prevMobileUrl.split("?")[0] as string
+                          )
+                        : null;
+
+                    // Only delete if key exists and is different from newly uploaded keys
+                    if (prevDesktopKey && prevDesktopKey !== keyDesktop) {
+                        await deleteFromR2(prevDesktopKey);
+                    }
+                    if (prevMobileKey && prevMobileKey !== keyMobile) {
+                        await deleteFromR2(prevMobileKey);
+                    }
+                }
+            } catch (deleteErr) {
+                console.warn(
+                    "Failed to delete previous hero images:",
+                    deleteErr
+                );
+                // Don't fail the whole request if deletion fails
+            }
 
             // Zwróć desktop URL jako główny, mobile w metadata
             processedBuffer = heroDesktopBuffer;
