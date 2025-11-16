@@ -131,7 +131,7 @@ export default function DashboardPage() {
                             badgeIcon={<Crown className="w-4 h-4" />}
                             title="Buduj"
                             highlight="piękne galerie"
-                            className="mb-6"
+
                         />
                         <motion.div
                             initial={{ opacity: 0, y: 12 }}

@@ -47,7 +47,7 @@ export default function Hero({
                 </div>
             )}
 
-            <h1 className="text-4xl sm:text-6xl font-bold  tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-6xl font-bold pb-6 tracking-tight leading-tight">
                 {typeof title === "string" ? (
                     highlight ? (
                         <>
