@@ -14,7 +14,6 @@ import {
     Check,
     Star,
 } from "lucide-react";
-import Hero from "@/components/Hero";
 import MainButton from "@/components/buttons/MainButton";
 import Loading from "@/components/ui/Loading";
 import FooterDashboard from "@/components/ui/FooterDashboard";
@@ -23,34 +22,28 @@ import { useAuthUser } from "@/hooks";
 const features = [
     {
         icon: Images,
-        title: "Create galleries",
-        description:
-            "Manage your photos in elegant galleries. Add, edit and organize your collections in seconds.",
-        color: "blue",
+        title: "Collections",
+        description: "Fast gallery management with drag & drop and previews.",
         href: "/dashboard/collections",
     },
     {
         icon: Palette,
-        title: "Customize look",
+        title: "Appearance",
         description:
-            "Adjust your profile and galleries to your preferences. Choose templates, colors and layouts.",
-        color: "blue",
+            "Themes, templates and brand settings for your public pages.",
         href: "/dashboard/settings",
     },
     {
         icon: Share2,
-        title: "Share content",
-        description:
-            "Share your galleries with the world. Generate links, control privacy and track statistics.",
-        color: "blue",
+        title: "Distribution",
+        description: "Share public links, embed galleries and control privacy.",
         href: "/dashboard/share",
     },
     {
         icon: Sparkles,
-        title: "AI Generator",
+        title: "AI Tools",
         description:
-            "Use artificial intelligence to automatically generate descriptions and tags for your photos.",
-        color: "blue",
+            "Auto-tag, suggest titles and write descriptions in one click.",
         href: "/dashboard/ai",
     },
 ];
@@ -58,41 +51,37 @@ const features = [
 const steps = [
     {
         number: "1",
-        title: "Upload photos",
-        description:
-            "Start by uploading your best photos. We support all popular formats.",
+        title: "Upload",
+        description: "Add photos quickly.",
         icon: Upload,
     },
     {
         number: "2",
-        title: "Organize in collections",
-        description:
-            "Create themed galleries and organize your photos according to your own criteria.",
+        title: "Organize",
+        description: "Group by collections.",
         icon: Images,
     },
     {
         number: "3",
-        title: "Personalize",
-        description:
-            "Customize the look of your profile and gallery to your own style and brand.",
+        title: "Style",
+        description: "Choose a theme.",
         icon: Palette,
     },
     {
         number: "4",
-        title: "Share with world",
-        description:
-            "Publish your galleries and share them with audiences around the world.",
+        title: "Publish",
+        description: "Share with the world.",
         icon: Share2,
     },
 ];
 
 const benefits = [
     "Unlimited galleries",
-    "High quality images",
-    "Own domain",
-    "Advanced statistics",
-    "24/7 technical support",
-    "Regular updates",
+    "Fast CDN delivery",
+    "Custom domain",
+    "Privacy controls",
+    "Analytics",
+    "Priority support",
 ];
 
 export default function DashboardPage() {
@@ -101,299 +90,228 @@ export default function DashboardPage() {
     const quickActions = [
         {
             icon: Images,
-            label: "Create collection",
-            description: "Create a new gallery from your photos",
-            href: "/dashboard/collections",
+            label: "New gallery",
+            description: "Create a gallery",
+            href: "/dashboard/collections/new",
             variant: "primary" as const,
         },
         {
             icon: Upload,
-            label: "Edit profile",
-            description: "Settings and customize your public profile",
-            href: "/dashboard/profile",
+            label: "Upload photos",
+            description: "Add new images",
+            href: "/dashboard/collections",
             variant: "success" as const,
         },
         {
             icon: Globe,
-            label: "Your public brand",
-            description: "View your public profile domain",
-            // jeśli username jest dostępny => zbuduj bezpieczny URL do subdomeny,
-            // w przeciwnym razie kieruj do profilu w dashboardzie (fallback)
+            label: "View site",
+            description: "Open your public profile",
             href: user?.username
                 ? `https://${encodeURIComponent(user.username)}.seovileo.pl/`
                 : "/dashboard/profile",
-            // zaznacz, że to zewnętrzny link (użyte przy renderowaniu)
             external: Boolean(user?.username),
             variant: "purple" as const,
         },
     ];
 
-    if (loading) {
-        return <Loading />;
-    }
-
-    if (!user) {
-        return <></>;
-    }
+    if (loading) return <Loading />;
+    if (!user) return <></>;
 
     return (
-        <div className="min-h-screen">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-20">
-                {/* Hero Section */}
-                <Hero
-                    badge="Welcome back!"
-                    badgeIcon={<Sparkles className="w-4 h-4" />}
-                    title="Your platform for"
-                    highlight="beautiful galleries"
-                    subtitle={
-                        "Create, organize and share your photos professionally. Everything you need in one place."
-                    }
-                    cta={[
-                        {
-                            label: "Create gallery",
-                            href: "/dashboard/collections/new",
-                            variant: "purple",
-                            icon: <Images className="w-5 h-5" />,
-                            className: "text-lg px-8 py-2",
-                        },
-                    ]}
-                />
+        <div className="min-h-screen bg-white text-black">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+                {/* Top split hero */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="lg:col-span-2 bg-white rounded-2xl p-8 shadow-sm border border-gray-200"
+                    >
 
-                {/* Quick Actions */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                    className="space-y-8"
-                >
-                    <div className="text-center space-y-3">
-                        <h2 className="text-3xl sm:text-4xl font-bold">
-                            Quick actions
-                        </h2>
-                        <p className="text-lg text-gray-600">
-                            Get started in seconds
-                        </p>
-                    </div>
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm uppercase tracking-wider text-gray-700 font-medium">
+                                        Welcome
+                                    </span>
+                                    <Sparkles className="w-4 h-4 text-gray-500" />
+                                </div>
+                                <h1 className="mt-2 text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
+                                    Build beautiful galleries — fast
+                                </h1>
+                                <p className="mt-2 text-slate-600 max-w-2xl">
+                                    A modern dashboard to organize, style and
+                                    share your photography. New look, focused on
+                                    clarity and speed.
+                                </p>
+                                <div className="mt-4 flex flex-wrap gap-3">
+                                    <MainButton
+                                        href="/dashboard/collections/new"
+                                        icon={<Images className="w-4 h-4" />}
+                                        label="Create gallery"
+                                    />
+                                    <MainButton
+                                        href="/dashboard/profile"
+                                        icon={<Star className="w-4 h-4" />}
+                                        label="Edit profile"
+                                    />
+                                </div>
+                            </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {quickActions.map((action, index) => {
-                            const Icon = action.icon;
-                            return (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{
-                                        duration: 0.4,
-                                        delay: 0.2 + index * 0.1,
-                                    }}
-                                    className="group"
-                                >
-                                    <div className="h-full bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-600 mb-4">
-                                            <Icon className="w-6 h-6" />
-                                        </div>
-                                        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                                            {action.label}
-                                        </h3>
-                                        <p className="text-gray-600 leading-relaxed mb-4">
-                                            {action.description}
-                                        </p>
-                                        <MainButton
-                                            href={action.href}
-                                            target={
-                                                action.external
-                                                    ? "_blank"
-                                                    : "_self"
-                                            }
-                                            variant={action.variant}
-                                            icon={
-                                                <ArrowRight className="w-4 h-4" />
-                                            }
-                                            label="Go"
-                                            className="text-sm"
-                                        />
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-                </motion.section>
 
-                {/* Main Features */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="py-20 px-4 sm:px-6 bg-white border border-gray-200 rounded-2xl -mx-4 xl:-mx-80"
-                >
-                    <div className="max-w-6xl mx-auto space-y-12">
-                        <div className="text-center space-y-3">
-                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
-                                Everything you need
-                            </h2>
-                            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                                Professional photo delivery made simple
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {features.map((feature, index) => {
-                                const Icon = feature.icon;
+                        {/* Feature highlights */}
+                        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {features.map((f, i) => {
+                                const Icon = f.icon;
                                 return (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{
-                                            duration: 0.4,
-                                            delay: 0.3 + index * 0.1,
-                                        }}
-                                        className="text-center"
+                                    <div
+                                        key={i}
+                                        className="flex items-start gap-4 p-4 rounded-xl bg-white border border-gray-200 shadow-sm"
                                     >
-                                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 mb-4">
-                                            <Icon className="w-6 h-6" />
+                                        <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-slate-900">
+                                            <Icon className="w-5 h-5" />
                                         </div>
-                                        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                                            {feature.title}
-                                        </h3>
-                                        <p className="text-gray-600 leading-relaxed">
-                                            {feature.description}
-                                        </p>
-                                    </motion.div>
+                                        <div>
+                                            <h3 className="font-semibold">
+                                                {f.title}
+                                            </h3>
+                                            <p className="text-sm text-slate-600">
+                                                {f.description}
+                                            </p>
+                                        </div>
+                                    </div>
                                 );
                             })}
                         </div>
-                    </div>
-                </motion.section>
+                    </motion.div>
 
-                {/* How it works */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="space-y-12 py-6"
-                >
-                    <div className="text-center space-y-3">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
-                            How it works
-                        </h2>
-                        <p className="text-lg text-gray-600">
-                            Four simple steps to success
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {steps.map((step, index) => {
-                            const Icon = step.icon;
-                            return (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{
-                                        duration: 0.4,
-                                        delay: 0.4 + index * 0.1,
-                                    }}
-                                    className="text-center"
-                                >
-                                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-xl mb-4">
-                                        {step.number}
-                                    </div>
-                                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                                        {step.title}
-                                    </h3>
-                                    <p className="text-gray-600 leading-relaxed">
-                                        {step.description}
-                                    </p>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-                </motion.section>
-
-                {/* Benefits Section */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                    className="py-20 px-4 sm:px-6 bg-blue-50 -mx-4 md:-mx-80"
-                >
-                    <div className="max-w-3xl mx-auto text-center space-y-8">
-                        <div>
-                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">
-                                Start free, upgrade when ready
-                            </h2>
-                            <p className="text-lg text-gray-600 mt-4 px-12">
-                                Free plan includes 3 galleries. Upgrade for
-                                unlimited galleries, password protection, and no
-                                watermarks.
+                    {/* Right side quick actions */}
+                    <motion.aside
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="space-y-4"
+                    >
+                        <div className="rounded-2xl p-4 bg-white border border-gray-200">
+                            <h4 className="text-sm font-semibold text-gray-700">
+                                Quick actions
+                            </h4>
+                            <p className="text-xs text-slate-600">
+                                Most common tasks at a glance
                             </p>
+                            <div className="mt-4 flex flex-col gap-3">
+                                {quickActions.map((a, idx) => {
+                                    const Icon = a.icon;
+                                    return (
+                                        <div
+                                            key={idx}
+                                            className="flex items-center justify-between gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center">
+                                                    <Icon className="w-4 h-4 text-gray-700" />
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm font-medium">
+                                                        {a.label}
+                                                    </div>
+                                                    <div className="text-xs text-slate-600">
+                                                        {a.description}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <MainButton
+                                                href={a.href}
+                                                target={
+                                                    a.external
+                                                        ? "_blank"
+                                                        : "_self"
+                                                }
+                                                icon={
+                                                    <ArrowRight className="w-4 h-4" />
+                                                }
+                                                label="Open"
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                            {benefits.map((benefit, index) => (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{
-                                        duration: 0.4,
-                                        delay: 0.5 + index * 0.05,
-                                    }}
-                                    className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm border border-gray-100"
+                        <div className="rounded-2xl p-4 bg-white border border-gray-200">
+                            <h4 className="text-sm font-semibold">Support</h4>
+                            <p className="text-xs text-gray-600">
+                                Need help? Our team responds quickly.
+                            </p>
+                            <div className="mt-3">
+                                <MainButton
+                                    href="/support"
+                                    icon={<Coffee className="w-4 h-4" />}
+                                    label="Contact support"
+                                />
+                            </div>
+                        </div>
+                    </motion.aside>
+                </div>
+
+                {/* Steps + benefits */}
+                <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-200"
+                    >
+                        <h3 className="text-lg font-semibold">How it works</h3>
+                        <p className="text-sm text-gray-600">
+                            Simple steps from upload to share.
+                        </p>
+                        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            {steps.map((s, i) => (
+                                <div
+                                    key={i}
+                                    className="p-3 rounded-lg bg-gray-50 text-center"
                                 >
-                                    <div className="shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <Check className="w-4 h-4 text-blue-600" />
+                                    <div className="w-9 h-9 mx-auto rounded-full bg-gray-800 text-white font-bold flex items-center justify-center">
+                                        {s.number}
                                     </div>
-                                    <span className="font-medium text-gray-800">
-                                        {benefit}
-                                    </span>
-                                </motion.div>
+                                    <div className="mt-2 text-sm font-medium">
+                                        {s.title}
+                                    </div>
+                                    <div className="text-xs text-slate-600">
+                                        {s.description}
+                                    </div>
+                                </div>
                             ))}
                         </div>
+                    </motion.div>
 
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.05 }}
+                        className="bg-white rounded-2xl p-6 border border-gray-200"
+                    >
+                        <h3 className="text-lg font-semibold">Why choose us</h3>
+                        <ul className="mt-4 space-y-2 text-sm text-gray-600">
+                            {benefits.map((b, i) => (
+                                <li key={i} className="flex items-center gap-2">
+                                    <div className="w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center">
+                                        <Check className="w-3 h-3" />
+                                    </div>
+                                    <span>{b}</span>
+                                </li>
+                            ))}
+                        </ul>
+                        <div className="mt-6">
                             <MainButton
-                                href="/dashboard/collections/new"
-                                variant="primary"
-                                icon={<Star className="w-5 h-5" />}
-                                label="Start now"
-                                className="text-lg px-8 py-3"
-                            />
-                            <a
                                 href="/dashboard/billing#plans"
-                                className="text-blue-700 font-medium hover:text-blue-800 transition-colors"
-                            >
-                                View pricing →
-                            </a>
+                                icon={<Star className="w-4 h-4" />}
+                                label="View plans"
+                            />
                         </div>
-                    </div>
-                </motion.section>
-
-                {/* Support Section */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.5 }}
-                    className="text-center space-y-6 py-16 px-4 sm:px-6 -mx-4 sm:-mx-6"
-                >
-                    <Shield className="w-12 h-12 mx-auto text-yellow-500 fill-yellow-400" />
-                    <h2 className="text-3xl sm:text-4xl font-bold">
-                        Need help?
-                    </h2>
-                    <p className="text-lg max-w-2xl mx-auto">
-                        Our support team is always ready to help you. Contact us
-                        anytime.
-                    </p>
-                    <MainButton
-                        href="/support"
-                        variant="orange"
-                        icon={<Coffee className="w-5 h-5" />}
-                        label="Help Center"
-                        className="text-lg px-8 py-3"
-                    />
-                </motion.section>
+                    </motion.div>
+                </div>
             </div>
 
             <FooterDashboard />
