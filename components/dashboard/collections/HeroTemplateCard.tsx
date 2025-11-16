@@ -1,4 +1,7 @@
 // components/dashboard/collections/HeroTemplateCard.tsx
+"use client";
+
+import { useEffect, useState } from "react";
 import { SquarePen } from "lucide-react";
 
 interface HeroTemplateCardProps {
@@ -18,6 +21,33 @@ export default function HeroTemplateCard({
     description,
     onEditImage,
 }: HeroTemplateCardProps) {
+    // Local cached src that appends a one-time cache-busting param whenever
+    // the `heroImage` prop changes. This forces the browser to refetch the
+    // updated image even if the URL (object key) itself didn't change.
+    const [displaySrc, setDisplaySrc] = useState<string>(heroImage);
+
+    useEffect(() => {
+        if (!heroImage) {
+            setDisplaySrc(heroImage);
+            return;
+        }
+
+        try {
+            // Use URL to safely set/replace the `v` query param
+            const u = new URL(heroImage, window.location.href);
+            u.searchParams.set("v", String(Date.now()));
+            setDisplaySrc(u.toString());
+        } catch (e) {
+            // Fallback for non-URL strings
+            setDisplaySrc(
+                heroImage +
+                    (heroImage.includes("?") ? "&" : "?") +
+                    "v=" +
+                    Date.now()
+            );
+        }
+    }, [heroImage]);
+
     return (
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <div className="border-b border-gray-200 px-5 py-4">
@@ -32,7 +62,7 @@ export default function HeroTemplateCard({
                     <div className="relative group rounded-lg overflow-hidden border border-transparent hover:border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md">
                         <div className="relative w-full aspect-video bg-gray-100">
                             <img
-                                src={heroImage}
+                                src={displaySrc}
                                 alt={collectionName}
                                 className="w-full h-full object-cover"
                             />

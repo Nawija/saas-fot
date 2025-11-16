@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import type { Collection } from "@/types/gallery";
 import { getGalleryHeroTemplate } from "@/components/gallery/hero/registry";
+import LoadingGallery from "@/components/ui/LoadingGallery";
 
 export interface GalleryHeroProps {
     collection: Collection;
@@ -27,6 +28,36 @@ export default function GalleryHero({ collection }: GalleryHeroProps) {
             </div>
         </div>
     );
+
+    const [heroLoaded, setHeroLoaded] = useState(false);
+
+    useEffect(() => {
+        // If there's no hero image, consider it loaded immediately
+        const src = collection.hero_image;
+        if (!src) {
+            setHeroLoaded(true);
+            return;
+        }
+
+        let mounted = true;
+        const img = new window.Image();
+        img.src = src;
+        img.onload = () => {
+            if (mounted) setHeroLoaded(true);
+        };
+        img.onerror = () => {
+            // If the hero image fails to load, allow the page to show anyway
+            if (mounted) setHeroLoaded(true);
+        };
+
+        return () => {
+            mounted = false;
+        };
+    }, [collection.hero_image]);
+
+    if (!heroLoaded) {
+        return <LoadingGallery />;
+    }
 
     return (
         <div style={{ fontFamily: FONT_FAMILY[fontKey] }}>

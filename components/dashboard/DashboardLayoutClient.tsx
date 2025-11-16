@@ -63,7 +63,7 @@ export default function DashboardLayoutClient({
                         username={user?.username}
                     />
                     <div
-                        className={`flex-1 overflow-x-hidden h-full w-full border rounded-t-2xl lg:rounded-tr-none border-gray-200 transition-all duration-300 ease-in-out ${
+                        className={`flex-1 overflow-x-hidden h-full w-full border border-gray-200 transition-all duration-300 ease-in-out ${
                             isCollectionDetails ? "lg:-ml-64" : "lg:w-full"
                         }`}
                     >
