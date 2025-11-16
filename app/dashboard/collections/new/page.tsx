@@ -33,7 +33,12 @@ export default function NewCollectionPage() {
     const username = user?.username || "";
 
     const generateSlug = (name: string) => {
+        // Normalize and remove diacritics (covers Polish letters like ą, ć, ę, ł, ń, ó, ś, ż, ź)
+        // using Unicode NFD form and stripping combining marks. This converts
+        // characters like 'ą' -> 'a' and 'ś' -> 's' before further slugification.
         return name
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // remove combining diacritical marks
             .toLowerCase()
             .replace(/[^a-z0-9\s-]/g, "")
             .replace(/\s+/g, "-")
