@@ -28,7 +28,7 @@ import {
     useHeroSettings,
     useCollectionSettings,
 } from "@/components/dashboard/collections";
-import { Heart, Image, Download } from "lucide-react";
+import { Heart, Image, Download, Trash2 } from "lucide-react";
 import MainButton from "@/components/buttons/MainButton";
 import { toast } from "sonner";
 import EmptyState from "@/components/dashboard/EmptyState";
@@ -513,7 +513,7 @@ export default function CollectionDetailPage({
 
             {/* Main Content */}
             <div className="max-w-[1500px] mx-auto p-6">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 ">
                     {/* Left Sidebar */}
                     <CollectionSidebar
                         collection={collection}
@@ -635,41 +635,50 @@ export default function CollectionDetailPage({
                                     )}
                                 </AccordionContent>
                             </AccordionItem>
-
-                            <AccordionItem
-                                value="gallery"
-                                className="bg-white rounded-2xl border border-gray-200 px-6 last:border-b"
-                            >
-                                <AccordionTrigger>
-                                    <div className="flex items-center gap-2">
-                                        <Image size={20} />
-                                        Photo Gallery (
-                                        {collection?.photo_count ??
-                                            photos.length}
-                                        )
-                                    </div>
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                    <UploadErrorsList
-                                        errors={uploadErrors}
-                                        onClose={() => setUploadErrors([])}
-                                    />
-
-                                    <CollectionGallerySection
-                                        photos={galleryPhotos}
-                                        deletingAll={deletingAll}
-                                        onDeletePhoto={handleDeletePhotoClick}
-                                        onDeleteAll={() =>
-                                            setConfirmDeleteAllOpen(true)
-                                        }
-                                        page={galleryPage}
-                                        total={galleryTotal}
-                                        pageSize={GALLERY_PAGE_SIZE}
-                                        onPageChange={(p) => setGalleryPage(p)}
-                                    />
-                                </AccordionContent>
-                            </AccordionItem>
                         </Accordion>
+                        <div className="bg-white rounded-2xl border border-gray-200 px-6 py-4 last:border-b">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Image size={20} />
+                                    Photo Gallery (
+                                    {collection?.photo_count ?? photos.length})
+                                </div>
+
+                                <div>
+                                    {(photos.length > 0 ||
+                                        galleryTotal > 0) && (
+                                        <MainButton
+                                            onClick={() =>
+                                                setConfirmDeleteAllOpen(true)
+                                            }
+                                            loading={deletingAll}
+                                            disabled={deletingAll}
+                                            loadingText="Deleting..."
+                                            icon={<Trash2 size={15} />}
+                                            label={"Delete all"}
+                                            variant="danger"
+                                            className="text-xs md:text-sm"
+                                        />
+                                    )}
+                                </div>
+                            </div>
+
+                            <div>
+                                <UploadErrorsList
+                                    errors={uploadErrors}
+                                    onClose={() => setUploadErrors([])}
+                                />
+
+                                <CollectionGallerySection
+                                    photos={galleryPhotos}
+                                    onDeletePhoto={handleDeletePhotoClick}
+                                    page={galleryPage}
+                                    total={galleryTotal}
+                                    pageSize={GALLERY_PAGE_SIZE}
+                                    onPageChange={(p) => setGalleryPage(p)}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -699,8 +708,28 @@ export default function CollectionDetailPage({
                 confirmLabel="Delete all"
                 cancelLabel="Cancel"
                 onConfirm={async () => {
-                    await deleteAllPhotos();
-                    setConfirmDeleteAllOpen(false);
+                    try {
+                        await deleteAllPhotos();
+
+                        // immediate local refresh so the UI doesn't show deleted photos
+                        // galleryPhotos is a paginated local state used by CollectionGallerySection
+                        setGalleryPhotos([]);
+                        setGalleryPage(1);
+
+                        // refresh server-side paginated list and liked list
+                        await fetchGalleryPageNow(1);
+                        await fetchLikedPageNow(1);
+
+                        // also refetch collection metadata (photo_count etc.)
+                        await fetchCollection();
+                    } catch (err) {
+                        console.error(
+                            "Error deleting all photos (onConfirm):",
+                            err
+                        );
+                    } finally {
+                        setConfirmDeleteAllOpen(false);
+                    }
                 }}
             />
 
