@@ -139,7 +139,7 @@ export default function DashboardPage() {
                             transition={{ duration: 0.5 }}
                             className="lg:col-span-2 bg-white rounded-2xl p-8 border border-gray-200"
                         >
-                            <p className="mt-2 text-slate-600 max-w-2xl">
+                            <p className="text-slate-600 max-w-2xl">
                                 Nowoczesny panel do organizowania, stylizowania
                                 i udostępniania Twojej fotografii. Nowy wygląd,
                                 skupiony na przejrzystości i szybkości.
@@ -166,7 +166,7 @@ export default function DashboardPage() {
                                             key={i}
                                             className="flex items-start gap-4 p-4 rounded-xl bg-white border border-gray-200"
                                         >
-                                            <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-slate-900">
+                                            <div className="p-4 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
                                                 <Icon className="w-5 h-5" />
                                             </div>
                                             <div>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                                         key={i}
                                         className="p-3 rounded-lg bg-gray-50 text-center"
                                     >
-                                        <div className="w-8 h-8 mx-auto rounded-full bg-gray-400 text-white font-bold flex items-center justify-center">
+                                        <div className="w-8 h-8 mx-auto rounded-full bg-gray-500 text-white font-bold flex items-center justify-center">
                                             {s.number}
                                         </div>
                                         <div className="mt-2 text-sm font-medium">
