@@ -71,10 +71,10 @@ export async function POST(req: NextRequest) {
                     .toBuffer(),
 
                 sharp(rotatedBuffer)
-                    .resize(1080, 1920, {
-                        fit: originalAspect < 1 ? "inside" : "cover",
+                    .resize(1080, 1080, {
+                        // fit: originalAspect < 1 ? "inside" : "cover",
                         position: "centre",
-                        withoutEnlargement: false,
+                        withoutEnlargement: true,
                         kernel: sharp.kernel.lanczos3,
                     })
                     .webp({
